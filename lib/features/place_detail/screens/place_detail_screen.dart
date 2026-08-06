@@ -1,0 +1,241 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/theme/app_theme.dart';
+import '../../home/models/place.dart';
+import '../../home/widgets/place_image_placeholder.dart';
+import '../../review/providers/review_providers.dart';
+import '../../review/widgets/review_form.dart';
+import '../../review/widgets/review_list_item.dart';
+import '../../review/widgets/star_rating.dart';
+import '../../saved/widgets/save_toggle_button.dart';
+import '../providers/place_detail_providers.dart';
+
+const _weekdayLabels = {
+  'mon': 'Thứ 2', 'tue': 'Thứ 3', 'wed': 'Thứ 4', 'thu': 'Thứ 5',
+  'fri': 'Thứ 6', 'sat': 'Thứ 7', 'sun': 'Chủ nhật',
+};
+const _weekdayOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+class PlaceDetailScreen extends ConsumerWidget {
+  const PlaceDetailScreen({super.key, required this.placeId});
+
+  final String placeId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final placeAsync = ref.watch(placeDetailProvider(placeId));
+
+    return Scaffold(
+      body: placeAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => Center(child: Text('Lỗi tải địa điểm: $error')),
+        data: (place) {
+          if (place == null) {
+            return const Center(child: Text('Không tìm thấy địa điểm.'));
+          }
+          return _PlaceDetailContent(place: place);
+        },
+      ),
+    );
+  }
+}
+
+class _PlaceDetailContent extends ConsumerWidget {
+  const _PlaceDetailContent({required this.place});
+
+  final Place place;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final target = (targetType: 'place', targetId: place.id);
+    final reviewsAsync = ref.watch(reviewsForTargetProvider(target));
+    final myReview = ref.watch(myReviewForTargetProvider(target));
+
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(
+          pinned: true,
+          expandedHeight: 240,
+          backgroundColor: AppColors.primary,
+          actions: [SaveToggleButton(placeId: place.id)],
+          flexibleSpace: FlexibleSpaceBar(
+            background: place.coverImage.isEmpty
+                ? PlaceImagePlaceholder(place: place)
+                : Image.network(place.coverImage, fit: BoxFit.cover),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(place.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
+                    ),
+                    if (place.has360)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                        ),
+                        child: const Text('360° VR', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Row(
+                  children: [
+                    StarRating(rating: place.ratingAvg),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text('${place.ratingAvg.toStringAsFixed(1)} (${place.ratingCount} đánh giá)'),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Wrap(
+                  spacing: AppSpacing.xs,
+                  children: place.tags
+                      .map((tag) => Chip(
+                            label: Text(tag, style: const TextStyle(fontSize: 12)),
+                            backgroundColor: AppColors.primary.withOpacity(0.08),
+                            side: BorderSide.none,
+                            visualDensity: VisualDensity.compact,
+                          ))
+                      .toList(),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                _InfoRow(icon: Icons.place_outlined, text: place.address),
+                _InfoRow(icon: Icons.access_time, text: _durationLabel(place.visitDurationMinutes)),
+                _InfoRow(icon: Icons.confirmation_number_outlined, text: _priceLabel(place.ticketPrice)),
+                if (place.openingHours.isNotEmpty) _OpeningHours(openingHours: place.openingHours),
+                if (place.has360) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () => context.push('/place/${place.id}/vr360'),
+                      icon: const Icon(Icons.threed_rotation),
+                      label: const Text('Trải nghiệm ngay 360°'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: const BorderSide(color: AppColors.primary),
+                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                      ),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: AppSpacing.lg),
+                const Text('Giới thiệu', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                const SizedBox(height: AppSpacing.xs),
+                Text(place.description, style: const TextStyle(color: AppColors.textPrimary)),
+                const SizedBox(height: AppSpacing.lg),
+                const Divider(),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  'Đánh giá (${reviewsAsync.valueOrNull?.where((r) => r.status == 'approved').length ?? 0})',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                ReviewForm(targetType: 'place', targetId: place.id, existingReview: myReview),
+                const SizedBox(height: AppSpacing.md),
+                reviewsAsync.when(
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (error, _) => Text('Lỗi tải đánh giá: $error'),
+                  data: (reviews) {
+                    if (reviews.isEmpty) {
+                      return const Text('Chưa có đánh giá nào cho địa điểm này.', style: TextStyle(color: AppColors.textSecondary));
+                    }
+                    return Column(
+                      children: [
+                        for (final review in reviews)
+                          ReviewListItem(review: review, isMine: review.userId == myReview?.userId),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _durationLabel(int minutes) {
+    if (minutes <= 0) return 'Chưa rõ thời gian tham quan';
+    final hours = minutes / 60;
+    final label = hours >= 1
+        ? '${hours.toStringAsFixed(hours.truncateToDouble() == hours ? 0 : 1)} giờ'
+        : '$minutes phút';
+    return 'Thời gian tham quan: $label';
+  }
+
+  String _priceLabel(int price) {
+    if (price <= 0) return 'Vé vào cổng: Miễn phí';
+    final s = price.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => '.');
+    return 'Vé vào cổng: $sđ';
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18, color: AppColors.textSecondary),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(child: Text(text)),
+        ],
+      ),
+    );
+  }
+}
+
+class _OpeningHours extends StatelessWidget {
+  const _OpeningHours({required this.openingHours});
+
+  final Map<String, String> openingHours;
+
+  @override
+  Widget build(BuildContext context) {
+    final values = openingHours.values.toSet();
+    final sameAllWeek = values.length == 1;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.schedule, size: 18, color: AppColors.textSecondary),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: sameAllWeek
+                ? Text('Giờ mở cửa: ${values.first} (cả tuần)')
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Giờ mở cửa:'),
+                      for (final day in _weekdayOrder)
+                        if (openingHours[day] != null)
+                          Text('${_weekdayLabels[day]}: ${openingHours[day]}', style: const TextStyle(fontSize: 13)),
+                    ],
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}

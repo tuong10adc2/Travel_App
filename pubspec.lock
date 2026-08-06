@@ -65,6 +65,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.3.0"
+  cloud_functions:
+    dependency: "direct main"
+    description:
+      name: cloud_functions
+      sha256: "036aa4f3b880935bda48fd6ab516e0f11686c328a46313226b9cbad9220b4c59"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.2.0"
+  cloud_functions_platform_interface:
+    dependency: transitive
+    description:
+      name: cloud_functions_platform_interface
+      sha256: "2a52ee909011b0f33ae2074b7a431bc2d7fff4618948d93d5e71830688e0733f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.8.12"
+  cloud_functions_web:
+    dependency: transitive
+    description:
+      name: cloud_functions_web
+      sha256: be032545ca1621248ffd251930952835593a9b8136895379930cecea766379a4
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.1.5"
   collection:
     dependency: transitive
     description:
@@ -166,6 +190,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_cube:
+    dependency: transitive
+    description:
+      name: flutter_cube
+      sha256: "71cf679a251166eb97f86751c56582b09abdbf859485fbf60524948813914c3b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.1"
   flutter_dotenv:
     dependency: "direct main"
     description:
@@ -344,6 +376,21 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  motion_sensors:
+    dependency: "direct overridden"
+    description:
+      path: "third_party/motion_sensors"
+      relative: true
+    source: path
+    version: "0.1.0"
+  panorama:
+    dependency: "direct main"
+    description:
+      name: panorama
+      sha256: "9e8b0908c3e4e2a223aff9a7d11670783179aa0ed18a84747b9d92a71aaeeccc"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.1"
   path:
     dependency: transitive
     description:

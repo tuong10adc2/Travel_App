@@ -1,0 +1,8 @@
+{
+  "name": "seed-vr360",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "firebase": "^11.0.0"
+  }
+}

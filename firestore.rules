@@ -90,7 +90,11 @@ service cloud.firestore {
 
     // ---------- reviews/{reviewId} ----------
     match /reviews/{reviewId} {
-      allow read: if resource.data.status == 'approved'
+      // resource == null trước để client get() kiểm tra tồn tại 1 review
+      // chưa từng tạo (vd trước khi submit) không bị lỗi — doc không tồn tại
+      // thì không có gì để lộ nên an toàn cho phép "đọc" (trả về null).
+      allow read: if resource == null
+        || resource.data.status == 'approved'
         || isOwner(resource.data.userId)
         || isSupport();
 
@@ -108,7 +112,11 @@ service cloud.firestore {
 
     // ---------- saved_places/{savedId} ----------
     match /saved_places/{savedId} {
-      allow read, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      // resource == null trước để client get() kiểm tra đã lưu chưa (trước khi
+      // toggle) không bị lỗi khi doc chưa từng tồn tại — giống fix ở reviews.
+      allow read: if resource == null
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
       allow update: if false;
     }
