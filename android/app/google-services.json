@@ -12,7 +12,20 @@
           "package_name": "com.tuong.travelai"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "591974579800-4cnk705uolrgpgul76vaatp37rjng55s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tuong.travelai",
+            "certificate_hash": "cb6cc849844b85c6cc9886cabc81ba4623c4615f"
+          }
+        },
+        {
+          "client_id": "591974579800-7gi7ascujl8v1cs9pn0h8njnaf34dkl0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDEQ41JmsOqlvUTrQtAizNdq8eR_qI1q2M"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "591974579800-7gi7ascujl8v1cs9pn0h8njnaf34dkl0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "591974579800-n3ickfqvho56jru3rg7fg0t94qv8oo10.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tuong.travelai"
+              }
+            }
+          ]
         }
       }
     }

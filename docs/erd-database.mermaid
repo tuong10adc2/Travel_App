@@ -1,0 +1,121 @@
+erDiagram
+    USERS ||--o{ ITINERARIES : "tao"
+    USERS ||--o{ SAVED_PLACES : "luu"
+    USERS ||--o{ REVIEWS : "viet"
+    USERS ||--o{ CHAT_HISTORY : "co"
+
+    PLACES ||--o{ MEDIA_360 : "co anh/video 360"
+    PLACES ||--o{ REVIEWS : "duoc danh gia"
+    PLACES ||--o{ SAVED_PLACES : "duoc luu"
+    PLACES ||--o{ ITINERARY_ITEMS : "xuat hien trong"
+    PLACES }o--o{ TOURS : "thuoc"
+
+    ITINERARIES ||--o{ ITINERARY_ITEMS : "gom (sub-collection)"
+
+    USERS {
+        string uid PK
+        string email
+        string displayName
+        string photoURL
+        string role "user | admin | content_editor | support"
+        array preferences
+        string language
+        bool isDisabled
+        timestamp createdAt
+        timestamp updatedAt
+    }
+
+    PLACES {
+        string id PK
+        string name
+        string description
+        string address
+        geopoint location
+        array tags
+        array images
+        string coverImage
+        map openingHours
+        number ticketPrice
+        number ratingAvg
+        number ratingCount
+        number visitDurationMinutes
+        bool isFeatured
+        bool isActive
+        bool has360
+        string createdBy FK
+        timestamp createdAt
+        timestamp updatedAt
+    }
+
+    MEDIA_360 {
+        string id PK
+        string placeId FK
+        string type "image | video"
+        string url
+        string title
+        number order
+        array hotspots
+        timestamp createdAt
+    }
+
+    TOURS {
+        string id PK
+        string name
+        string description
+        array placeIds FK
+        string coverImage
+        number price
+        number durationDays
+        bool isActive
+        timestamp createdAt
+        timestamp updatedAt
+    }
+
+    ITINERARIES {
+        string id PK
+        string userId FK
+        string name
+        timestamp startDate
+        timestamp endDate
+        bool isShared
+        string shareCode
+        timestamp createdAt
+        timestamp updatedAt
+    }
+
+    ITINERARY_ITEMS {
+        string id PK
+        string itineraryId FK
+        string placeId FK
+        number dayIndex
+        number order
+        string note
+        timestamp createdAt
+    }
+
+    REVIEWS {
+        string id PK
+        string placeId FK
+        string userId FK
+        number rating
+        string comment
+        array images
+        string status "pending | approved | hidden"
+        timestamp createdAt
+        timestamp updatedAt
+    }
+
+    SAVED_PLACES {
+        string id PK "userId_placeId"
+        string userId FK
+        string placeId FK
+        timestamp createdAt
+    }
+
+    CHAT_HISTORY {
+        string sessionId PK
+        string userId FK
+        string title
+        timestamp createdAt
+        timestamp updatedAt
+    }

@@ -15,6 +15,8 @@ class SplashScreen extends StatelessWidget {
             Icon(Icons.travel_explore, size: 64, color: AppColors.primary),
             SizedBox(height: AppSpacing.md),
             Text('Trợ lý du lịch AI', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+            SizedBox(height: AppSpacing.lg),
+            CircularProgressIndicator(color: AppColors.primary),
           ],
         ),
       ),

@@ -20,16 +20,17 @@
 > Đã làm thêm (chưa thuộc giai đoạn 0 nhưng dựng khung sẵn): `app_router.dart` (go_router) với 2 route `/` (Splash) và `/home`, `SplashScreen` và `HomeScreen` mới là UI placeholder tĩnh, chưa có logic/dữ liệu thật.
 ## GIAI ĐOẠN 1 — Database & Auth
  
-- [ ] Từ file ERD, thiết kế collection Firestore: `users`, `places`, `media_360`, `tours`, `itineraries` (với sub-collection `itinerary_items`), `reviews`, `saved_places`, `chat_history`
-- [ ] Viết Firestore Security Rules cơ bản cho từng collection (đọc/ghi theo `request.auth.uid`, role admin)
-- [ ] Setup Firebase Authentication (Email/password)
-- [ ] Setup đăng nhập Google (OAuth) qua Firebase Auth
-- [ ] Màn hình Splash
-- [ ] Màn hình Đăng ký
-- [ ] Màn hình Đăng nhập
-- [ ] Màn hình Quên mật khẩu
-- [ ] Màn hình Hồ sơ cá nhân (xem/sửa thông tin)
-- [ ] Test luồng đăng ký → đăng nhập → đăng xuất hoàn chỉnh
+- [x] Từ file ERD, thiết kế collection Firestore: `users`, `places`, `media_360`, `tours`, `itineraries` (với sub-collection `itinerary_items`), `reviews`, `saved_places`, `chat_history` — xem `docs/erd-database.mermaid` và `docs/firestore-schema.md`
+- [x] Viết Firestore Security Rules cơ bản cho từng collection (đọc/ghi theo `request.auth.uid`, role admin) — `firestore.rules` (đã validate compile thành công), index đề xuất tại `firestore.indexes.json`
+- [x] Setup Firebase Authentication (Email/password) — code: `lib/features/auth/data/auth_repository.dart` (+ `firebase_providers.dart`, `auth_exception.dart`); provider Email/Password đã bật trên Firebase Console (xác nhận bằng screenshot)
+- [x] Setup đăng nhập Google (OAuth) qua Firebase Auth (Android — dự án chỉ target Android, bỏ iOS/Web) — code `AuthRepository.signInWithGoogle()` đã xong; provider Google đã bật trên Console; đã tạo debug keystore + đăng ký SHA-1 debug (`CB:6C:C8:49:84:4B:85:C6:CC:98:86:CA:BC:81:BA:46:23:C4:61:5F`) qua `firebase apps:android:sha:create`, tải lại `android/app/google-services.json` (đã có `oauth_client`)
+**Còn thiếu**: cài app lên thiết bị/emulator thật và bấm nút đăng nhập Google để test luồng thật (chưa test tương tác UI, chỉ xác nhận build+config đúng)
+- [x] Màn hình Splash — `splash_screen.dart`, chỉ hiển thị loading; điều hướng thật xử lý ở `app_router.dart` (redirect theo `authStateChangesProvider`)
+- [x] Màn hình Đăng ký — `register_screen.dart` (họ tên, email, mật khẩu, xác nhận mật khẩu) → gọi `AuthRepository.signUpWithEmail`
+- [x] Màn hình Đăng nhập — `login_screen.dart` (email/mật khẩu + nút Google) → gọi `signInWithEmail` / `signInWithGoogle`
+- [x] Màn hình Quên mật khẩu — `forgot_password_screen.dart` → gọi `sendPasswordResetEmail`
+- [x] Màn hình Hồ sơ cá nhân (xem/sửa thông tin) — `profile_screen.dart` đọc realtime từ `users/{uid}` qua `currentUserDocProvider`; sửa họ tên/số điện thoại → `AuthRepository.updateProfile()` (cập nhật cả `FirebaseAuth.displayName` và Firestore); nút đăng xuất chuyển từ Home vào đây; route `/profile`, vào từ icon trên AppBar Home
+- [x] Test luồng đăng ký → đăng nhập → đăng xuất hoàn chỉnh — chạy app thật (`flutter run -d web-server`) + script Playwright tự động bấm UI thật, nối Firebase project thật (`travelapp-7f140`), không mock: Đăng ký → tự đăng nhập → vào Home → mở Profile xác nhận `displayName` đọc đúng từ Firestore (ảnh chụp) → Đăng xuất → Đăng nhập lại đúng tài khoản → Đăng xuất lần 2. Không còn lỗi console. **Phát hiện + đã sửa bug thật**: `firestore.rules` viết từ Giai đoạn 1 chưa từng được deploy lên project thật (chỉ mới `--dry-run`) → gây `permission-denied` khi đọc/ghi `users/{uid}`; đã `firebase deploy --only firestore:rules,firestore:indexes` (đã sửa luôn 1 index sai — single-field index cho `itinerary_items.placeId` không hợp lệ trong composite indexes, Firestore tự tạo single-field index nên bỏ luôn). **Lưu ý**: còn vài tài khoản test (`qa.test.*@travelai-test.local`) tạo ra trong lúc test, có thể xoá trong Firebase Console > Authentication nếu muốn dọn sạch; test bằng browser (web-server) nên vẫn chưa test tay trên emulator/thiết bị Android thật
 ## GIAI ĐOẠN 2 — Trang chủ & Khám phá
  
 - [ ] Seed dữ liệu mẫu cho collection `places` (5-10 địa điểm)
