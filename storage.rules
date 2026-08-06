@@ -1,0 +1,19 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ---------- media_360/** ----------
+    // Ảnh 360 công khai xem được (khớp rule đọc của Firestore media_360:
+    // allow read: if true), chỉ content editor/admin được upload.
+    match /media_360/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in ['admin', 'content_editor'];
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

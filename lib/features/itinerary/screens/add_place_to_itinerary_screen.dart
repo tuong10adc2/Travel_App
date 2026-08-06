@@ -1,0 +1,131 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/theme/app_theme.dart';
+import '../../home/models/place.dart';
+import '../../home/providers/places_providers.dart';
+import '../../home/widgets/place_image_placeholder.dart';
+import '../data/itinerary_repository.dart';
+
+class AddPlaceToItineraryScreen extends ConsumerStatefulWidget {
+  const AddPlaceToItineraryScreen({super.key, required this.itineraryId, required this.dayIndex});
+
+  final String itineraryId;
+  final int dayIndex;
+
+  @override
+  ConsumerState<AddPlaceToItineraryScreen> createState() => _AddPlaceToItineraryScreenState();
+}
+
+class _AddPlaceToItineraryScreenState extends ConsumerState<AddPlaceToItineraryScreen> {
+  final _searchController = TextEditingController();
+  String _query = '';
+  String? _addingPlaceId;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _add(Place place) async {
+    setState(() => _addingPlaceId = place.id);
+    try {
+      await ref.read(itineraryRepositoryProvider).addItem(
+            itineraryId: widget.itineraryId,
+            placeId: place.id,
+            dayIndex: widget.dayIndex,
+          );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Đã thêm "${place.name}" vào Ngày ${widget.dayIndex + 1}')),
+        );
+        context.pop();
+      }
+    } finally {
+      if (mounted) setState(() => _addingPlaceId = null);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final placesAsync = ref.watch(placesProvider);
+    final query = _query.trim().toLowerCase();
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Thêm địa điểm · Ngày ${widget.dayIndex + 1}')),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) => setState(() => _query = value),
+              decoration: InputDecoration(
+                hintText: 'Tìm địa điểm...',
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: AppColors.surface,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: placesAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, _) => Center(child: Text('Lỗi tải địa điểm: $error')),
+              data: (places) {
+                final filtered = query.isEmpty
+                    ? places
+                    : places.where((p) => p.name.toLowerCase().contains(query)).toList();
+                if (filtered.isEmpty) {
+                  return const Center(
+                    child: Text('Không tìm thấy địa điểm phù hợp', style: TextStyle(color: AppColors.textSecondary)),
+                  );
+                }
+                return ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                  itemCount: filtered.length,
+                  separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.sm),
+                  itemBuilder: (context, index) {
+                    final place = filtered[index];
+                    final isAdding = _addingPlaceId == place.id;
+                    return Card(
+                      clipBehavior: Clip.antiAlias,
+                      child: ListTile(
+                        leading: SizedBox(
+                          width: 48,
+                          height: 48,
+                          child: place.coverImage.isEmpty
+                              ? PlaceImagePlaceholder(place: place)
+                              : Image.network(place.coverImage, fit: BoxFit.cover),
+                        ),
+                        title: Text(place.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                        subtitle: Text(place.address, maxLines: 1, overflow: TextOverflow.ellipsis),
+                        trailing: isAdding
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : IconButton(
+                                icon: const Icon(Icons.add_circle_outline, color: AppColors.primary),
+                                onPressed: () => _add(place),
+                              ),
+                        onTap: isAdding ? null : () => _add(place),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
