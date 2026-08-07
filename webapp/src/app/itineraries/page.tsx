@@ -32,9 +32,14 @@ function ItinerariesInner() {
         setItems(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Itinerary, "id">) })));
         setLoading(false);
       },
-      () => setLoading(false)
+      (err) => {
+        console.error("Không tải được danh sách lịch trình", err);
+        toast.error("Không tải được danh sách lịch trình.");
+        setLoading(false);
+      }
     );
     return () => unsub();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   async function handleDelete(it: Itinerary) {
