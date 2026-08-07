@@ -37,10 +37,12 @@ service cloud.firestore {
         && request.resource.data.isDisabled == false;
 
       // Chủ tài khoản được sửa hồ sơ của mình nhưng không được tự đổi role/isDisabled.
+      // Support được khoá/mở khoá tài khoản (isDisabled) nhưng không được đổi role.
       allow update: if (isOwner(userId)
           && request.resource.data.role == resource.data.role
           && request.resource.data.isDisabled == resource.data.isDisabled)
-        || isAdmin();
+        || isAdmin()
+        || (isSupport() && request.resource.data.role == resource.data.role);
 
       allow delete: if isAdmin();
 
@@ -119,6 +121,15 @@ service cloud.firestore {
       allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
       allow update: if false;
+    }
+
+    // ---------- audit_logs/{logId} (Admin Dashboard) ----------
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn()
+        && request.resource.data.actorUid == request.auth.uid
+        && (isContentEditor() || isSupport());
+      allow update, delete: if false;
     }
   }
 }

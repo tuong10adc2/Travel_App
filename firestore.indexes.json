@@ -19,6 +19,22 @@
       ]
     },
     {
+      "collectionGroup": "media_360",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "placeId", "order": "ASCENDING" },
+        { "fieldPath": "order", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "itinerary_items",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "dayIndex", "order": "ASCENDING" },
+        { "fieldPath": "order", "order": "ASCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "reviews",
       "queryScope": "COLLECTION",
       "fields": [
