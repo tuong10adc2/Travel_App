@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+:root {
+  /* Bảng màu theo đúng theme app Flutter (lib/core/theme/app_theme.dart):
+     primary #0E7C66, secondary #F2A93B, error #D64545. */
+  --background: #f7f7f5;
+  --foreground: #1c1c1e;
+
+  --brand-50: #eaf6f3;
+  --brand-100: #d2ece5;
+  --brand-200: #a6d9cc;
+  --brand-300: #71c0ac;
+  --brand-500: #1c9a80;
+  --brand-600: #0e7c66;
+  --brand-700: #0b6553;
+  --brand-800: #094f42;
+  --brand-900: #073b32;
+
+  --accent-500: #f2a93b;
+  --accent-600: #d99120;
+
+  --surface: #ffffff;
+  --surface-muted: #f1f1ef;
+  --border: #e4e4e0;
+  --muted-foreground: #6b6b6f;
+
+  --success-50: #ecfdf5;
+  --success-600: #0e7c66;
+  --warning-50: #fef6e7;
+  --warning-600: #c8830a;
+  --danger-50: #fdecec;
+  --danger-600: #d64545;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+
+  --color-accent-500: var(--accent-500);
+  --color-accent-600: var(--accent-600);
+
+  --color-success-50: var(--success-50);
+  --color-success-600: var(--success-600);
+  --color-warning-50: var(--warning-50);
+  --color-warning-600: var(--warning-600);
+  --color-danger-50: var(--danger-50);
+  --color-danger-600: var(--danger-600);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+::selection {
+  background: var(--brand-200);
+}

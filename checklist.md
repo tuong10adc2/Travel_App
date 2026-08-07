@@ -81,27 +81,40 @@
 - [x] Hiển thị danh sách đánh giá ở màn Chi tiết Tour — tái dùng `ReviewForm`/`ReviewListItem` với `targetType: 'tour'`
 - [x] Test toàn bộ luồng: xem danh sách tour → xem chi tiết → chuyển thành lịch trình → sửa lịch trình vừa tạo → quay lại đánh giá tour — chạy app thật (`flutter run -d web-server`) + script Playwright tự động bấm UI thật, nối Firebase project thật, không mock: đăng ký tài khoản → tab "Tours" hiện đủ 5 tour đúng tên/giá/số ngày/số điểm → mở "Sa Pa mùa lúa chín" xem đủ thông tin → bấm "Thêm vào lịch trình của tôi" → điền tên + ngày → tạo → sang đúng màn Chi tiết lịch trình có 3 ngày với Sa Pa ở Ngày 1 → quay lại tour → chọn 5 sao + viết bình luận → gửi → SnackBar xác nhận "chờ duyệt", form chuyển sang chế độ "Sửa đánh giá của bạn". Không còn lỗi Firestore/console (chỉ 1 cảnh báo benign VideoFrame GC). **Phát hiện + sửa 2 bug thật khi test**: (1) `TourCard` dùng `AspectRatio` trực tiếp trong `Row` không bọc `SizedBox`/`Expanded` → `RenderAspectRatio has unbounded constraints`, làm cả `ListView.builder` crash và render trắng toàn màn hình — sửa bằng `SizedBox(width: 100, height: 100)` bọc ngoài; (2) `createItineraryFromTour()` ban đầu gộp chung 1 `WriteBatch` để tạo `itinerary` cha và `itinerary_items` con cùng lúc → `permission-denied`, vì rule của `itinerary_items` đọc `get()` doc cha để kiểm tra chủ sở hữu, mà trong 1 batch chưa commit thì doc cha "chưa tồn tại" theo góc nhìn của rule — sửa bằng cách `await` tạo xong `itinerary` trước, rồi mới batch-ghi `itinerary_items` sau. **Lưu ý**: test qua trình duyệt (web-server), chưa test tay trên emulator/thiết bị Android thật
 ## GIAI ĐOẠN 7 — Admin Dashboard (Next.js)
- 
-- [ ] Tạo project Next.js riêng cho Admin
-- [ ] Setup Auth riêng cho admin (kiểm tra custom claim hoặc field `role` trong document `users`, dùng Firebase Admin SDK trong Next.js)
-- [ ] Trang quản lý người dùng (danh sách, khoá/mở tài khoản)
-- [ ] Trang CRUD địa điểm/tour (thêm/sửa/xoá, upload ảnh)
-- [ ] Trang upload & gắn ảnh 360° vào địa điểm
-- [ ] Trang duyệt/ẩn/xoá đánh giá
-- [ ] Trang chọn nội dung nổi bật hiển thị trang chủ app
-- [ ] Trang thống kê cơ bản (số user mới, lượt xem, địa điểm hot)
-- [ ] Test luồng: đăng nhập admin → thêm địa điểm mới → kiểm tra hiện trên app
+
+> Chạy độc lập với app Flutter, chỉ dùng chung Firebase (Firestore + Auth), không cần Cloud Functions
+> nên không bị chặn bởi việc chưa bật gói Blaze. Giao diện theo tông xanh brand (tham khảo thiết kế web
+> "VietGuide AI" bạn gửi). Bảo mật thật sự nằm ở `firestore.rules` (role-based) — phần "guard" phía
+> client trong admin chỉ là UX, không phải lớp bảo mật chính.
+
+- [x] Tạo project Next.js riêng cho Admin — `admin/` (Next.js 16 App Router, TypeScript, Tailwind v4, tự dựng UI bằng Tailwind thuần thay vì shadcn CLI vì CLI yêu cầu tương tác không tự động hoá được); đăng ký thêm 1 Firebase Web App riêng "TravelAI Admin" trong project `travelapp-7f140` để lấy config
+- [x] Setup Auth riêng cho admin — **không dùng Admin SDK/service account** (tránh phải quản lý key nhạy cảm cho 1 đồ án): đăng nhập bằng Firebase Auth client SDK (email/password, dùng chung tài khoản với app), `contexts/auth-context.tsx` đọc field `role` trong `users/{uid}` qua `onSnapshot`, tính quyền theo role (`admin` / `content_editor` / `support`) rồi gate route ở `(dashboard)/layout.tsx`. Bảo mật thật nằm ở `firestore.rules` (role-based), không phải ở lớp guard này. Đã mở rộng rule `users` cho phép `support` khoá/mở tài khoản (`isDisabled`) nhưng không đổi được `role` — khớp đúng phân quyền "Super Admin / Content Editor / Support" trong kế hoạch ban đầu; đã deploy
+- [x] Trang quản lý người dùng — `(dashboard)/users/page.tsx`: tìm theo tên/email, đổi quyền (chỉ admin), khoá/mở tài khoản (admin + support), link nhanh sang "Xem đánh giá" của từng user (lọc `reviews` theo `userId`)
+- [x] Trang CRUD địa điểm/tour — `place-form.tsx`/`tour-form.tsx` dùng chung cho tạo/sửa: tag, giờ mở cửa theo từng ngày, giá vé, thời gian tham quan, toạ độ, ảnh bìa (upload Storage hoặc dán URL trực tiếp — dán URL luôn hoạt động kể cả khi Storage chưa bật), thư viện ảnh; danh sách có bật/tắt nổi bật/hoạt động, xoá có xác nhận
+- [x] Trang upload & gắn ảnh 360° — `places/[id]/media360/page.tsx`: thêm điểm nhìn (ảnh 360° qua upload hoặc URL), chỉnh hotspot liên kết giữa các điểm nhìn cùng địa điểm (chọn điểm đích + yaw/pitch), tự đồng bộ `has360` trên `places` theo số điểm nhìn còn lại
+- [x] Trang duyệt/ẩn/xoá đánh giá — `reviews/page.tsx`: tab Chờ duyệt/Đã duyệt/Đã ẩn/Tất cả, join tên người đánh giá + tên địa điểm/tour, hỗ trợ lọc theo `?userId=` từ trang Người dùng
+- [x] Trang chọn nội dung nổi bật — gộp vào trang Địa điểm (nút bật/tắt "Nổi bật" ngay trong danh sách) thay vì làm trang riêng, vì hệ thống hiện chưa có collection banner/tin tức trong ERD nên không có gì khác để quản lý ở mục này
+- [x] Trang thống kê cơ bản — `(dashboard)/page.tsx`: số người dùng, địa điểm đang hoạt động/tổng, địa điểm có VR 360°, số tour, số đánh giá chờ duyệt (dùng `getCountFromServer`, không tốn đọc toàn bộ document); thêm trang **Nhật ký thao tác** (`audit-log`, admin-only) ghi lại các hành động quản trị (tạo/sửa/xoá địa điểm-tour, khoá/mở tài khoản, duyệt/ẩn đánh giá) vào collection mới `audit_logs` (đã thêm rule + deploy)
+- [x] Test luồng: đăng nhập admin → thêm địa điểm mới → kiểm tra hiện trên app — build/lint sạch, sau đó test thật bằng Playwright trên dữ liệu Firestore thật của project (`travelapp-7f140`), không mock: đăng nhập → tất cả trang điều hướng đúng theo role → tạo địa điểm mới → hiện ngay trong danh sách (đã xoá dọn sau test) → duyệt 1 đánh giá thật → ghi đúng vào Nhật ký thao tác → thêm ảnh 360° + hotspot cho "Vịnh Hạ Long". Không còn lỗi console. **Phát hiện + đã sửa 1 bug thật khi test**: trang ảnh 360° ghi được vào Firestore nhưng danh sách không hiển thị lại do thiếu composite index (`media_360`: `placeId` + `order`) và lỗi `onSnapshot` bị nuốt âm thầm không báo — đã thêm index (đã deploy) và sửa để lỗi hiện toast + `console.error` rõ ràng thay vì im lặng, áp dụng luôn cho các trang danh sách khác (Địa điểm/Tour/Đánh giá/Nhật ký). **Lưu ý**: "Trang CRUD địa điểm/tour" upload ảnh qua Storage sẽ báo lỗi nhẹ nhàng (gợi ý dán URL thay thế) cho tới khi Firebase Storage được bật (xem việc cần làm Giai đoạn 4); chưa test tay trên trình duyệt thật ngoài Playwright headless.
 ## GIAI ĐOẠN 8 — Web (Next.js)
- 
-- [ ] Tạo project Next.js cho Web người dùng
-- [ ] Landing page giới thiệu (theo tham khảo VietGuide AI)
-- [ ] Trang Khám phá (list + tìm kiếm + filter) — tái dùng API đã có
-- [ ] Trang Chi tiết địa điểm
-- [ ] Trang Chat AI
-- [ ] Trang VR 360° (dùng thư viện panorama viewer cho web, ví dụ Pannellum hoặc Three.js)
-- [ ] Trang Lịch trình
-- [ ] Responsive kiểm tra trên mobile/tablet/desktop
-- [ ] Test đăng nhập/đăng ký trên web hoạt động đúng, dùng chung tài khoản với app
+
+> `webapp/` (tách biệt hoàn toàn với `web/` — đó là thư mục nền tảng Web của Flutter, không đụng tới).
+> Cùng stack với Admin (Next.js App Router + Tailwind v4 + Firebase client SDK), dùng chung 1 Firebase
+> project/tài khoản với app & admin. Tông màu chủ đạo lấy đúng theme thật của app Flutter (`#0E7C66`),
+> bố cục hero/stat/card tham khảo layout ảnh mẫu "VietGuide AI" người dùng gửi. Tối ưu cho desktop
+> (container rộng, grid nhiều cột, sidebar sticky ở trang chi tiết) nhưng vẫn responsive xuống mobile.
+
+- [x] Tạo project Next.js cho Web người dùng — `webapp/`, đăng ký thêm 1 Firebase Web App riêng "TravelAI Web"; cài `@photo-sphere-viewer/core` + `markers-plugin` cho VR 360°
+- [x] Landing page giới thiệu — hero gradient + ô tìm kiếm, dải thống kê **lấy số thật từ Firestore** (`getCountFromServer`, không hardcode), khối tính năng (AI/VR/Lịch trình/Đa ngôn ngữ), địa điểm nổi bật, CTA cuối trang
+- [x] Trang Khám phá — `/explore`: tìm theo tên/địa chỉ + lọc tag, grid 4 cột ở desktop, đọc trực tiếp Firestore `places` (không qua API riêng, đúng kiến trúc "1 backend nhiều client")
+- [x] Trang Chi tiết địa điểm — `/places/[id]`: gallery ảnh, giờ mở cửa (rút gọn "Cả tuần" nếu giống nhau, giống logic app Flutter), nút Lưu (tim), nút "Thêm vào lịch trình" (chọn lịch trình + ngày có sẵn), khối đánh giá (viết/sửa đánh giá của mình + danh sách đã duyệt), CTA "Trải nghiệm VR 360°" khi `has360`
+- [x] Trang Tour — `/tours` (list) + `/tours/[id]` (chi tiết, danh sách địa điểm, đánh giá, nút "Thêm vào lịch trình của tôi" tự tạo lịch trình mới + chia đều địa điểm theo số ngày, giống hệt logic `createItineraryFromTour` bên Flutter)
+- [x] Trang Chat AI — `/chat`: giao diện hội thoại, lưu lịch sử vào đúng path `users/{uid}/chat_history/default/messages` (khớp schema Flutter dùng chung), gợi ý địa điểm dạng card khi AI trả tool `suggest_places`. **Chưa gọi được thật** vì Cloud Functions vẫn chờ bạn bật Blaze (xem việc cần làm Giai đoạn 3) — đã xử lý graceful: bắt lỗi và hiện toast thông báo trợ lý chưa khả dụng thay vì crash
+- [x] Trang VR 360° — `/places/[id]/vr360`: dùng `@photo-sphere-viewer/core`, hotspot từ Admin (yaw/pitch/targetMediaId) chuyển thành marker bấm được để nhảy giữa các điểm nhìn cùng địa điểm, dải chip chọn nhanh điểm nhìn khi có nhiều hơn 1
+- [x] Trang Lịch trình — `/itineraries` (danh sách + xoá) , `/itineraries/new` (tạo), `/itineraries/[id]` (thêm địa điểm theo ngày qua modal tìm kiếm, xoá, **kéo-thả sắp xếp lại thứ tự trong ngày** bằng HTML5 drag-and-drop, "+ Thêm ngày" nới `endDate`)
+- [x] Trang Đã lưu (`/saved`) và Hồ sơ cá nhân (`/profile`: sửa họ tên/số điện thoại/ngôn ngữ, đăng xuất) — làm thêm ngoài checklist gốc vì đây là chức năng "đầy đủ" của app cần có trên web
+- [x] Responsive kiểm tra trên mobile/tablet/desktop — Tailwind responsive classes (`sm:`/`lg:`) xuyên suốt, navbar có menu mobile riêng; **mới kiểm tra kỹ ở viewport desktop (1400px)** qua Playwright, chưa test tay trên thiết bị mobile/tablet thật
+- [x] Test đăng nhập/đăng ký trên web hoạt động đúng, dùng chung tài khoản với app — đăng ký ghi đúng `users/{uid}` theo schema chung (`role: 'user'`, `isDisabled: false`); test thật bằng Playwright trên dữ liệu Firestore thật của project `travelapp-7f140` (không mock), đăng nhập bằng tài khoản `admin@gmail.com` đã dùng cho Admin Dashboard: duyệt Khám phá → xem chi tiết địa điểm → Lưu → viết đánh giá → tạo lịch trình → thêm địa điểm theo ngày → thêm ngày → xoá địa điểm → xem Tour → "Thêm vào lịch trình của tôi" → Đã lưu → Hồ sơ → Chat AI (lỗi graceful đúng như kỳ vọng). Đã dọn sạch dữ liệu test sau khi xong. **Phát hiện + đã sửa 3 bug thật khi test**: (1) thiếu composite index `itinerary_items` (`dayIndex` + `order`) khiến trang chi tiết lịch trình đọc dữ liệu bị lỗi âm thầm — đã thêm index + deploy; (2) nút "Hỏi trợ lý AI" ở khối CTA trang chủ bị mất chữ do class Tailwind tự viết đè (`bg-transparent`/`text-white`) xung đột thứ tự với class gốc của variant `outline` — sửa bằng cách thêm hẳn 1 variant `outlineInverse` riêng cho nút trên nền màu thay vì đè class; (3) trang Chat bị đẩy layout lệch hẳn lên trên (header/tin nhắn khuất khỏi khung nhìn) do `scrollIntoView({behavior:'smooth'})` mặc định `block:'start'` chạy ngay cả khi chưa có tin nhắn nào — sửa bằng cách bỏ qua khi danh sách tin nhắn rỗng và thêm `block:'nearest'`
 ## GIAI ĐOẠN 9 — Hoàn thiện & nộp đồ án
  
 - [ ] Push notification (FCM) cho các sự kiện: gợi ý mới, nhắc lịch trình
