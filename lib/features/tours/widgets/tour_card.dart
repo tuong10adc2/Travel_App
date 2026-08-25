@@ -37,20 +37,23 @@ class TourCard extends StatelessWidget {
             SizedBox(
               width: 100,
               height: 100,
-              child: tour.coverImage.isEmpty
-                  ? Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: colors,
+              child: Hero(
+                tag: 'tour-image-${tour.id}',
+                child: tour.coverImage.isEmpty
+                    ? Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: colors,
+                          ),
                         ),
-                      ),
-                      child: const Center(
-                        child: Icon(Icons.card_travel, size: 32, color: Colors.white70),
-                      ),
-                    )
-                  : AppNetworkImage(url: tour.coverImage),
+                        child: const Center(
+                          child: Icon(Icons.card_travel, size: 32, color: Colors.white70),
+                        ),
+                      )
+                    : AppNetworkImage(url: tour.coverImage),
+              ),
             ),
             Expanded(
               child: Padding(
@@ -74,11 +77,11 @@ class TourCard extends StatelessWidget {
                     const SizedBox(height: AppSpacing.xs),
                     Row(
                       children: [
-                        const Icon(Icons.calendar_month_outlined, size: 14, color: AppColors.textSecondary),
+                        Icon(Icons.calendar_month_outlined, size: 14, color: context.colors.textSecondary),
                         const SizedBox(width: 4),
                         Text('${tour.durationDays} ngày', style: Theme.of(context).textTheme.bodySmall),
                         const SizedBox(width: AppSpacing.sm),
-                        const Icon(Icons.place_outlined, size: 14, color: AppColors.textSecondary),
+                        Icon(Icons.place_outlined, size: 14, color: context.colors.textSecondary),
                         const SizedBox(width: 4),
                         Text('${tour.placeIds.length} điểm', style: Theme.of(context).textTheme.bodySmall),
                       ],

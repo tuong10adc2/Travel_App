@@ -24,6 +24,8 @@ class MyApp extends ConsumerWidget {
       title: 'Trợ lý du lịch AI',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.system,
       routerConfig: router,
     );
   }

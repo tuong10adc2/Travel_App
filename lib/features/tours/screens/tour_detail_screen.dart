@@ -68,9 +68,12 @@ class _TourDetailContent extends ConsumerWidget {
           expandedHeight: 220,
           backgroundColor: AppColors.primary,
           flexibleSpace: FlexibleSpaceBar(
-            background: tour.coverImage.isEmpty
-                ? Container(color: AppColors.primary, child: const Center(child: Icon(Icons.card_travel, size: 56, color: Colors.white70)))
-                : AppNetworkImage(url: tour.coverImage),
+            background: Hero(
+              tag: 'tour-image-${tour.id}',
+              child: tour.coverImage.isEmpty
+                  ? Container(color: AppColors.primary, child: const Center(child: Icon(Icons.card_travel, size: 56, color: Colors.white70)))
+                  : AppNetworkImage(url: tour.coverImage),
+            ),
           ),
         ),
         SliverToBoxAdapter(
@@ -91,11 +94,11 @@ class _TourDetailContent extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.md),
                 Row(
                   children: [
-                    const Icon(Icons.calendar_month_outlined, size: 18, color: AppColors.textSecondary),
+                    Icon(Icons.calendar_month_outlined, size: 18, color: context.colors.textSecondary),
                     const SizedBox(width: AppSpacing.sm),
                     Text('${tour.durationDays} ngày'),
                     const SizedBox(width: AppSpacing.lg),
-                    const Icon(Icons.place_outlined, size: 18, color: AppColors.textSecondary),
+                    Icon(Icons.place_outlined, size: 18, color: context.colors.textSecondary),
                     const SizedBox(width: AppSpacing.sm),
                     Text('${tour.placeIds.length} địa điểm'),
                   ],
@@ -152,7 +155,7 @@ class _TourDetailContent extends ConsumerWidget {
                     if (reviews.isEmpty) {
                       return Text(
                         'Chưa có đánh giá nào cho tour này.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
                       );
                     }
                     return Column(
@@ -236,7 +239,7 @@ class _TourDetailContent extends ConsumerWidget {
                       decoration: const InputDecoration(labelText: 'Ngày bắt đầu'),
                       child: Row(
                         children: [
-                          const Icon(Icons.calendar_today_outlined, size: 18, color: AppColors.textSecondary),
+                          Icon(Icons.calendar_today_outlined, size: 18, color: dialogContext.colors.textSecondary),
                           const SizedBox(width: AppSpacing.sm),
                           Text(formatDateVi(startDate)),
                         ],

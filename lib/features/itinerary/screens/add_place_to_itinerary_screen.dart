@@ -68,7 +68,7 @@ class _AddPlaceToItineraryScreenState extends ConsumerState<AddPlaceToItineraryS
                 hintText: 'Tìm địa điểm...',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
-                fillColor: AppColors.surface,
+                fillColor: context.colors.surface,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.lg),
                   borderSide: BorderSide.none,
@@ -88,7 +88,7 @@ class _AddPlaceToItineraryScreenState extends ConsumerState<AddPlaceToItineraryS
                   return Center(
                     child: Text(
                       'Không tìm thấy địa điểm phù hợp',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
                     ),
                   );
                 }

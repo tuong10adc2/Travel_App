@@ -63,9 +63,12 @@ class _PlaceDetailContent extends ConsumerWidget {
           backgroundColor: AppColors.primary,
           actions: [SaveToggleButton(placeId: place.id)],
           flexibleSpace: FlexibleSpaceBar(
-            background: place.coverImage.isEmpty
-                ? PlaceImagePlaceholder(place: place)
-                : AppNetworkImage(url: place.coverImage),
+            background: Hero(
+              tag: 'place-image-${place.id}',
+              child: place.coverImage.isEmpty
+                  ? PlaceImagePlaceholder(place: place)
+                  : AppNetworkImage(url: place.coverImage),
+            ),
           ),
         ),
         SliverToBoxAdapter(
@@ -158,7 +161,7 @@ class _PlaceDetailContent extends ConsumerWidget {
                     if (reviews.isEmpty) {
                       return Text(
                         'Chưa có đánh giá nào cho địa điểm này.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
                       );
                     }
                     return Column(
@@ -206,7 +209,7 @@ class _InfoRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: AppColors.textSecondary),
+          Icon(icon, size: 18, color: context.colors.textSecondary),
           const SizedBox(width: AppSpacing.sm),
           Expanded(child: Text(text, style: Theme.of(context).textTheme.bodyMedium)),
         ],
@@ -230,7 +233,7 @@ class _OpeningHours extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.schedule, size: 18, color: AppColors.textSecondary),
+          Icon(Icons.schedule, size: 18, color: context.colors.textSecondary),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: sameAllWeek

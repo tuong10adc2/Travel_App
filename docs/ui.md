@@ -71,45 +71,67 @@
 - `admin/src/components/ui/activity-chart.tsx`: đổi màu series từ hex cứng sang `var(--brand-600)`/
   `var(--warning-600)` để chart tự đổi màu theo theme luôn, không cần logic JS phát hiện dark mode.
 
-**Chưa làm**: dark mode cho Flutter app (`AppTheme.dark`) — xem mục 2 trong "Hướng tiếp theo" bên dưới,
-vẫn còn nguyên vì lần này chỉ làm webapp + admin theo đúng phạm vi đã thống nhất.
+### 6. Flutter app: dark mode, Hero animation, micro-interaction, illustration nhẹ
+- **Dark mode thật** — tách `AppColors` (chỉ còn màu thương hiệu tĩnh: `primary/primaryDark/secondary/
+  error`) khỏi màu phụ thuộc theme (`background/surface/textPrimary/textSecondary/divider/shimmer*`),
+  đưa nhóm sau vào `AppSemanticColors extends ThemeExtension<AppSemanticColors>` đăng ký qua
+  `ThemeData.extensions` ở cả `AppTheme.light` và `AppTheme.dark` mới — đây là cách Flutter làm tương
+  đương "CSS custom property" mà webapp/admin có sẵn qua Tailwind, Flutter không có cơ chế miễn phí
+  tương tự nên phải làm ThemeExtension. Truy cập qua extension tiện `context.colors.X` (định nghĩa ngay
+  trong `app_theme.dart`) thay vì gọi `Theme.of(context).extension<AppSemanticColors>()!` dài dòng.
+  `MyApp` (`main.dart`) thêm `darkTheme: AppTheme.dark, themeMode: ThemeMode.system` — tự theo theme hệ
+  điều hành, không có nút chuyển tay riêng (khác webapp/admin) vì Flutter đã tôn trọng cài đặt hệ thống
+  của thiết bị theo mặc định.
+  - Đã quét & sửa toàn bộ ~13 file còn tham chiếu thẳng `AppColors.background/surface/textPrimary/
+    textSecondary/divider` sang `context.colors.X` tương ứng (bao gồm `shimmer_box.dart`,
+    `empty_state.dart`, `chat_screen.dart`, `chat_message_bubble.dart`, `home_screen.dart`,
+    `place_card.dart`, `place_detail_screen.dart`, `tour_card.dart`, `tour_detail_screen.dart`,
+    `itinerary_detail_screen.dart`, `add_place_to_itinerary_screen.dart`, `create_itinerary_screen.dart`,
+    `review_form.dart`).
+- **Hero animation** — `Hero(tag: 'place-image-${place.id}')` bọc ảnh cover ở cả `PlaceCard` và
+  `PlaceDetailScreen`, tương tự `Hero(tag: 'tour-image-${tour.id}')` cho `TourCard`/`TourDetailScreen` —
+  ảnh "bay" mượt khi chuyển từ lưới sang trang chi tiết thay vì cắt cảnh đột ngột.
+- **Micro-interaction** — widget `lib/core/widgets/pressable_scale.dart` (`PressableScale`): co nhẹ
+  (96%) khi nhấn giữ. Dùng `Listener` (chỉ quan sát pointer, không tham gia gesture arena) thay vì
+  `GestureDetector.onTap` riêng — nhờ vậy bọc được quanh `IconButton`/`ElevatedButton`/
+  `FloatingActionButton` có sẵn `onPressed` mà không giành mất sự kiện chạm của chúng (dùng
+  `GestureDetector` sẽ xung đột: widget con nuốt mất tap, scale không bao giờ kích hoạt). Áp dụng cho nút
+  gửi chat, nút tim lưu địa điểm (`SaveToggleButton`), FAB "Tạo lịch trình".
+- **Illustration nhẹ cho Empty state** — `EmptyState` đổi icon đơn sắc trần thành icon đặt giữa 2 lớp
+  vòng tròn màu thương hiệu mờ dần (secondary 12%, primary 14%) thay vì tải asset SVG ngoài (unDraw/
+  Storyset) — không cần thêm dependency/asset, vẫn đỡ "trơ" hơn hẳn 1 icon xám. Đây là bản thay thế nhẹ,
+  chưa phải illustration vẽ tay/SVG thật — xem lại mục "Illustration SVG thật" bên dưới nếu muốn nâng
+  cấp tiếp.
+- **Bo góc & shadow** — kiểm tra lại, hoá ra không có vấn đề: toàn bộ `BorderRadius.circular` trong code
+  (ngoài 1 chỗ bo tròn hoàn toàn `999` cho nút dạng viên thuốc và 1 chỗ `BorderRadius.zero` cho ảnh full-
+  bleed, cả 2 đều đúng ý không thuộc thang `sm/md/lg`) đã dùng `AppRadius.sm/md/lg` sẵn — không cần sửa.
+
+Đã verify: `flutter analyze` sạch, `flutter build web` build được (chạy lại sau khi refactor màu +
+Hero + micro-interaction).
 
 ## Hướng tiếp theo nếu muốn đẹp hơn nữa
 
-### Flutter app
-1. **Page transition + Hero animation** — hiện chuyển màn hình dùng transition mặc định của
-   `go_router`/Material, ảnh cover ở list và ở trang chi tiết là 2 widget riêng biệt (không có hiệu ứng
-   ảnh "bay" từ card sang trang chi tiết). Bọc ảnh cover bằng `Hero(tag: place.id, ...)` ở cả
-   `PlaceCard` và `PlaceDetailScreen` là điểm nhanh, rẻ, hiệu ứng rất rõ.
-2. **Dark mode** — token màu đã tách riêng ở `AppColors`, nhưng `AppTheme` mới chỉ có `light`. Thêm
-   `AppTheme.dark` (đảo `background`/`surface`/`textPrimary` sang tối, giữ `primary`/`secondary`) và
-   set `themeMode: ThemeMode.system` ở `MaterialApp` là đủ cho bản đầu.
-3. **Illustration cho Empty/Error state** — `EmptyState` hiện chỉ có icon Material đơn sắc (56px). Thay
-   icon bằng 1 bộ illustration nhẹ (SVG, ví dụ từ unDraw/Storyset) theo màu thương hiệu sẽ khiến các màn
-   trống (chưa lưu địa điểm, chưa có lịch trình...) đỡ "trơ" hơn nhiều so với 1 icon xám.
-4. **Micro-interaction** — nút bấm, `ChoiceChip`, `Card` hiện dùng behavior mặc định của Material (chỉ
-   có ripple). Thêm `AnimatedScale`/`AnimatedContainer` nhẹ khi nhấn (scale 0.97, 100ms) cho nút chính
-   (gửi chat, tạo lịch trình, lưu địa điểm) tạo cảm giác "phản hồi" rõ hơn.
-5. **Bo góc & shadow nhất quán hơn** — `AppRadius`/`CardTheme` đã có nhưng vài nơi (badge trong
-   `PlaceCard`, chip trong `TourCard`) tự đặt `BorderRadius.circular` riêng thay vì dùng `AppRadius.sm`.
-   Rà lại 1 lượt để tất cả bo góc dùng chung 3 mức `sm/md/lg` đã định nghĩa.
-
 ### Webapp (Next.js)
-6. **framer-motion cho các transition phức tạp hơn** — hiện chỉ có 1 `IntersectionObserver` tự viết cho
+1. **framer-motion cho các transition phức tạp hơn** — hiện chỉ có 1 `IntersectionObserver` tự viết cho
    scroll-reveal. Nếu muốn shared-element transition (ảnh place-card "bay" sang trang chi tiết như ở
-   app) hoặc page transition mượt giữa các route, cần thêm `framer-motion` — hiện chưa có trong
-   `package.json`.
+   app, giờ app đã có nhờ Hero) hoặc page transition mượt giữa các route, cần thêm `framer-motion` —
+   hiện chưa có trong `package.json`.
+
+### Flutter app
+2. **Illustration SVG thật** — bản `EmptyState` hiện tại (vòng tròn màu + icon) là giải pháp tạm không
+   cần asset ngoài; nếu muốn nâng cấp tiếp, thêm package `flutter_svg` + vài file SVG phong cách nhất
+   quán (unDraw/Storyset, đổi màu theo `primary`) cho từng loại empty state (chưa lưu địa điểm, chưa có
+   lịch trình, lỗi mạng...).
 
 ### Admin dashboard
-7. **Bảng dữ liệu thật** — `places/page.tsx`, `reviews/page.tsx` vẫn là `<table>`/card-list không phân
+3. **Bảng dữ liệu thật** — `places/page.tsx`, `reviews/page.tsx` vẫn là `<table>`/card-list không phân
    trang/sắp xếp/bulk-action. Nếu danh sách địa điểm/đánh giá tăng lên vài trăm dòng sẽ cần thêm
    pagination + sort theo cột.
-8. **Thêm chart cho users/reviews** — `activity-chart.tsx` mới chỉ có 1 chart tổng quan ở trang chủ.
+4. **Thêm chart cho users/reviews** — `activity-chart.tsx` mới chỉ có 1 chart tổng quan ở trang chủ.
    Có thể thêm biểu đồ tương tự (rating trung bình theo thời gian, top địa điểm được xem nhiều) ở trang
    riêng nếu cần báo cáo sâu hơn.
 
 ## Ưu tiên nếu làm tiếp (ROI theo thời gian bỏ ra)
-1. Dark mode cho Flutter app (đã có ở webapp/admin, hạ tầng token `AppColors` sẵn sàng)
-2. `Hero` animation cho ảnh place ở Flutter app (rẻ, hiệu ứng rất rõ)
-3. Illustration cho empty state (trung bình, cần tìm/tải asset)
-4. framer-motion + shared-element transition (tốn công nhất, để sau cùng)
+1. framer-motion + shared-element transition cho webapp (tốn công nhất trong các mục còn lại)
+2. Illustration SVG thật cho Flutter (trung bình, cần tìm/tải asset)
+3. Bảng dữ liệu + chart bổ sung cho admin (làm khi dữ liệu thật đủ lớn để cần)

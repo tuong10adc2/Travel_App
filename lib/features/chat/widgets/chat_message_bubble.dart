@@ -31,19 +31,19 @@ class ChatMessageBubble extends ConsumerWidget {
                 constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.78),
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
                 decoration: BoxDecoration(
-                  color: isUser ? AppColors.primary : AppColors.surface,
+                  color: isUser ? AppColors.primary : context.colors.surface,
                   borderRadius: BorderRadius.only(
                     topLeft: const Radius.circular(AppRadius.md),
                     topRight: const Radius.circular(AppRadius.md),
                     bottomLeft: Radius.circular(isUser ? AppRadius.md : 4),
                     bottomRight: Radius.circular(isUser ? 4 : AppRadius.md),
                   ),
-                  border: isUser ? null : Border.all(color: AppColors.textSecondary.withOpacity(0.15)),
+                  border: isUser ? null : Border.all(color: context.colors.textSecondary.withOpacity(0.15)),
                 ),
                 child: Text(
                   message.content,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: isUser ? Colors.white : AppColors.textPrimary,
+                        color: isUser ? Colors.white : context.colors.textPrimary,
                       ),
                 ),
               ),
@@ -101,9 +101,9 @@ class _ItineraryPlanCard extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: context.colors.surface,
           borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: AppColors.textSecondary.withOpacity(0.15)),
+          border: Border.all(color: context.colors.textSecondary.withOpacity(0.15)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,7 +204,7 @@ class _ItineraryPlanCard extends ConsumerWidget {
                       decoration: const InputDecoration(labelText: 'Ngày bắt đầu'),
                       child: Row(
                         children: [
-                          const Icon(Icons.calendar_today_outlined, size: 18, color: AppColors.textSecondary),
+                          Icon(Icons.calendar_today_outlined, size: 18, color: dialogContext.colors.textSecondary),
                           const SizedBox(width: AppSpacing.sm),
                           Text(formatDateVi(startDate)),
                         ],

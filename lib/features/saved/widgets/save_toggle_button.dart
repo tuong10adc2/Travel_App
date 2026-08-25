@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/widgets/pressable_scale.dart';
 import '../data/saved_place_repository.dart';
 import '../providers/saved_providers.dart';
 
@@ -29,11 +30,13 @@ class _SaveToggleButtonState extends ConsumerState<SaveToggleButton> {
   Widget build(BuildContext context) {
     final isSaved = ref.watch(isPlaceSavedProvider(widget.placeId));
 
-    return IconButton(
-      onPressed: _isToggling ? null : _toggle,
-      icon: Icon(isSaved ? Icons.favorite : Icons.favorite_border),
-      color: isSaved ? Colors.redAccent : Colors.white,
-      tooltip: isSaved ? 'Bỏ lưu' : 'Lưu địa điểm',
+    return PressableScale(
+      child: IconButton(
+        onPressed: _isToggling ? null : _toggle,
+        icon: Icon(isSaved ? Icons.favorite : Icons.favorite_border),
+        color: isSaved ? Colors.redAccent : Colors.white,
+        tooltip: isSaved ? 'Bỏ lưu' : 'Lưu địa điểm',
+      ),
     );
   }
 }
