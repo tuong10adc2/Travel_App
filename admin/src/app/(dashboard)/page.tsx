@@ -111,7 +111,7 @@ export default function DashboardPage() {
     <div>
       <PageHeader
         title={`Chào ${profile?.displayName || "bạn"} 👋`}
-        description="Tổng quan hệ thống VietGuide AI"
+        description="Tổng quan hệ thống TngGuide"
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

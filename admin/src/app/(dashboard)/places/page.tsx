@@ -38,6 +38,7 @@ export default function PlacesPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [statusTab, setStatusTab] = useState<"all" | "active" | "pending">("all");
 
   useEffect(() => {
     const q = query(collection(db, "places"), orderBy("createdAt", "desc"));
@@ -55,13 +56,18 @@ export default function PlacesPage() {
     return () => unsub();
   }, []);
 
+  const pendingCount = useMemo(() => places.filter((p) => !p.isActive).length, [places]);
+
   const filtered = useMemo(() => {
+    let list = places;
+    if (statusTab === "active") list = list.filter((p) => p.isActive);
+    if (statusTab === "pending") list = list.filter((p) => !p.isActive);
     const q = search.trim().toLowerCase();
-    if (!q) return places;
-    return places.filter(
+    if (!q) return list;
+    return list.filter(
       (p) => p.name?.toLowerCase().includes(q) || p.address?.toLowerCase().includes(q)
     );
-  }, [places, search]);
+  }, [places, search, statusTab]);
 
   async function toggleField(p: Place, field: "isActive" | "isFeatured") {
     setBusyId(p.id);
@@ -104,8 +110,29 @@ export default function PlacesPage() {
         }
       />
 
-      <div className="mb-4 max-w-sm">
-        <div className="relative">
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <div className="flex gap-1 rounded-lg bg-surface-muted p-1 w-fit">
+          {(
+            [
+              { key: "all", label: "Tất cả" },
+              { key: "active", label: "Hoạt động" },
+              { key: "pending", label: `Chờ duyệt${pendingCount ? ` (${pendingCount})` : ""}` },
+            ] as const
+          ).map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setStatusTab(t.key)}
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                statusTab === t.key
+                  ? "bg-white text-brand-700 shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <div className="relative max-w-sm flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Tìm theo tên hoặc địa chỉ..."

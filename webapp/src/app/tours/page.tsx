@@ -8,6 +8,7 @@ import { db } from "@/lib/firebase";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PlaceImage } from "@/components/ui/place-image";
+import { Reveal } from "@/components/ui/reveal";
 import type { Tour } from "@/lib/types";
 
 function formatVnd(n: number) {
@@ -67,25 +68,26 @@ export default function ToursPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((t) => (
-            <Link
-              key={t.id}
-              href={`/tours/${t.id}`}
-              className="group overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-shadow hover:shadow-md"
-            >
-              <PlaceImage src={t.coverImage} alt={t.name} className="h-44 w-full transition-transform duration-300 group-hover:scale-105" />
-              <div className="p-4">
-                <h3 className="line-clamp-1 font-semibold text-foreground">{t.name}</h3>
-                <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{t.description}</p>
-                <div className="mt-3 flex items-center justify-between">
-                  <div className="flex gap-1.5">
-                    <Badge tone="brand">{t.durationDays} ngày</Badge>
-                    <Badge tone="neutral">{t.placeIds?.length ?? 0} địa điểm</Badge>
+          {filtered.map((t, i) => (
+            <Reveal key={t.id} delay={(i % 6) * 70} y={16}>
+              <Link
+                href={`/tours/${t.id}`}
+                className="group block overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/10"
+              >
+                <PlaceImage src={t.coverImage} alt={t.name} className="h-44 w-full transition-transform duration-300 group-hover:scale-105" />
+                <div className="p-4">
+                  <h3 className="line-clamp-1 font-semibold text-foreground">{t.name}</h3>
+                  <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{t.description}</p>
+                  <div className="mt-3 flex items-center justify-between">
+                    <div className="flex gap-1.5">
+                      <Badge tone="brand">{t.durationDays} ngày</Badge>
+                      <Badge tone="neutral">{t.placeIds?.length ?? 0} địa điểm</Badge>
+                    </div>
+                    <span className="font-semibold text-brand-700">{formatVnd(t.price)}</span>
                   </div>
-                  <span className="font-semibold text-brand-700">{formatVnd(t.price)}</span>
                 </div>
-              </div>
-            </Link>
+              </Link>
+            </Reveal>
           ))}
         </div>
       )}

@@ -113,6 +113,7 @@ export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   placeCards?: { placeId: string; name: string; image: string; rating: number }[];
+  itineraryPlan?: { dayIndex: number; placeIds: string[] }[];
   createdAt?: unknown;
 }
 

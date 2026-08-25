@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Android 13+ yêu cầu quyền runtime để hiện push notification (FCM). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application
-        android:label="travelai"
+        android:label="TngGuide"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

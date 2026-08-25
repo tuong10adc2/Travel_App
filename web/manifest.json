@@ -1,6 +1,6 @@
 {
-    "name": "travelai",
-    "short_name": "travelai",
+    "name": "TngGuide",
+    "short_name": "TngGuide",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

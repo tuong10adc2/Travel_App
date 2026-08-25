@@ -76,6 +76,7 @@ export interface Review {
   comment: string;
   images?: string[];
   status: ReviewStatus;
+  aiModeration?: { flagged: boolean; reason: string | null } | null;
   createdAt?: unknown;
   updatedAt?: unknown;
 }

@@ -13,7 +13,7 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { Check, EyeOff, Star, Trash2 } from "lucide-react";
+import { Check, EyeOff, Sparkles, Star, Trash2 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
@@ -100,7 +100,8 @@ function ReviewsPageInner() {
     let list = reviews;
     if (userIdFilter) list = list.filter((r) => r.userId === userIdFilter);
     if (tab !== "all") list = list.filter((r) => r.status === tab);
-    return list;
+    // Đẩy đánh giá bị AI đánh dấu khả nghi lên đầu để content editor ưu tiên xem trước.
+    return [...list].sort((a, b) => Number(!!b.aiModeration?.flagged) - Number(!!a.aiModeration?.flagged));
   }, [reviews, tab, userIdFilter]);
 
   async function setStatus(r: Review, status: ReviewStatus) {
@@ -187,6 +188,11 @@ function ReviewsPageInner() {
                   >
                     {r.status === "approved" ? "Đã duyệt" : r.status === "pending" ? "Chờ duyệt" : "Đã ẩn"}
                   </Badge>
+                  {r.aiModeration?.flagged && (
+                    <Badge tone="danger" title={r.aiModeration.reason ?? undefined}>
+                      <Sparkles className="mr-1 h-3 w-3" /> AI: khả nghi
+                    </Badge>
+                  )}
                 </div>
                 <div className="mt-1 flex items-center gap-0.5">
                   {Array.from({ length: 5 }).map((_, i) => (

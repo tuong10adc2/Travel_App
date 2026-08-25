@@ -7,6 +7,7 @@ import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
 import { RequireAuth } from "@/components/require-auth";
 import { PlaceCard } from "@/components/place-card";
+import { Reveal } from "@/components/ui/reveal";
 import type { Place, SavedPlace } from "@/lib/types";
 
 function SavedInner() {
@@ -65,8 +66,10 @@ function SavedInner() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {list.map((p) => (
-            <PlaceCard key={p.id} place={p} />
+          {list.map((p, i) => (
+            <Reveal key={p.id} delay={(i % 8) * 60} y={16}>
+              <PlaceCard place={p} />
+            </Reveal>
           ))}
         </div>
       )}

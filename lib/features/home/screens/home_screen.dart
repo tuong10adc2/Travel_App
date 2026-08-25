@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/services/push_notification_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/places_providers.dart';
 import '../widgets/place_card.dart';
@@ -17,6 +18,16 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _navIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Home là màn đầu tiên sau khi đăng nhập (app_router redirect) — điểm hợp lý nhất để
+    // đăng ký nhận push notification 1 lần cho cả phiên.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(pushNotificationServiceProvider).init();
+    });
+  }
 
   void _onNavTap(int index) {
     if (index == _navIndex) return;
@@ -144,15 +155,17 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
-          child: const Icon(Icons.travel_explore, color: Colors.white, size: 22),
+        const ClipOval(
+          child: Image(
+            image: AssetImage('assets/images/logo.png'),
+            width: 40,
+            height: 40,
+            fit: BoxFit.cover,
+          ),
         ),
         const SizedBox(width: AppSpacing.sm),
         const Expanded(
-          child: Text('Trợ lý du lịch AI', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+          child: Text('TngGuide', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
         ),
         IconButton(
           onPressed: onProfileTap,

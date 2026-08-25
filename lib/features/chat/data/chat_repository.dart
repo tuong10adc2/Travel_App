@@ -94,10 +94,19 @@ class ChatRepository {
     final reply = (result.data['reply'] as String?) ?? '';
     final suggestedPlaceIds = List<String>.from(result.data['suggestedPlaceIds'] as List? ?? const []);
 
+    // itineraryPlan trả về dạng [{dayIndex, placeIds}, ...] (kết quả tool plan_itinerary,
+    // đã gom theo khu vực địa lý + sắp thứ tự ở server) — chuyển thành List<List<String>>
+    // theo đúng thứ tự dayIndex để lưu gọn vào Firestore.
+    final rawPlan = result.data['itineraryPlan'] as List? ?? const [];
+    final itineraryPlan = rawPlan
+        .map((day) => List<String>.from((day as Map)['placeIds'] as List? ?? const []))
+        .toList();
+
     await messagesRef.add({
       'role': 'assistant',
       'content': reply,
       'placeSuggestionIds': suggestedPlaceIds,
+      'itineraryPlan': itineraryPlan,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }

@@ -1,0 +1,12 @@
+{
+  "name": "import-places",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "import": "node import.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
+    "firebase": "^11.0.0"
+  }
+}

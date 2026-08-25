@@ -94,6 +94,52 @@ class ItineraryRepository {
     return itineraryRef.id;
   }
 
+  /// Tạo lịch trình mới từ 1 kế hoạch đã gom cụm sẵn theo ngày (vd: kết quả tool
+  /// `plan_itinerary` của trợ lý AI — đã nhóm theo khu vực địa lý + sắp thứ tự di chuyển
+  /// hợp lý trong từng ngày). Khác [createItineraryFromTour] ở chỗ không tự chia đều theo
+  /// index mà giữ nguyên đúng cách gom ngày/thứ tự đã tính sẵn.
+  Future<String> createItineraryFromPlan({
+    required String name,
+    required DateTime startDate,
+    required List<List<String>> placeIdsByDay,
+  }) async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) throw StateError('Chưa đăng nhập');
+
+    final days = placeIdsByDay.isEmpty ? 1 : placeIdsByDay.length;
+    final endDate = startDate.add(Duration(days: days - 1));
+
+    final itineraryRef = await _itineraries.add({
+      'userId': user.uid,
+      'name': name,
+      'startDate': Timestamp.fromDate(startDate),
+      'endDate': Timestamp.fromDate(endDate),
+      'isShared': false,
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    if (placeIdsByDay.isNotEmpty) {
+      final itemsRef = itineraryRef.collection('itinerary_items');
+      final batch = _firestore.batch();
+      for (var dayIndex = 0; dayIndex < placeIdsByDay.length; dayIndex++) {
+        final ids = placeIdsByDay[dayIndex];
+        for (var order = 0; order < ids.length; order++) {
+          batch.set(itemsRef.doc(), {
+            'placeId': ids[order],
+            'dayIndex': dayIndex,
+            'order': order,
+            'note': null,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+        }
+      }
+      await batch.commit();
+    }
+
+    return itineraryRef.id;
+  }
+
   Future<void> addDay({required String itineraryId, required DateTime newEndDate}) async {
     await _itineraries.doc(itineraryId).update({
       'endDate': Timestamp.fromDate(newEndDate),

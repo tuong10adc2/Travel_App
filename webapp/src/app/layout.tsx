@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VietGuide AI — Trợ lý du lịch thông minh Việt Nam",
+  title: "TngGuide — Trợ lý du lịch thông minh Việt Nam",
   description:
     "Trợ lý du lịch số riêng bạn — mang đến tri thức bản địa, gợi ý AI và trải nghiệm VR 360° tới mọi miền đất nước.",
 };

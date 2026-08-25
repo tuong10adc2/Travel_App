@@ -1,9 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Compass,
   LayoutDashboard,
   Users,
   MapPin,
@@ -37,11 +37,9 @@ export function Sidebar() {
   return (
     <aside className="flex h-full w-60 shrink-0 flex-col border-r border-border bg-surface">
       <div className="flex h-16 items-center gap-2 border-b border-border px-5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white">
-          <Compass className="h-4.5 w-4.5" />
-        </div>
+        <Image src="/logo.png" alt="TngGuide" width={32} height={32} className="h-8 w-8 rounded-lg object-cover" />
         <div>
-          <p className="text-sm font-semibold leading-tight text-foreground">VietGuide</p>
+          <p className="text-sm font-semibold leading-tight text-foreground">TngGuide</p>
           <p className="text-xs leading-tight text-muted-foreground">Admin</p>
         </div>
       </div>
