@@ -23,6 +23,7 @@ import {
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
+import { useConfirm } from "@/contexts/confirm-context";
 import { logAction } from "@/lib/audit-log";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -34,6 +35,7 @@ import type { Place } from "@/lib/types";
 export default function PlacesPage() {
   const { user, can } = useAuth();
   const toast = useToast();
+  const confirm = useConfirm();
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -81,7 +83,13 @@ export default function PlacesPage() {
   }
 
   async function handleDelete(p: Place) {
-    if (!confirm(`Xoá địa điểm "${p.name}"? Hành động này không thể hoàn tác.`)) return;
+    const ok = await confirm({
+      title: `Xoá địa điểm "${p.name}"?`,
+      description: "Hành động này không thể hoàn tác.",
+      confirmLabel: "Xoá",
+      danger: true,
+    });
+    if (!ok) return;
     setBusyId(p.id);
     try {
       await deleteDoc(doc(db, "places", p.id));

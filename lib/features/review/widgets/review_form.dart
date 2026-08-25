@@ -73,7 +73,7 @@ class _ReviewFormState extends ConsumerState<ReviewForm> {
         children: [
           Text(
             widget.existingReview == null ? 'Viết đánh giá của bạn' : 'Sửa đánh giá của bạn',
-            style: const TextStyle(fontWeight: FontWeight.w600),
+            style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: AppSpacing.sm),
           StarRating(rating: _rating.toDouble(), size: 28, onChanged: (v) => setState(() => _rating = v)),

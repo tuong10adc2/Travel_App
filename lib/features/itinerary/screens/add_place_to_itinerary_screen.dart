@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_network_image.dart';
+import '../../../core/widgets/skeleton_loaders.dart';
 import '../../home/models/place.dart';
 import '../../home/providers/places_providers.dart';
 import '../../home/widgets/place_image_placeholder.dart';
@@ -76,15 +78,18 @@ class _AddPlaceToItineraryScreenState extends ConsumerState<AddPlaceToItineraryS
           ),
           Expanded(
             child: placesAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const SkeletonList(),
               error: (error, _) => Center(child: Text('Lỗi tải địa điểm: $error')),
               data: (places) {
                 final filtered = query.isEmpty
                     ? places
                     : places.where((p) => p.name.toLowerCase().contains(query)).toList();
                 if (filtered.isEmpty) {
-                  return const Center(
-                    child: Text('Không tìm thấy địa điểm phù hợp', style: TextStyle(color: AppColors.textSecondary)),
+                  return Center(
+                    child: Text(
+                      'Không tìm thấy địa điểm phù hợp',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+                    ),
                   );
                 }
                 return ListView.separated(
@@ -102,9 +107,9 @@ class _AddPlaceToItineraryScreenState extends ConsumerState<AddPlaceToItineraryS
                           height: 48,
                           child: place.coverImage.isEmpty
                               ? PlaceImagePlaceholder(place: place)
-                              : Image.network(place.coverImage, fit: BoxFit.cover),
+                              : AppNetworkImage(url: place.coverImage),
                         ),
-                        title: Text(place.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                        title: Text(place.name, style: Theme.of(context).textTheme.titleSmall),
                         subtitle: Text(place.address, maxLines: 1, overflow: TextOverflow.ellipsis),
                         trailing: isAdding
                             ? const SizedBox(

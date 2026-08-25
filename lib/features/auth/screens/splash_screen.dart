@@ -7,20 +7,20 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image(
+            const Image(
               image: AssetImage('assets/images/logo.png'),
               width: 96,
               height: 96,
             ),
-            SizedBox(height: AppSpacing.md),
-            Text('TngGuide', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
-            SizedBox(height: AppSpacing.lg),
-            CircularProgressIndicator(color: AppColors.primary),
+            const SizedBox(height: AppSpacing.md),
+            Text('TngGuide', style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: AppSpacing.lg),
+            const CircularProgressIndicator(color: AppColors.primary),
           ],
         ),
       ),

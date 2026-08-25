@@ -15,6 +15,7 @@ import { Package, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
+import { useConfirm } from "@/contexts/confirm-context";
 import { logAction } from "@/lib/audit-log";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -30,6 +31,7 @@ function formatVnd(n: number) {
 export default function ToursPage() {
   const { user, can } = useAuth();
   const toast = useToast();
+  const confirm = useConfirm();
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -69,7 +71,13 @@ export default function ToursPage() {
   }
 
   async function handleDelete(t: Tour) {
-    if (!confirm(`Xoá tour "${t.name}"?`)) return;
+    const ok = await confirm({
+      title: `Xoá tour "${t.name}"?`,
+      description: "Hành động này không thể hoàn tác.",
+      confirmLabel: "Xoá",
+      danger: true,
+    });
+    if (!ok) return;
     setBusyId(t.id);
     try {
       await deleteDoc(doc(db, "tours", t.id));

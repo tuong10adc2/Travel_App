@@ -46,12 +46,18 @@ class _Vr360ViewerScreenState extends ConsumerState<Vr360ViewerScreen> {
       body: mediaAsync.when(
         loading: () => const Center(child: CircularProgressIndicator(color: Colors.white)),
         error: (error, _) => Center(
-          child: Text('Lỗi tải dữ liệu 360°: $error', style: const TextStyle(color: Colors.white)),
+          child: Text(
+            'Lỗi tải dữ liệu 360°: $error',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
+          ),
         ),
         data: (mediaList) {
           if (mediaList.isEmpty) {
-            return const Center(
-              child: Text('Chưa có ảnh 360° cho địa điểm này.', style: TextStyle(color: Colors.white70)),
+            return Center(
+              child: Text(
+                'Chưa có ảnh 360° cho địa điểm này.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white70),
+              ),
             );
           }
           final current = mediaList.firstWhere(
@@ -187,13 +193,16 @@ class _LoadingSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: const Color(0xFF1A1A1A),
-      child: const Center(
+      child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(color: Colors.white),
-            SizedBox(height: AppSpacing.md),
-            Text('Đang tải ảnh 360°...', style: TextStyle(color: Colors.white70)),
+            const CircularProgressIndicator(color: Colors.white),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              'Đang tải ảnh 360°...',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white70),
+            ),
           ],
         ),
       ),
@@ -212,9 +221,9 @@ class _RotateHint extends StatelessWidget {
         color: Colors.black.withOpacity(0.5),
         borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
-      child: const Text(
+      child: Text(
         'Vuốt hoặc nghiêng thiết bị để xoay 360°',
-        style: TextStyle(color: Colors.white, fontSize: 12),
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.white),
       ),
     );
   }
@@ -245,7 +254,10 @@ class _ViewpointSelector extends StatelessWidget {
             onSelected: (_) => onSelect(media.id),
             selectedColor: AppColors.primary,
             backgroundColor: Colors.black.withOpacity(0.5),
-            labelStyle: TextStyle(color: selected ? Colors.white : Colors.white70, fontSize: 12),
+            labelStyle: Theme.of(context)
+                .textTheme
+                .labelMedium
+                ?.copyWith(color: selected ? Colors.white : Colors.white70),
             side: BorderSide.none,
             showCheckmark: false,
           );

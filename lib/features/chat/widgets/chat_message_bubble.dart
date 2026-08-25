@@ -42,7 +42,9 @@ class ChatMessageBubble extends ConsumerWidget {
                 ),
                 child: Text(
                   message.content,
-                  style: TextStyle(color: isUser ? Colors.white : AppColors.textPrimary),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: isUser ? Colors.white : AppColors.textPrimary,
+                      ),
                 ),
               ),
             ),
@@ -112,7 +114,7 @@ class _ItineraryPlanCard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Ngày ${i + 1}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                    Text('Ngày ${i + 1}', style: Theme.of(context).textTheme.titleSmall),
                     const SizedBox(height: AppSpacing.xs),
                     Wrap(
                       spacing: AppSpacing.xs,

@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/date_format.dart';
+import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/skeleton_loaders.dart';
 import '../models/itinerary.dart';
 import '../providers/itinerary_providers.dart';
 
@@ -22,11 +24,15 @@ class ItineraryListScreen extends ConsumerWidget {
         label: const Text('Tạo lịch trình'),
       ),
       body: itinerariesAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const SkeletonList(),
         error: (error, _) => Center(child: Text('Lỗi tải lịch trình: $error')),
         data: (itineraries) {
           if (itineraries.isEmpty) {
-            return const _EmptyState();
+            return const EmptyState(
+              icon: Icons.calendar_month_outlined,
+              title: 'Chưa có lịch trình nào',
+              message: 'Bấm "Tạo lịch trình" để bắt đầu lên kế hoạch chuyến đi.',
+            );
           }
           return ListView.separated(
             padding: const EdgeInsets.fromLTRB(
@@ -40,36 +46,6 @@ class ItineraryListScreen extends ConsumerWidget {
             itemBuilder: (context, index) => _ItineraryTile(itinerary: itineraries[index]),
           );
         },
-      ),
-    );
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  const _EmptyState();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.calendar_month_outlined, size: 56, color: AppColors.textSecondary),
-            SizedBox(height: AppSpacing.md),
-            Text(
-              'Chưa có lịch trình nào',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-            ),
-            SizedBox(height: AppSpacing.xs),
-            Text(
-              'Bấm "Tạo lịch trình" để bắt đầu lên kế hoạch chuyến đi.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textSecondary),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -94,10 +70,10 @@ class _ItineraryTile extends StatelessWidget {
           foregroundColor: Colors.white,
           child: Icon(Icons.map_outlined),
         ),
-        title: Text(itinerary.name, style: const TextStyle(fontWeight: FontWeight.w700)),
+        title: Text(itinerary.name, style: Theme.of(context).textTheme.titleSmall),
         subtitle: Text(
           '${formatDateVi(itinerary.startDate)} · $dayCount ngày',
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: Theme.of(context).textTheme.bodySmall,
         ),
         trailing: const Icon(Icons.chevron_right),
         onTap: () => context.push('/itineraries/${itinerary.id}'),
