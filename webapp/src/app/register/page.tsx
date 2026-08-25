@@ -75,7 +75,7 @@ export default function RegisterPage() {
             <p className="text-sm text-muted-foreground">Bắt đầu hành trình khám phá của bạn</p>
           </div>
         </div>
-        <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-4">
             <Field label="Họ tên">
               <Input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Nguyễn Văn A" />

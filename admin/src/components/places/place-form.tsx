@@ -156,7 +156,7 @@ export function PlaceForm({
                     "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
                     values.tags.includes(tag)
                       ? "border-brand-600 bg-brand-600 text-white"
-                      : "border-border bg-white text-muted-foreground hover:bg-surface-muted"
+                      : "border-border bg-surface text-muted-foreground hover:bg-surface-muted"
                   )}
                 >
                   {tag}

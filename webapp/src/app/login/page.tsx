@@ -95,7 +95,7 @@ export default function LoginPage() {
             <p className="text-sm text-muted-foreground">Đăng nhập để tiếp tục hành trình</p>
           </div>
         </div>
-        <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
           <Suspense fallback={null}>
             <LoginForm />
           </Suspense>

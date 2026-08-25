@@ -161,7 +161,7 @@ export default function TourDetailPage() {
                 <Link
                   key={p.id}
                   href={`/places/${p.id}`}
-                  className="flex items-center gap-4 rounded-xl border border-border bg-white p-3 hover:bg-surface-muted"
+                  className="flex items-center gap-4 rounded-xl border border-border bg-surface p-3 hover:bg-surface-muted"
                 >
                   <PlaceImage src={p.coverImage} alt={p.name} tags={p.tags} className="h-16 w-20 shrink-0 rounded-lg" />
                   <div className="min-w-0">
@@ -180,7 +180,7 @@ export default function TourDetailPage() {
           </div>
         </div>
 
-        <div className="sticky top-24 h-fit rounded-2xl border border-border bg-white p-5">
+        <div className="sticky top-24 h-fit rounded-2xl border border-border bg-surface p-5">
           <p className="text-2xl font-bold text-brand-700">{formatVnd(tour.price)}</p>
           <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
             <Clock className="h-4 w-4" /> {tour.durationDays} ngày · {tour.placeIds.length} địa điểm
@@ -193,7 +193,7 @@ export default function TourDetailPage() {
 
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-sm rounded-2xl bg-surface p-6 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-base font-semibold text-foreground">Tạo lịch trình từ tour</h3>
               <button onClick={() => setModalOpen(false)} className="text-muted-foreground hover:text-foreground">

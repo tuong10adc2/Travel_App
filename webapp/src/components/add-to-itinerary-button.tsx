@@ -101,7 +101,7 @@ export function AddToItineraryButton({
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-sm rounded-2xl bg-surface p-6 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-base font-semibold text-foreground">Thêm vào lịch trình</h3>
               <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
@@ -123,7 +123,7 @@ export function AddToItineraryButton({
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-foreground">Lịch trình</label>
                   <select
-                    className="h-10 w-full rounded-lg border border-border bg-white px-3 text-sm"
+                    className="h-10 w-full rounded-lg border border-border bg-surface px-3 text-sm"
                     value={selectedId}
                     onChange={(e) => {
                       setSelectedId(e.target.value);
@@ -141,7 +141,7 @@ export function AddToItineraryButton({
                   <div>
                     <label className="mb-1.5 block text-sm font-medium text-foreground">Ngày</label>
                     <select
-                      className="h-10 w-full rounded-lg border border-border bg-white px-3 text-sm"
+                      className="h-10 w-full rounded-lg border border-border bg-surface px-3 text-sm"
                       value={dayIndex}
                       onChange={(e) => setDayIndex(Number(e.target.value))}
                     >

@@ -76,7 +76,7 @@ function ItinerariesInner() {
           ))}
         </div>
       ) : items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-white p-16 text-center text-muted-foreground">
+        <div className="rounded-2xl border border-dashed border-border bg-surface p-16 text-center text-muted-foreground">
           <MapPinned className="mx-auto mb-3 h-6 w-6 opacity-40" />
           Bạn chưa có lịch trình nào.
           <div className="mt-4">
@@ -88,7 +88,7 @@ function ItinerariesInner() {
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((it) => (
-            <div key={it.id} className="group relative rounded-2xl border border-border bg-white p-5">
+            <div key={it.id} className="group relative rounded-2xl border border-border bg-surface p-5">
               <Link href={`/itineraries/${it.id}`} className="block">
                 <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
                   <CalendarRange className="h-5 w-5" />

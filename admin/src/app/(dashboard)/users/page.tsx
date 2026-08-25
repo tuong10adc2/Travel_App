@@ -168,7 +168,7 @@ export default function UsersPage() {
                   <td className="px-5 py-3">
                     {can.manageRoles ? (
                       <select
-                        className="h-8 rounded-lg border border-border bg-white px-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        className="h-8 rounded-lg border border-border bg-surface px-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
                         value={u.role}
                         disabled={busyUid === u.uid || u.uid === currentUser?.uid}
                         onChange={(e) => changeRole(u, e.target.value as UserRole)}

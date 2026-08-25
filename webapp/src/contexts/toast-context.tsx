@@ -45,8 +45,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             className={cn(
               "flex items-center gap-2 rounded-lg border px-4 py-3 text-sm shadow-lg",
               t.tone === "success"
-                ? "border-success-600/20 bg-white text-success-600"
-                : "border-danger-600/20 bg-white text-danger-600"
+                ? "border-success-600/20 bg-surface text-success-600"
+                : "border-danger-600/20 bg-surface text-danger-600"
             )}
           >
             {t.tone === "success" ? (

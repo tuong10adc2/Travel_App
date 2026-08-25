@@ -59,7 +59,7 @@ export function SaveToggleButton({ placeId, className }: { placeId: string; clas
         "flex h-11 w-11 items-center justify-center rounded-full border transition-colors disabled:opacity-50",
         saved
           ? "border-danger-600 bg-danger-50 text-danger-600"
-          : "border-border bg-white text-muted-foreground hover:text-danger-600",
+          : "border-border bg-surface text-muted-foreground hover:text-danger-600",
         className
       )}
     >

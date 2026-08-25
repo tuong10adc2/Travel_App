@@ -132,7 +132,7 @@ export default function PlacesPage() {
               onClick={() => setStatusTab(t.key)}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 statusTab === t.key
-                  ? "bg-white text-brand-700 shadow-sm"
+                  ? "bg-surface text-brand-700 shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >

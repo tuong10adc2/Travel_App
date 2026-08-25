@@ -247,7 +247,7 @@ export default function PlaceMedia360Page() {
                   <div className="sm:col-span-2">
                     <label className="mb-1 block text-xs text-muted-foreground">Điểm nhìn đích</label>
                     <select
-                      className="h-9 w-full rounded-lg border border-border bg-white px-2 text-sm"
+                      className="h-9 w-full rounded-lg border border-border bg-surface px-2 text-sm"
                       value={h.targetMediaId}
                       onChange={(e) => {
                         const target = items.find((i) => i.id === e.target.value);

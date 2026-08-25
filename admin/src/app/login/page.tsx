@@ -67,7 +67,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl bg-white p-6 shadow-2xl shadow-brand-900/30">
+        <div className="rounded-2xl bg-surface p-6 shadow-2xl shadow-brand-900/30">
           {showNotAuthorized ? (
             <div className="space-y-4 text-center">
               <p className="text-sm text-foreground">

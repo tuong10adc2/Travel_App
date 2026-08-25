@@ -63,7 +63,7 @@ function ExploreInner() {
               "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
               selectedTag === null
                 ? "border-brand-600 bg-brand-600 text-white"
-                : "border-border bg-white text-muted-foreground hover:bg-surface-muted"
+                : "border-border bg-surface text-muted-foreground hover:bg-surface-muted"
             )}
           >
             Tất cả
@@ -76,7 +76,7 @@ function ExploreInner() {
                 "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
                 selectedTag === tag
                   ? "border-brand-600 bg-brand-600 text-white"
-                  : "border-border bg-white text-muted-foreground hover:bg-surface-muted"
+                  : "border-border bg-surface text-muted-foreground hover:bg-surface-muted"
               )}
             >
               {tag}
@@ -94,7 +94,7 @@ function ExploreInner() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-white p-16 text-center text-muted-foreground">
+        <div className="rounded-2xl border border-dashed border-border bg-surface p-16 text-center text-muted-foreground">
           <MapPin className="mx-auto mb-3 h-6 w-6 opacity-40" />
           Không tìm thấy địa điểm phù hợp.
         </div>

@@ -16,8 +16,11 @@ export interface ActivityPoint {
   reviews: number;
 }
 
-const BRAND = "#0e7c66";
-const WARNING = "#c8830a";
+// CSS var thay vì hex cứng — tự đổi màu theo theme sáng/tối vì đây là chuỗi
+// được recharts gán thẳng vào thuộc tính SVG (stroke/fill), trình duyệt hiện
+// đại resolve var() trên presentation attribute như CSS bình thường.
+const BRAND = "var(--brand-600)";
+const WARNING = "var(--warning-600)";
 
 export function ActivityChart({
   data,
@@ -60,6 +63,8 @@ export function ActivityChart({
           contentStyle={{
             borderRadius: 12,
             border: "1px solid var(--border)",
+            background: "var(--surface)",
+            color: "var(--foreground)",
             fontSize: 13,
           }}
         />

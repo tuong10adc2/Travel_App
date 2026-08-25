@@ -84,7 +84,7 @@ function PlacePickerModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="flex max-h-[80vh] w-full max-w-md flex-col rounded-2xl bg-white p-6 shadow-xl">
+      <div className="flex max-h-[80vh] w-full max-w-md flex-col rounded-2xl bg-surface p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-base font-semibold text-foreground">Thêm địa điểm</h3>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
@@ -304,7 +304,7 @@ function ItineraryDetailInner() {
 
       <div className="space-y-6">
         {days.map(({ dayIndex, items: dayItems }) => (
-          <div key={dayIndex} className="rounded-2xl border border-border bg-white p-5">
+          <div key={dayIndex} className="rounded-2xl border border-border bg-surface p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-semibold text-foreground">{dayLabel(itinerary, dayIndex)}</h2>
               <Button variant="secondary" size="sm" onClick={() => setPickerDay(dayIndex)}>
@@ -325,7 +325,7 @@ function ItineraryDetailInner() {
                       onDragStart={() => setDragging({ day: dayIndex, id: item.id })}
                       onDragOver={(e) => e.preventDefault()}
                       onDrop={() => handleDrop(dayIndex, item.id)}
-                      className="flex items-center gap-3 rounded-xl border border-border bg-white p-2.5 hover:bg-surface-muted"
+                      className="flex items-center gap-3 rounded-xl border border-border bg-surface p-2.5 hover:bg-surface-muted"
                     >
                       <GripVertical className="h-4 w-4 shrink-0 cursor-grab text-muted-foreground" />
                       {place ? (

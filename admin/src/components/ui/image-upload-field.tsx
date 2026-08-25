@@ -53,7 +53,7 @@ export function ImageUploadField({
           type="button"
           disabled={uploading}
           onClick={() => inputRef.current?.click()}
-          className="flex h-10 shrink-0 items-center gap-1.5 rounded-lg border border-border bg-white px-3 text-sm text-foreground hover:bg-surface-muted disabled:opacity-50"
+          className="flex h-10 shrink-0 items-center gap-1.5 rounded-lg border border-border bg-surface px-3 text-sm text-foreground hover:bg-surface-muted disabled:opacity-50"
         >
           {uploading ? (
             <Loader2 className="h-4 w-4 animate-spin" />

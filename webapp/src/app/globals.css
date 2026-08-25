@@ -32,6 +32,73 @@
   --danger-600: #d64545;
 }
 
+/* Dark mode: theo hệ thống (prefers-color-scheme) khi chưa chọn thủ công,
+   ghi đè bằng [data-theme] khi người dùng bấm nút chuyển giao diện.
+   Các sắc "600/700" vốn dùng làm chữ trên nền tint riêng của nó (vd:
+   bg-brand-50 + text-brand-700) nên phải SÁNG hơn nền, không chỉ đảo màu nền
+   — nếu không chữ sẽ chìm vào nền tint tối. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #0f1312;
+    --foreground: #eef1ef;
+
+    --brand-50: #16302a;
+    --brand-100: #1c3b33;
+    --brand-200: #24493f;
+    --brand-300: #2f5b4e;
+    --brand-500: #22a884;
+    --brand-600: #14916f;
+    --brand-700: #5fd1b3;
+    --brand-800: #8ee2cb;
+    --brand-900: #bdf0e0;
+
+    --accent-500: #f5b855;
+    --accent-600: #e0a83c;
+
+    --surface: #171b1a;
+    --surface-muted: #1f2422;
+    --border: #2a302d;
+    --muted-foreground: #93a19c;
+
+    --success-50: #12261f;
+    --success-600: #5fd1b3;
+    --warning-50: #2a2010;
+    --warning-600: #f0a83c;
+    --danger-50: #2a1414;
+    --danger-600: #f47171;
+  }
+}
+
+:root[data-theme="dark"] {
+  --background: #0f1312;
+  --foreground: #eef1ef;
+
+  --brand-50: #16302a;
+  --brand-100: #1c3b33;
+  --brand-200: #24493f;
+  --brand-300: #2f5b4e;
+  --brand-500: #22a884;
+  --brand-600: #14916f;
+  --brand-700: #5fd1b3;
+  --brand-800: #8ee2cb;
+  --brand-900: #bdf0e0;
+
+  --accent-500: #f5b855;
+  --accent-600: #e0a83c;
+
+  --surface: #171b1a;
+  --surface-muted: #1f2422;
+  --border: #2a302d;
+  --muted-foreground: #93a19c;
+
+  --success-50: #12261f;
+  --success-600: #5fd1b3;
+  --warning-50: #2a2010;
+  --warning-600: #f0a83c;
+  --danger-50: #2a1414;
+  --danger-600: #f47171;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
