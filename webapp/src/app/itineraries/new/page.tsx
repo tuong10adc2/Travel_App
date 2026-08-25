@@ -44,7 +44,7 @@ function NewItineraryInner() {
   return (
     <div className="mx-auto max-w-md px-4 py-16 sm:px-6">
       <h1 className="mb-6 text-2xl font-bold text-foreground">Tạo lịch trình mới</h1>
-      <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-white p-6">
+      <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-surface p-6">
         <Field label="Tên lịch trình">
           <Input
             required

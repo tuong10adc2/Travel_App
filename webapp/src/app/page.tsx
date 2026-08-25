@@ -164,7 +164,7 @@ export default function HomePage() {
       </section>
 
       {/* Stats */}
-      <section className="border-b border-border bg-white">
+      <section className="border-b border-border bg-surface">
         <div className="mx-auto grid max-w-5xl grid-cols-2 gap-6 px-4 py-10 sm:px-6 md:grid-cols-4 lg:px-8">
           {[
             { value: `${stats.places}+`, label: "Địa điểm & di tích" },
@@ -193,7 +193,7 @@ export default function HomePage() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {FEATURES.map((f, i) => (
             <Reveal key={f.title} delay={i * 90}>
-              <div className="group h-full rounded-2xl border border-border bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/5">
+              <div className="group h-full rounded-2xl border border-border bg-surface p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/5">
                 <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition-colors duration-300 group-hover:bg-brand-600 group-hover:text-white">
                   <f.icon className="h-5.5 w-5.5" />
                 </div>
@@ -220,11 +220,11 @@ export default function HomePage() {
           {loadingFeatured ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-72 animate-pulse rounded-2xl bg-white" />
+                <div key={i} className="h-72 animate-pulse rounded-2xl bg-surface-muted" />
               ))}
             </div>
           ) : featured.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border bg-white p-12 text-center text-muted-foreground">
+            <div className="rounded-2xl border border-dashed border-border bg-surface p-12 text-center text-muted-foreground">
               <MapPin className="mx-auto mb-3 h-6 w-6 opacity-40" />
               Chưa có địa điểm nổi bật nào.
             </div>

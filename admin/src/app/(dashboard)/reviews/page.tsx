@@ -160,7 +160,7 @@ function ReviewsPageInner() {
             onClick={() => setTab(t.key)}
             className={cn(
               "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-              tab === t.key ? "bg-white text-brand-700 shadow-sm" : "text-muted-foreground hover:text-foreground"
+              tab === t.key ? "bg-surface text-brand-700 shadow-sm" : "text-muted-foreground hover:text-foreground"
             )}
           >
             {t.label}

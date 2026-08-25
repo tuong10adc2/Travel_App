@@ -40,7 +40,7 @@ export default function ForgotPasswordPage() {
             <p className="text-sm text-muted-foreground">Nhập email để nhận liên kết đặt lại mật khẩu</p>
           </div>
         </div>
-        <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
           {sent ? (
             <div className="space-y-3 text-center">
               <MailCheck className="mx-auto h-8 w-8 text-brand-600" />

@@ -8,7 +8,7 @@ export function PlaceCard({ place }: { place: Place }) {
   return (
     <Link
       href={`/places/${place.id}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-sm shadow-slate-900/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/10"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm shadow-slate-900/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/10"
     >
       <div className="relative h-44 w-full overflow-hidden">
         <PlaceImage

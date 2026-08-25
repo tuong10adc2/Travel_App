@@ -155,7 +155,7 @@ export function ReviewSection({
       </h2>
 
       {user ? (
-        <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-white p-5">
+        <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-surface p-5">
           {mine?.status === "pending" && (
             <Badge tone="warning" className="mb-3">Đánh giá của bạn đang chờ duyệt</Badge>
           )}
@@ -172,7 +172,7 @@ export function ReviewSection({
           </Button>
         </form>
       ) : (
-        <div className="rounded-2xl border border-dashed border-border bg-white p-5 text-sm text-muted-foreground">
+        <div className="rounded-2xl border border-dashed border-border bg-surface p-5 text-sm text-muted-foreground">
           <Link href="/login" className="font-medium text-brand-700 hover:underline">
             Đăng nhập
           </Link>{" "}
@@ -189,7 +189,7 @@ export function ReviewSection({
           {approved
             .filter((r) => r.userId !== user?.uid)
             .map((r) => (
-              <div key={r.id} className="rounded-2xl border border-border bg-white p-4">
+              <div key={r.id} className="rounded-2xl border border-border bg-surface p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-foreground">
                     {users.cache[r.userId] ?? "..."}

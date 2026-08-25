@@ -54,7 +54,7 @@ function ProfileForm({ profile }: { profile: AppUser }) {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-white p-6">
+      <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-surface p-6">
         <Field label="Họ tên">
           <Input value={name} onChange={(e) => setName(e.target.value)} />
         </Field>
@@ -83,7 +83,7 @@ function ProfileForm({ profile }: { profile: AppUser }) {
         </Button>
       </form>
 
-      <div className="mt-6 rounded-2xl border border-border bg-white p-6">
+      <div className="mt-6 rounded-2xl border border-border bg-surface p-6">
         <Button variant="outline" onClick={() => signOut()} className="w-full">
           <LogOut className="h-4 w-4" /> Đăng xuất
         </Button>

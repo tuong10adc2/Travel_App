@@ -207,7 +207,7 @@ function ChatInner() {
                 "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm",
                 m.role === "user"
                   ? "rounded-br-sm bg-brand-600 text-white"
-                  : "rounded-bl-sm border border-border bg-white text-foreground"
+                  : "rounded-bl-sm border border-border bg-surface text-foreground"
               )}
             >
               <p className="whitespace-pre-line">{m.content}</p>
@@ -217,7 +217,7 @@ function ChatInner() {
                     <Link
                       key={card.placeId}
                       href={`/places/${card.placeId}`}
-                      className="w-40 shrink-0 overflow-hidden rounded-xl border border-border bg-white"
+                      className="w-40 shrink-0 overflow-hidden rounded-xl border border-border bg-surface"
                     >
                       <PlaceImage src={card.image} alt={card.name} className="h-20 w-full" />
                       <div className="p-2">
@@ -242,7 +242,7 @@ function ChatInner() {
                           {day.placeIds.map((id) => (
                             <span
                               key={id}
-                              className="rounded-full bg-white px-2 py-0.5 text-[11px] text-foreground"
+                              className="rounded-full bg-surface px-2 py-0.5 text-[11px] text-foreground"
                             >
                               {placesCache[id]?.name ?? "..."}
                             </span>
@@ -265,7 +265,7 @@ function ChatInner() {
         ))}
         {sending && (
           <div className="flex justify-start">
-            <div className="flex items-center gap-2 rounded-2xl rounded-bl-sm border border-border bg-white px-4 py-2.5 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 rounded-2xl rounded-bl-sm border border-border bg-surface px-4 py-2.5 text-sm text-muted-foreground">
               <Loader2 className="h-3.5 w-3.5 animate-spin" /> Đang trả lời...
             </div>
           </div>
@@ -278,7 +278,7 @@ function ChatInner() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Nhập câu hỏi của bạn..."
-          className="h-11 flex-1 rounded-full border border-border bg-white px-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="h-11 flex-1 rounded-full border border-border bg-surface px-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         />
         <Button type="submit" size="icon" className="rounded-full" disabled={!input.trim() || sending}>
           <Send className="h-4 w-4" />
@@ -287,7 +287,7 @@ function ChatInner() {
 
       {planModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-sm rounded-2xl bg-surface p-6 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-base font-semibold text-foreground">Tạo lịch trình từ gợi ý AI</h3>
               <button

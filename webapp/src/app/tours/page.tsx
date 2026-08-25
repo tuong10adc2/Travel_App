@@ -62,7 +62,7 @@ export default function ToursPage() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-white p-16 text-center text-muted-foreground">
+        <div className="rounded-2xl border border-dashed border-border bg-surface p-16 text-center text-muted-foreground">
           <Package className="mx-auto mb-3 h-6 w-6 opacity-40" />
           Chưa có tour nào.
         </div>
@@ -72,7 +72,7 @@ export default function ToursPage() {
             <Reveal key={t.id} delay={(i % 6) * 70} y={16}>
               <Link
                 href={`/tours/${t.id}`}
-                className="group block overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/10"
+                className="group block overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/10"
               >
                 <PlaceImage src={t.coverImage} alt={t.name} className="h-44 w-full transition-transform duration-300 group-hover:scale-105" />
                 <div className="p-4">

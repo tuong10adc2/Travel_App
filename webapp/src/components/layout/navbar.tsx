@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { cn } from "@/lib/cn";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV_LINKS = [
   { href: "/explore", label: "Khám phá" },
@@ -30,7 +31,7 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-border bg-surface/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2">
           <Image src="/logo.png" alt="TngGuide" width={36} height={36} className="h-9 w-9 rounded-xl object-cover" />
@@ -58,6 +59,7 @@ export function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
+          <ThemeToggle />
           {user ? (
             <div className="relative">
               <button
@@ -74,7 +76,7 @@ export function Navbar() {
                 <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
               {menuOpen && (
-                <div className="absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border border-border bg-white shadow-lg">
+                <div className="absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border border-border bg-surface shadow-lg">
                   <Link
                     href="/profile"
                     className="flex items-center gap-2 px-4 py-2.5 text-sm text-foreground hover:bg-surface-muted"
@@ -112,16 +114,19 @@ export function Navbar() {
           )}
         </div>
 
-        <button
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-foreground lg:hidden"
-          onClick={() => setMobileOpen((v) => !v)}
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="flex items-center gap-1 lg:hidden">
+          <ThemeToggle />
+          <button
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-foreground"
+            onClick={() => setMobileOpen((v) => !v)}
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-border bg-white px-4 py-3 lg:hidden">
+        <div className="border-t border-border bg-surface px-4 py-3 lg:hidden">
           <nav className="flex flex-col gap-1">
             {NAV_LINKS.map((link) => (
               <Link

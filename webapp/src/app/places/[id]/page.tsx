@@ -146,7 +146,7 @@ export default function PlaceDetailPage() {
             <p className="mt-6 whitespace-pre-line leading-relaxed text-foreground">{place.description}</p>
 
             {hours.length > 0 && (
-              <div className="mt-6 rounded-2xl border border-border bg-white p-5">
+              <div className="mt-6 rounded-2xl border border-border bg-surface p-5">
                 <h3 className="mb-3 flex items-center gap-2 font-semibold text-foreground">
                   <Clock className="h-4 w-4" /> Giờ mở cửa
                 </h3>
@@ -167,7 +167,7 @@ export default function PlaceDetailPage() {
           </div>
         </div>
 
-        <div className="sticky top-24 h-fit space-y-3 rounded-2xl border border-border bg-white p-5">
+        <div className="sticky top-24 h-fit space-y-3 rounded-2xl border border-border bg-surface p-5">
           {place.has360 && (
             <Link href={`/places/${place.id}/vr360`} className="block">
               <Button className="w-full" size="lg">

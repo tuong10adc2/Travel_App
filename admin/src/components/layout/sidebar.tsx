@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { cn } from "@/lib/cn";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface NavItem {
   href: string;
@@ -70,17 +71,20 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-border p-3">
-        <div className="rounded-lg bg-surface-muted px-3 py-2 text-xs text-muted-foreground">
-          Vai trò hiện tại:{" "}
-          <span className="font-medium text-foreground">
-            {role === "admin"
-              ? "Super Admin"
-              : role === "content_editor"
-              ? "Content Editor"
-              : role === "support"
-              ? "Support"
-              : "—"}
+        <div className="flex items-center justify-between gap-2 rounded-lg bg-surface-muted px-3 py-2 text-xs text-muted-foreground">
+          <span>
+            Vai trò hiện tại:{" "}
+            <span className="font-medium text-foreground">
+              {role === "admin"
+                ? "Super Admin"
+                : role === "content_editor"
+                ? "Content Editor"
+                : role === "support"
+                ? "Support"
+                : "—"}
+            </span>
           </span>
+          <ThemeToggle className="h-7 w-7" />
         </div>
       </div>
     </aside>

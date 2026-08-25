@@ -60,7 +60,7 @@ function SavedInner() {
           ))}
         </div>
       ) : list.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-white p-16 text-center text-muted-foreground">
+        <div className="rounded-2xl border border-dashed border-border bg-surface p-16 text-center text-muted-foreground">
           <Heart className="mx-auto mb-3 h-6 w-6 opacity-40" />
           Bạn chưa lưu địa điểm nào.
         </div>
