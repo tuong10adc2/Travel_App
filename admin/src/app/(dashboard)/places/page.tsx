@@ -13,6 +13,8 @@ import {
 } from "firebase/firestore";
 import {
   Aperture,
+  ChevronDown,
+  ChevronUp,
   MapPin,
   Pencil,
   Plus,
@@ -30,7 +32,64 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Pagination } from "@/components/ui/pagination";
+import { cn } from "@/lib/cn";
+import { toMillis } from "@/lib/timestamp";
 import type { Place } from "@/lib/types";
+
+const PAGE_SIZE = 20;
+type SortField = "name" | "ratingAvg" | "createdAt";
+type SortDir = "asc" | "desc";
+
+function SortHeader({
+  field,
+  label,
+  sortField,
+  sortDir,
+  onSort,
+  className,
+}: {
+  field: SortField;
+  label: string;
+  sortField: SortField;
+  sortDir: SortDir;
+  onSort: (field: SortField) => void;
+  className?: string;
+}) {
+  const active = sortField === field;
+  return (
+    <th className={cn("px-5 py-3 font-medium", className)}>
+      <button
+        type="button"
+        onClick={() => onSort(field)}
+        className={cn(
+          "inline-flex items-center gap-1 transition-colors hover:text-foreground",
+          active && "text-foreground"
+        )}
+      >
+        {label}
+        {active &&
+          (sortDir === "asc" ? (
+            <ChevronUp className="h-3.5 w-3.5" />
+          ) : (
+            <ChevronDown className="h-3.5 w-3.5" />
+          ))}
+      </button>
+    </th>
+  );
+}
+
+function formatDate(value: unknown): string {
+  if (
+    value &&
+    typeof value === "object" &&
+    "toDate" in value &&
+    typeof (value as { toDate: unknown }).toDate === "function"
+  ) {
+    return (value as { toDate: () => Date }).toDate().toLocaleDateString("vi-VN");
+  }
+  return "—";
+}
 
 export default function PlacesPage() {
   const { user, can } = useAuth();
@@ -41,6 +100,9 @@ export default function PlacesPage() {
   const [search, setSearch] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [statusTab, setStatusTab] = useState<"all" | "active" | "pending">("all");
+  const [sortField, setSortField] = useState<SortField>("createdAt");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     const q = query(collection(db, "places"), orderBy("createdAt", "desc"));
@@ -70,6 +132,42 @@ export default function PlacesPage() {
       (p) => p.name?.toLowerCase().includes(q) || p.address?.toLowerCase().includes(q)
     );
   }, [places, search, statusTab]);
+
+  const sorted = useMemo(() => {
+    const list = [...filtered];
+    list.sort((a, b) => {
+      let cmp = 0;
+      if (sortField === "name") cmp = (a.name ?? "").localeCompare(b.name ?? "");
+      else if (sortField === "ratingAvg") cmp = (a.ratingAvg ?? 0) - (b.ratingAvg ?? 0);
+      else cmp = toMillis(a.createdAt) - toMillis(b.createdAt);
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+    return list;
+  }, [filtered, sortField, sortDir]);
+
+  // Reset về trang 1 khi bộ lọc/sắp xếp đổi — điều chỉnh state ngay trong lúc
+  // render (theo khuyến nghị của React) thay vì trong useEffect để tránh
+  // render lồng nhau không cần thiết.
+  const resetKey = `${search}__${statusTab}__${sortField}__${sortDir}`;
+  const [prevResetKey, setPrevResetKey] = useState(resetKey);
+  if (resetKey !== prevResetKey) {
+    setPrevResetKey(resetKey);
+    setPage(1);
+  }
+
+  const paged = useMemo(
+    () => sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [sorted, page]
+  );
+
+  function handleSort(field: SortField) {
+    if (sortField === field) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(field);
+      setSortDir(field === "name" ? "asc" : "desc");
+    }
+  }
 
   async function toggleField(p: Place, field: "isActive" | "isFeatured") {
     setBusyId(p.id);
@@ -156,9 +254,10 @@ export default function PlacesPage() {
           <table className="w-full text-sm">
             <thead className="bg-surface-muted text-left text-xs uppercase text-muted-foreground">
               <tr>
-                <th className="px-5 py-3 font-medium">Địa điểm</th>
+                <SortHeader field="name" label="Địa điểm" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
                 <th className="px-5 py-3 font-medium">Tag</th>
-                <th className="px-5 py-3 font-medium">Đánh giá</th>
+                <SortHeader field="ratingAvg" label="Đánh giá" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
+                <SortHeader field="createdAt" label="Ngày tạo" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
                 <th className="px-5 py-3 font-medium">Trạng thái</th>
                 <th className="px-5 py-3 font-medium text-right">Thao tác</th>
               </tr>
@@ -166,20 +265,20 @@ export default function PlacesPage() {
             <tbody className="divide-y divide-border">
               {loading && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-8 text-center text-muted-foreground">
+                  <td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">
                     Đang tải...
                   </td>
                 </tr>
               )}
               {!loading && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-muted-foreground">
+                  <td colSpan={6} className="px-5 py-10 text-center text-muted-foreground">
                     <MapPin className="mx-auto mb-2 h-6 w-6 opacity-40" />
                     Chưa có địa điểm nào.
                   </td>
                 </tr>
               )}
-              {filtered.map((p) => (
+              {paged.map((p) => (
                 <tr key={p.id} className="hover:bg-surface-muted/50">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-3">
@@ -218,6 +317,7 @@ export default function PlacesPage() {
                       <span className="text-xs text-muted-foreground">({p.ratingCount ?? 0})</span>
                     </span>
                   </td>
+                  <td className="px-5 py-3 text-muted-foreground">{formatDate(p.createdAt)}</td>
                   <td className="px-5 py-3">
                     <div className="flex flex-wrap gap-1">
                       <Badge tone={p.isActive ? "success" : "neutral"}>
@@ -269,6 +369,11 @@ export default function PlacesPage() {
             </tbody>
           </table>
         </div>
+        {!loading && sorted.length > 0 && (
+          <div className="border-t border-border">
+            <Pagination page={page} pageSize={PAGE_SIZE} total={sorted.length} onPageChange={setPage} />
+          </div>
+        )}
       </Card>
     </div>
   );
