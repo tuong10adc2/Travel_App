@@ -13,17 +13,20 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { Check, EyeOff, Sparkles, Star, Trash2 } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, EyeOff, Sparkles, Star, Trash2 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
 import { useConfirm } from "@/contexts/confirm-context";
 import { logAction } from "@/lib/audit-log";
 import { PageHeader } from "@/components/layout/page-header";
-import { Card } from "@/components/ui/card";
+import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Pagination } from "@/components/ui/pagination";
+import { RatingDistributionChart } from "@/components/ui/rating-distribution-chart";
 import { cn } from "@/lib/cn";
+import { toMillis } from "@/lib/timestamp";
 import type { Review, ReviewStatus } from "@/lib/types";
 
 const TABS: { key: ReviewStatus | "all"; label: string }[] = [
@@ -32,6 +35,10 @@ const TABS: { key: ReviewStatus | "all"; label: string }[] = [
   { key: "hidden", label: "Đã ẩn" },
   { key: "all", label: "Tất cả" },
 ];
+
+const PAGE_SIZE = 20;
+type SortField = "createdAt" | "rating";
+type SortDir = "asc" | "desc";
 
 function useLookup(kind: "places" | "tours" | "users") {
   const [cache, setCache] = useState<Record<string, string>>({});
@@ -68,6 +75,9 @@ function ReviewsPageInner() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<ReviewStatus | "all">(userIdFilter ? "all" : "pending");
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<SortField>("createdAt");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [page, setPage] = useState(1);
 
   const places = useLookup("places");
   const tours = useLookup("tours");
@@ -102,9 +112,55 @@ function ReviewsPageInner() {
     let list = reviews;
     if (userIdFilter) list = list.filter((r) => r.userId === userIdFilter);
     if (tab !== "all") list = list.filter((r) => r.status === tab);
-    // Đẩy đánh giá bị AI đánh dấu khả nghi lên đầu để content editor ưu tiên xem trước.
-    return [...list].sort((a, b) => Number(!!b.aiModeration?.flagged) - Number(!!a.aiModeration?.flagged));
+    return list;
   }, [reviews, tab, userIdFilter]);
+
+  const sorted = useMemo(() => {
+    const list = [...filtered];
+    list.sort((a, b) => {
+      // Đẩy đánh giá bị AI đánh dấu khả nghi lên đầu để content editor ưu tiên xem trước,
+      // bất kể cột sắp xếp đang chọn.
+      const flaggedCmp = Number(!!b.aiModeration?.flagged) - Number(!!a.aiModeration?.flagged);
+      if (flaggedCmp !== 0) return flaggedCmp;
+      const cmp =
+        sortField === "rating" ? (a.rating ?? 0) - (b.rating ?? 0) : toMillis(a.createdAt) - toMillis(b.createdAt);
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+    return list;
+  }, [filtered, sortField, sortDir]);
+
+  // Reset về trang 1 khi bộ lọc/sắp xếp đổi — điều chỉnh state ngay trong lúc
+  // render (theo khuyến nghị của React) thay vì trong useEffect để tránh
+  // render lồng nhau không cần thiết.
+  const resetKey = `${tab}__${userIdFilter}__${sortField}__${sortDir}`;
+  const [prevResetKey, setPrevResetKey] = useState(resetKey);
+  if (resetKey !== prevResetKey) {
+    setPrevResetKey(resetKey);
+    setPage(1);
+  }
+
+  const paged = useMemo(
+    () => sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [sorted, page]
+  );
+
+  const ratingDistribution = useMemo(() => {
+    const counts = [0, 0, 0, 0, 0];
+    reviews.forEach((r) => {
+      const idx = Math.round(r.rating) - 1;
+      if (idx >= 0 && idx < 5) counts[idx]++;
+    });
+    return counts.map((count, i) => ({ label: `${i + 1}★`, count }));
+  }, [reviews]);
+
+  function handleSort(field: SortField) {
+    if (sortField === field) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(field);
+      setSortDir("desc");
+    }
+  }
 
   async function setStatus(r: Review, status: ReviewStatus) {
     setBusyId(r.id);
@@ -153,29 +209,69 @@ function ReviewsPageInner() {
         }
       />
 
-      <div className="mb-4 flex gap-1 rounded-lg bg-surface-muted p-1 w-fit">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={cn(
-              "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-              tab === t.key ? "bg-surface text-brand-700 shadow-sm" : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle>Phân bố đánh giá theo sao</CardTitle>
+        </CardHeader>
+        <CardBody>
+          <RatingDistributionChart data={ratingDistribution} />
+        </CardBody>
+      </Card>
+
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex gap-1 rounded-lg bg-surface-muted p-1 w-fit">
+          {TABS.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={cn(
+                "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                tab === t.key ? "bg-surface text-brand-700 shadow-sm" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+          <span className="mr-1">Sắp xếp:</span>
+          {(
+            [
+              { key: "createdAt", label: "Ngày tạo" },
+              { key: "rating", label: "Số sao" },
+            ] as const
+          ).map((s) => {
+            const active = sortField === s.key;
+            return (
+              <button
+                key={s.key}
+                onClick={() => handleSort(s.key)}
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 font-medium transition-colors",
+                  active ? "bg-surface-muted text-foreground" : "hover:text-foreground"
+                )}
+              >
+                {s.label}
+                {active &&
+                  (sortDir === "asc" ? (
+                    <ChevronUp className="h-3.5 w-3.5" />
+                  ) : (
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  ))}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="space-y-3">
         {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
-        {!loading && filtered.length === 0 && (
+        {!loading && sorted.length === 0 && (
           <Card className="p-10 text-center text-sm text-muted-foreground">
             Không có đánh giá nào.
           </Card>
         )}
-        {filtered.map((r) => (
+        {paged.map((r) => (
           <Card key={r.id} className="p-4">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0 flex-1">
@@ -250,6 +346,12 @@ function ReviewsPageInner() {
           </Card>
         ))}
       </div>
+
+      {!loading && sorted.length > 0 && (
+        <Card className="mt-3">
+          <Pagination page={page} pageSize={PAGE_SIZE} total={sorted.length} onPageChange={setPage} />
+        </Card>
+      )}
     </div>
   );
 }

@@ -33,6 +33,7 @@ class ItineraryListScreen extends ConsumerWidget {
           if (itineraries.isEmpty) {
             return const EmptyState(
               icon: Icons.calendar_month_outlined,
+              illustrationAsset: 'assets/illustrations/empty_itinerary.svg',
               title: 'Chưa có lịch trình nào',
               message: 'Bấm "Tạo lịch trình" để bắt đầu lên kế hoạch chuyến đi.',
             );

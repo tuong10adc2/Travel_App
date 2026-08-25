@@ -97,41 +97,61 @@
   `FloatingActionButton` có sẵn `onPressed` mà không giành mất sự kiện chạm của chúng (dùng
   `GestureDetector` sẽ xung đột: widget con nuốt mất tap, scale không bao giờ kích hoạt). Áp dụng cho nút
   gửi chat, nút tim lưu địa điểm (`SaveToggleButton`), FAB "Tạo lịch trình".
-- **Illustration nhẹ cho Empty state** — `EmptyState` đổi icon đơn sắc trần thành icon đặt giữa 2 lớp
-  vòng tròn màu thương hiệu mờ dần (secondary 12%, primary 14%) thay vì tải asset SVG ngoài (unDraw/
-  Storyset) — không cần thêm dependency/asset, vẫn đỡ "trơ" hơn hẳn 1 icon xám. Đây là bản thay thế nhẹ,
-  chưa phải illustration vẽ tay/SVG thật — xem lại mục "Illustration SVG thật" bên dưới nếu muốn nâng
-  cấp tiếp.
+- **Illustration SVG thật cho Empty state** — 4 file SVG tự vẽ tay (`assets/illustrations/empty_chat.svg`,
+  `empty_itinerary.svg`, `empty_saved.svg`, `empty_tours.svg` — chat bubble + sparkle AI, calendar +
+  checkmark, bookmark + tim, map pin + đường chấm) dùng đúng 2 màu thương hiệu (`primary`/`secondary`),
+  render qua package `flutter_svg`. `EmptyState` nhận thêm `illustrationAsset` (optional) — có thì thay
+  cho `icon` bên trong halo, không có thì fallback về icon Material như cũ (không phá các chỗ gọi
+  `EmptyState` khác trong tương lai chưa có SVG riêng). Áp dụng cho 4 màn: chat trống, chưa có lịch
+  trình, chưa lưu địa điểm, chưa có tour.
 - **Bo góc & shadow** — kiểm tra lại, hoá ra không có vấn đề: toàn bộ `BorderRadius.circular` trong code
   (ngoài 1 chỗ bo tròn hoàn toàn `999` cho nút dạng viên thuốc và 1 chỗ `BorderRadius.zero` cho ảnh full-
   bleed, cả 2 đều đúng ý không thuộc thang `sm/md/lg`) đã dùng `AppRadius.sm/md/lg` sẵn — không cần sửa.
 
 Đã verify: `flutter analyze` sạch, `flutter build web` build được (chạy lại sau khi refactor màu +
-Hero + micro-interaction).
+Hero + micro-interaction + illustration).
+
+### 7. Webapp: page transition (framer-motion)
+- Cài `framer-motion`, thêm `components/page-transition.tsx` — fade + trượt nhẹ (10px, 180ms) giữa các
+  trang khi điều hướng, dùng `AnimatePresence` + `key={pathname}` (từ `usePathname()`). Tôn trọng
+  `prefers-reduced-motion` qua hook `useReducedMotion()` — tắt hẳn animation thay vì chỉ giảm biên độ.
+  Gắn vào `layout.tsx` (server component) bằng cách bọc `{children}` trong `<main>` bằng component
+  client này — pattern chuẩn của Next.js App Router để mount 1 client boundary bên trong 1 server layout.
+- **Không làm shared-element transition** (ảnh place-card "bay" sang ảnh hero ở trang chi tiết bằng
+  `layoutId`) như dự tính ban đầu — kiểm tra code thì `places/[id]/page.tsx` tự fetch dữ liệu bằng
+  `getDoc` sau khi mount và hiện loading spinner riêng trong lúc chờ; ảnh đích chưa tồn tại trong DOM tại
+  thời điểm chuyển trang nên `layoutId` không có gì để khớp — hiệu ứng "bay" sẽ không xảy ra, chỉ tốn
+  công thêm code chết. Muốn làm đúng cần đổi cách lấy dữ liệu trang chi tiết (truyền trước qua router
+  state, hoặc cache theo id) — nằm ngoài phạm vi 1 đợt polish UI thuần tuý, để riêng nếu sau này đổi kiến
+  trúc fetch dữ liệu.
+
+Đã verify: `npx tsc --noEmit`, `npm run lint`, `npm run build` đều sạch.
+
+### 8. Admin dashboard: pagination + sort + chart phân bố rating
+- `components/ui/pagination.tsx` — component phân trang dùng chung (20 dòng/trang, nhãn "Hiển thị X–Y
+  trên Z", nút Trước/Sau). Áp dụng cho `places/page.tsx` (sau bộ lọc tìm kiếm/tab) và `reviews/page.tsx`.
+- Sắp xếp theo cột: `places/page.tsx` có header bấm được (tên, đánh giá, ngày tạo — thêm mới cột ngày tạo
+  vì trước đó không hiển thị); `reviews/page.tsx` là card-list nên thay bằng hàng nút "Sắp xếp: ngày tạo/
+  rating" cùng quy ước chevron lên/xuống. Reset về trang 1 khi đổi tìm kiếm/tab/sắp xếp — cài đặt qua
+  "điều chỉnh state trong lúc render" (so `resetKey` phái sinh với `prevResetKey`) thay vì `useEffect`
+  gọi `setState` để tránh lỗi lint `react-hooks/set-state-in-effect` của Next 16.
+- `components/ui/rating-distribution-chart.tsx` — bar chart 5 cột (1★–5★) đếm số đánh giá theo từng mức
+  sao, dùng toàn bộ dữ liệu `reviews` (không phải danh sách đã lọc) để phản ánh đúng phân bố tổng thể;
+  cùng pattern màu qua CSS variable (`var(--warning-600)`) như `activity-chart.tsx` để tự đổi theo dark
+  mode.
+
+Đã verify: `npx tsc --noEmit`, `npm run lint`, `npm run build` đều sạch.
 
 ## Hướng tiếp theo nếu muốn đẹp hơn nữa
 
-### Webapp (Next.js)
-1. **framer-motion cho các transition phức tạp hơn** — hiện chỉ có 1 `IntersectionObserver` tự viết cho
-   scroll-reveal. Nếu muốn shared-element transition (ảnh place-card "bay" sang trang chi tiết như ở
-   app, giờ app đã có nhờ Hero) hoặc page transition mượt giữa các route, cần thêm `framer-motion` —
-   hiện chưa có trong `package.json`.
+Tất cả các hướng đã liệt kê trong các đợt polish trước đều đã làm. Còn lại là các hướng lớn hơn, cần thay
+đổi kiến trúc hoặc đầu tư thời gian đáng kể hơn 1 đợt polish UI:
 
-### Flutter app
-2. **Illustration SVG thật** — bản `EmptyState` hiện tại (vòng tròn màu + icon) là giải pháp tạm không
-   cần asset ngoài; nếu muốn nâng cấp tiếp, thêm package `flutter_svg` + vài file SVG phong cách nhất
-   quán (unDraw/Storyset, đổi màu theo `primary`) cho từng loại empty state (chưa lưu địa điểm, chưa có
-   lịch trình, lỗi mạng...).
-
-### Admin dashboard
-3. **Bảng dữ liệu thật** — `places/page.tsx`, `reviews/page.tsx` vẫn là `<table>`/card-list không phân
-   trang/sắp xếp/bulk-action. Nếu danh sách địa điểm/đánh giá tăng lên vài trăm dòng sẽ cần thêm
-   pagination + sort theo cột.
-4. **Thêm chart cho users/reviews** — `activity-chart.tsx` mới chỉ có 1 chart tổng quan ở trang chủ.
-   Có thể thêm biểu đồ tương tự (rating trung bình theo thời gian, top địa điểm được xem nhiều) ở trang
-   riêng nếu cần báo cáo sâu hơn.
-
-## Ưu tiên nếu làm tiếp (ROI theo thời gian bỏ ra)
-1. framer-motion + shared-element transition cho webapp (tốn công nhất trong các mục còn lại)
-2. Illustration SVG thật cho Flutter (trung bình, cần tìm/tải asset)
-3. Bảng dữ liệu + chart bổ sung cho admin (làm khi dữ liệu thật đủ lớn để cần)
+1. **Shared-element image transition (webapp)** — xem lý do descope ở mục 7 phía trên; cần đổi cách
+   fetch dữ liệu trang chi tiết trước.
+2. **Server-side pagination cho admin** — hiện `places`/`reviews` vẫn tải toàn bộ collection qua
+   `onSnapshot` rồi phân trang phía client; nếu dữ liệu lên tới hàng nghìn dòng sẽ cần chuyển sang
+   `startAfter` cursor-based pagination thật ở tầng Firestore query.
+3. **Thêm chart khác cho admin** (rating trung bình theo thời gian, top địa điểm được xem nhiều) — mục
+   "top địa điểm được xem nhiều" cần thêm cơ chế đếm lượt xem (view tracking) chưa có trong schema hiện
+   tại, nên đây là việc lớn hơn 1 chart đơn thuần.

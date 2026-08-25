@@ -147,6 +147,7 @@ class _WelcomeState extends StatelessWidget {
   Widget build(BuildContext context) {
     return const EmptyState(
       icon: Icons.smart_toy_outlined,
+      illustrationAsset: 'assets/illustrations/empty_chat.svg',
       title: 'Trợ lý du lịch AI',
       message: 'Hỏi mình về địa điểm, lên lịch trình hay mẹo du lịch nhé!',
     );

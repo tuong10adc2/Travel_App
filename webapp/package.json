@@ -13,6 +13,7 @@
     "@photo-sphere-viewer/markers-plugin": "^5.15.1",
     "clsx": "^2.1.1",
     "firebase": "^12.17.1",
+    "framer-motion": "^13.1.1",
     "lucide-react": "^1.29.0",
     "next": "16.3.0",
     "react": "19.2.8",

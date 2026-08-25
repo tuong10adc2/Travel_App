@@ -23,6 +23,7 @@ class SavedPlacesScreen extends ConsumerWidget {
           if (places.isEmpty) {
             return const EmptyState(
               icon: Icons.bookmark_border,
+              illustrationAsset: 'assets/illustrations/empty_saved.svg',
               title: 'Chưa lưu địa điểm nào',
               message: 'Bấm biểu tượng trái tim ở màn Chi tiết địa điểm để lưu vào đây.',
             );

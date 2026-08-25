@@ -23,6 +23,7 @@ class TourListScreen extends ConsumerWidget {
           if (tours.isEmpty) {
             return const EmptyState(
               icon: Icons.card_travel,
+              illustrationAsset: 'assets/illustrations/empty_tours.svg',
               title: 'Chưa có tour nào',
               message: 'Tour gợi ý sẽ do quản trị viên thêm.',
             );
