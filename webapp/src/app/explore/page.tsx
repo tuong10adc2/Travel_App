@@ -6,6 +6,7 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { Search, MapPin } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { Input } from "@/components/ui/input";
+import { Reveal } from "@/components/ui/reveal";
 import { PlaceCard } from "@/components/place-card";
 import { cn } from "@/lib/cn";
 import { PLACE_TAGS, type Place } from "@/lib/types";
@@ -99,8 +100,10 @@ function ExploreInner() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((p) => (
-            <PlaceCard key={p.id} place={p} />
+          {filtered.map((p, i) => (
+            <Reveal key={p.id} delay={(i % 8) * 60} y={16}>
+              <PlaceCard place={p} />
+            </Reveal>
           ))}
         </div>
       )}

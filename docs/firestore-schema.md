@@ -16,6 +16,7 @@ Doc id = `uid` từ Firebase Auth.
 | role | string | `user` \| `admin` \| `content_editor` \| `support`, mặc định `user` |
 | preferences | array\<string\> | sở thích du lịch, dùng cho AI gợi ý |
 | language | string | `vi` \| `en`, mặc định `vi` |
+| fcmToken | string? | token push notification (FCM), ghi bởi client sau khi đăng nhập |
 | isDisabled | bool | admin khoá tài khoản |
 | createdAt | timestamp | |
 | updatedAt | timestamp | |
@@ -101,6 +102,7 @@ Sub-collection: `itineraries/{itineraryId}/itinerary_items/{itemId}`
 | comment | string | |
 | images | array\<string\> | |
 | status | string | `pending` \| `approved` \| `hidden`, admin duyệt |
+| aiModeration | map? | `{ flagged, reason, checkedAt }` — tiền duyệt bằng AI (Cloud Function `moderateReviewOnCreate`), chỉ gắn nhãn gợi ý, không tự động đổi `status` |
 | createdAt / updatedAt | timestamp | |
 
 ## `saved_places/{savedId}`
@@ -129,6 +131,7 @@ Sub-collection: `.../chat_history/{sessionId}/messages/{messageId}`
 | role | string | `user` \| `assistant` |
 | content | string | |
 | placeCards | array\<map\>? | gợi ý địa điểm dạng card: `{ placeId, name, image, rating }` |
+| itineraryPlan | array\<map\>? | kết quả tool `plan_itinerary`: `{ dayIndex, placeIds }[]`, đã gom theo khu vực địa lý + sắp thứ tự di chuyển ở server (không phải LLM đoán) |
 | createdAt | timestamp | |
 
 ---

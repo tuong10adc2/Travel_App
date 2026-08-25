@@ -1,5 +1,5 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Compass } from "lucide-react";
 
 export function Footer() {
   return (
@@ -8,10 +8,8 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="mb-3 flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white">
-                <Compass className="h-4.5 w-4.5" />
-              </div>
-              <span className="text-base font-semibold text-foreground">VietGuide AI</span>
+              <Image src="/logo.png" alt="TngGuide" width={32} height={32} className="h-8 w-8 rounded-lg object-cover" />
+              <span className="text-base font-semibold text-foreground">TngGuide</span>
             </div>
             <p className="text-sm text-muted-foreground">
               Trợ lý du lịch số riêng bạn — mang đến tri thức bản địa và dẫn đường thông minh
@@ -44,7 +42,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-10 border-t border-border pt-6 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} VietGuide AI. Trợ lý du lịch thông minh khám phá Việt Nam.
+          © {new Date().getFullYear()} TngGuide. Trợ lý du lịch thông minh khám phá Việt Nam.
         </div>
       </div>
     </footer>

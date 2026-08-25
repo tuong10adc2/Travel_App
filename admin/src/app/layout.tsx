@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VietGuide Admin",
-  description: "Bảng điều khiển quản trị VietGuide AI",
+  title: "TngGuide Admin",
+  description: "Bảng điều khiển quản trị TngGuide",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

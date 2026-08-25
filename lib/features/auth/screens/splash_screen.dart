@@ -12,9 +12,13 @@ class SplashScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.travel_explore, size: 64, color: AppColors.primary),
+            Image(
+              image: AssetImage('assets/images/logo.png'),
+              width: 96,
+              height: 96,
+            ),
             SizedBox(height: AppSpacing.md),
-            Text('Trợ lý du lịch AI', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+            Text('TngGuide', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
             SizedBox(height: AppSpacing.lg),
             CircularProgressIndicator(color: AppColors.primary),
           ],

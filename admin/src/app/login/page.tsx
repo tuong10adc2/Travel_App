@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { Compass } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
@@ -60,11 +60,9 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-900 via-brand-700 to-brand-500 px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-3 text-white">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15 backdrop-blur">
-            <Compass className="h-6 w-6" />
-          </div>
+          <Image src="/logo.png" alt="TngGuide" width={48} height={48} className="h-12 w-12 rounded-xl object-cover" />
           <div className="text-center">
-            <h1 className="text-xl font-semibold">VietGuide Admin</h1>
+            <h1 className="text-xl font-semibold">TngGuide Admin</h1>
             <p className="text-sm text-white/70">Bảng điều khiển quản trị</p>
           </div>
         </div>
@@ -93,7 +91,7 @@ export default function LoginPage() {
                   autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="ban@vietguide.ai"
+                  placeholder="ban@tngguide.ai"
                 />
               </Field>
               <Field label="Mật khẩu">

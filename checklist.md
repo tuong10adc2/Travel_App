@@ -129,6 +129,7 @@
  
 ## Ghi chú
 - Sau mỗi giai đoạn: **commit Git riêng**, đặt tên rõ ràng (vd: `feat: hoan thanh giai doan 2 - trang chu`)
+- Sau mỗi giai đoạn: **commit Git riêng**, đặt tên rõ ràng (vd: `feat: hoan thanh giai doan 2 - trang chu`)
 - Nếu thiếu thời gian: có thể bỏ Giai đoạn 4 (VR 360°) và phần Push notification ở Giai đoạn 9 để rút gọn — vẫn đủ chức năng cốt lõi cho 1 đồ án hoàn chỉnh
 - Luôn tự chạy thử app thật sau khi vibe code xong mỗi mục, không chỉ tin AI báo "xong"
 
