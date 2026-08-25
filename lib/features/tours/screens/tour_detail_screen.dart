@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/date_format.dart';
+import '../../../core/widgets/app_network_image.dart';
+import '../../../core/widgets/skeleton_loaders.dart';
 import '../../home/models/place.dart';
 import '../../home/widgets/place_image_placeholder.dart';
 import '../../itinerary/data/itinerary_repository.dart';
@@ -27,7 +29,7 @@ class TourDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       body: tourAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const SkeletonDetailPage(),
         error: (error, _) => Center(child: Text('Lỗi tải tour: $error')),
         data: (tour) {
           if (tour == null) {
@@ -68,7 +70,7 @@ class _TourDetailContent extends ConsumerWidget {
           flexibleSpace: FlexibleSpaceBar(
             background: tour.coverImage.isEmpty
                 ? Container(color: AppColors.primary, child: const Center(child: Icon(Icons.card_travel, size: 56, color: Colors.white70)))
-                : Image.network(tour.coverImage, fit: BoxFit.cover),
+                : AppNetworkImage(url: tour.coverImage),
           ),
         ),
         SliverToBoxAdapter(
@@ -77,7 +79,7 @@ class _TourDetailContent extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(tour.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
+                Text(tour.name, style: Theme.of(context).textTheme.headlineSmall),
                 const SizedBox(height: AppSpacing.xs),
                 Row(
                   children: [
@@ -99,13 +101,13 @@ class _TourDetailContent extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                Text(_priceLabel, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.primary)),
+                Text(_priceLabel, style: Theme.of(context).textTheme.titleLarge?.copyWith(color: AppColors.primary)),
                 const SizedBox(height: AppSpacing.lg),
-                const Text('Giới thiệu', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                Text('Giới thiệu', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.xs),
                 Text(tour.description),
                 const SizedBox(height: AppSpacing.lg),
-                const Text('Địa điểm trong tour', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                Text('Địa điểm trong tour', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.sm),
                 for (final place in places)
                   Card(
@@ -117,7 +119,7 @@ class _TourDetailContent extends ConsumerWidget {
                         height: 48,
                         child: place.coverImage.isEmpty
                             ? PlaceImagePlaceholder(place: place)
-                            : Image.network(place.coverImage, fit: BoxFit.cover),
+                            : AppNetworkImage(url: place.coverImage),
                       ),
                       title: Text(place.name),
                       subtitle: Text(place.address, maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -138,17 +140,20 @@ class _TourDetailContent extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   'Đánh giá (${reviewsAsync.valueOrNull?.where((r) => r.status == 'approved').length ?? 0})',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: AppSpacing.md),
                 ReviewForm(targetType: 'tour', targetId: tour.id, existingReview: myReview),
                 const SizedBox(height: AppSpacing.md),
                 reviewsAsync.when(
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () => const SkeletonList(itemCount: 3),
                   error: (error, _) => Text('Lỗi tải đánh giá: $error'),
                   data: (reviews) {
                     if (reviews.isEmpty) {
-                      return const Text('Chưa có đánh giá nào cho tour này.', style: TextStyle(color: AppColors.textSecondary));
+                      return Text(
+                        'Chưa có đánh giá nào cho tour này.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+                      );
                     }
                     return Column(
                       children: [

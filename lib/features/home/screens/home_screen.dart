@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/services/push_notification_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/skeleton_loaders.dart';
 import '../providers/places_providers.dart';
 import '../widgets/place_card.dart';
 
@@ -85,20 +86,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       onSelect: (tag) => ref.read(selectedTagProvider.notifier).state = tag,
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    const Text(
-                      'Đề xuất cho bạn',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-                    ),
+                    Text('Đề xuất cho bạn', style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: AppSpacing.sm),
                   ],
                 ),
               ),
             ),
             placesAsync.when(
-              loading: () => const SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(child: CircularProgressIndicator()),
-              ),
+              loading: () => const SliverToBoxAdapter(child: SkeletonCardGrid()),
               error: (error, _) => SliverFillRemaining(
                 hasScrollBody: false,
                 child: Center(child: Text('Lỗi tải địa điểm: $error')),
@@ -164,8 +159,8 @@ class _Header extends StatelessWidget {
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
-        const Expanded(
-          child: Text('TngGuide', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+        Expanded(
+          child: Text('TngGuide', style: Theme.of(context).textTheme.titleLarge),
         ),
         IconButton(
           onPressed: onProfileTap,
@@ -211,20 +206,20 @@ class _PromoBanner extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.primary, Color(0xFF0A5C4A)],
+          colors: [AppColors.primary, AppColors.primaryDark],
         ),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Khám phá hành trình mới',
-            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white),
           ),
-          SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             'Những địa điểm được gợi ý riêng cho chuyến đi của bạn',
-            style: TextStyle(color: Colors.white70, fontSize: 13),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white70),
           ),
         ],
       ),
@@ -272,7 +267,9 @@ class _TagChip extends StatelessWidget {
       onSelected: (_) => onTap(),
       selectedColor: AppColors.primary,
       backgroundColor: AppColors.surface,
-      labelStyle: TextStyle(color: selected ? Colors.white : AppColors.textPrimary, fontWeight: FontWeight.w600),
+      labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
+            color: selected ? Colors.white : AppColors.textPrimary,
+          ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg), side: BorderSide.none),
       showCheckmark: false,
     );

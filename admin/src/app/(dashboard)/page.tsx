@@ -5,19 +5,56 @@ import Link from "next/link";
 import {
   collection,
   getCountFromServer,
+  getDocs,
   query,
   where,
   orderBy,
   limit,
   onSnapshot,
+  Timestamp,
 } from "firebase/firestore";
-import { Users, MapPin, Package, Star, ImagePlay, ArrowRight } from "lucide-react";
+import { Users, MapPin, Package, Star, ImagePlay, ArrowRight, TrendingUp } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
 import { PageHeader } from "@/components/layout/page-header";
 import { StatCard } from "@/components/ui/stat-card";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ActivityChart, type ActivityPoint } from "@/components/ui/activity-chart";
+
+const ACTIVITY_WINDOW_DAYS = 14;
+
+// Gom theo ngày (yyyy-mm-dd) — điền 0 cho ngày không có phát sinh ở buildActivitySeries
+// để đường biểu đồ không bị đứt đoạn.
+function bucketByDay(docs: { createdAt?: Timestamp }[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const doc of docs) {
+    const date = doc.createdAt?.toDate();
+    if (!date) continue;
+    const dayKey = date.toISOString().slice(0, 10);
+    counts.set(dayKey, (counts.get(dayKey) ?? 0) + 1);
+  }
+  return counts;
+}
+
+function buildActivitySeries(
+  usersByDay: Map<string, number>,
+  reviewsByDay: Map<string, number>
+): ActivityPoint[] {
+  const points: ActivityPoint[] = [];
+  const today = new Date();
+  for (let i = ACTIVITY_WINDOW_DAYS - 1; i >= 0; i--) {
+    const day = new Date(today);
+    day.setDate(day.getDate() - i);
+    const dayKey = day.toISOString().slice(0, 10);
+    points.push({
+      label: day.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" }),
+      users: usersByDay.get(dayKey) ?? 0,
+      reviews: reviewsByDay.get(dayKey) ?? 0,
+    });
+  }
+  return points;
+}
 
 interface Counts {
   users?: number;
@@ -43,6 +80,8 @@ export default function DashboardPage() {
   const [counts, setCounts] = useState<Counts>({});
   const [loading, setLoading] = useState(true);
   const [recentLogs, setRecentLogs] = useState<AuditEntry[]>([]);
+  const [activity, setActivity] = useState<ActivityPoint[] | null>(null);
+  const [activityLoading, setActivityLoading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -107,6 +146,44 @@ export default function DashboardPage() {
     return () => unsub();
   }, [can.manageRoles]);
 
+  useEffect(() => {
+    if (!can.manageUsers) return;
+    let cancelled = false;
+    async function load() {
+      setActivityLoading(true);
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - (ACTIVITY_WINDOW_DAYS - 1));
+      cutoff.setHours(0, 0, 0, 0);
+      const cutoffTs = Timestamp.fromDate(cutoff);
+      try {
+        const usersSnap = await getDocs(
+          query(collection(db, "users"), where("createdAt", ">=", cutoffTs))
+        );
+        let reviewsByDay = new Map<string, number>();
+        if (can.moderateReviews) {
+          const reviewsSnap = await getDocs(
+            query(collection(db, "reviews"), where("createdAt", ">=", cutoffTs))
+          );
+          reviewsByDay = bucketByDay(
+            reviewsSnap.docs.map((d) => d.data() as { createdAt?: Timestamp })
+          );
+        }
+        const usersByDay = bucketByDay(
+          usersSnap.docs.map((d) => d.data() as { createdAt?: Timestamp })
+        );
+        if (!cancelled) setActivity(buildActivitySeries(usersByDay, reviewsByDay));
+      } catch (err) {
+        console.error("Không tải được dữ liệu hoạt động", err);
+        if (!cancelled) setActivity(null);
+      }
+      if (!cancelled) setActivityLoading(false);
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [can.manageUsers, can.moderateReviews]);
+
   return (
     <div>
       <PageHeader
@@ -159,6 +236,30 @@ export default function DashboardPage() {
           />
         )}
       </div>
+
+      {can.manageUsers && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-brand-600" />
+              Hoạt động {ACTIVITY_WINDOW_DAYS} ngày qua
+            </CardTitle>
+          </CardHeader>
+          <CardBody>
+            {activityLoading ? (
+              <div className="flex h-[220px] items-center justify-center text-sm text-muted-foreground">
+                Đang tải...
+              </div>
+            ) : activity && activity.some((p) => p.users > 0 || p.reviews > 0) ? (
+              <ActivityChart data={activity} showUsers showReviews={can.moderateReviews} />
+            ) : (
+              <div className="flex h-[220px] items-center justify-center text-sm text-muted-foreground">
+                Chưa có phát sinh nào trong {ACTIVITY_WINDOW_DAYS} ngày qua.
+              </div>
+            )}
+          </CardBody>
+        </Card>
+      )}
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
         {can.manageContent && (

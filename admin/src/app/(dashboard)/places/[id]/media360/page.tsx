@@ -20,6 +20,7 @@ import { ArrowLeft, Compass, Loader2, Plus, Trash2 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
+import { useConfirm } from "@/contexts/confirm-context";
 import { logAction } from "@/lib/audit-log";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,6 +34,7 @@ export default function PlaceMedia360Page() {
   const placeId = params.id;
   const { user } = useAuth();
   const toast = useToast();
+  const confirm = useConfirm();
 
   const [place, setPlace] = useState<Place | null>(null);
   const [items, setItems] = useState<Media360[]>([]);
@@ -103,7 +105,13 @@ export default function PlaceMedia360Page() {
   }
 
   async function handleDelete(item: Media360) {
-    if (!confirm(`Xoá điểm nhìn "${item.title}"?`)) return;
+    const ok = await confirm({
+      title: `Xoá điểm nhìn "${item.title}"?`,
+      description: "Hành động này không thể hoàn tác.",
+      confirmLabel: "Xoá",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await deleteDoc(doc(db, "media_360", item.id));
       // xoá tham chiếu hotspot trỏ tới điểm nhìn vừa xoá ở các điểm nhìn còn lại

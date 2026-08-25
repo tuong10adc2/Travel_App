@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/skeleton_loaders.dart';
 import '../../home/models/place.dart';
 import '../data/itinerary_repository.dart';
 import '../models/itinerary_item.dart';
@@ -59,7 +60,7 @@ class _ItineraryDetailScreenState extends ConsumerState<ItineraryDetailScreen> {
         title: Text(itineraryAsync.valueOrNull?.name ?? 'Lịch trình'),
       ),
       body: itineraryAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const SkeletonList(),
         error: (error, _) => Center(child: Text('Lỗi tải lịch trình: $error')),
         data: (itinerary) {
           if (itinerary == null) {
@@ -150,10 +151,9 @@ class _DaySelector extends StatelessWidget {
                 selected: selectedDay == day,
                 onSelected: (_) => onSelect(day),
                 selectedColor: AppColors.primary,
-                labelStyle: TextStyle(
-                  color: selectedDay == day ? Colors.white : AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
+                labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: selectedDay == day ? Colors.white : AppColors.textPrimary,
+                    ),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
                 showCheckmark: false,
               ),
@@ -175,13 +175,13 @@ class _EmptyDay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Text(
           'Chưa có địa điểm nào trong ngày này.\nBấm "Thêm địa điểm" bên dưới.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: AppColors.textSecondary),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
         ),
       ),
     );
@@ -214,7 +214,7 @@ class _ItineraryItemTile extends StatelessWidget {
         ),
         title: Text(
           place?.name ?? '(Địa điểm không còn tồn tại)',
-          style: const TextStyle(fontWeight: FontWeight.w600),
+          style: Theme.of(context).textTheme.titleSmall,
         ),
         subtitle: place != null
             ? Text(place!.address, maxLines: 1, overflow: TextOverflow.ellipsis)

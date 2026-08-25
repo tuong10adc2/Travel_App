@@ -28,7 +28,7 @@ class ReviewListItem extends StatelessWidget {
             backgroundColor: AppColors.primary.withOpacity(0.12),
             child: Text(
               review.userName.isNotEmpty ? review.userName[0].toUpperCase() : '?',
-              style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w700),
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(color: AppColors.primary),
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -38,12 +38,12 @@ class ReviewListItem extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(review.userName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    Text(review.userName, style: Theme.of(context).textTheme.titleSmall),
                     if (review.createdAt != null) ...[
                       const SizedBox(width: AppSpacing.sm),
                       Text(
                         _formatDate(review.createdAt!),
-                        style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                        style: Theme.of(context).textTheme.labelSmall,
                       ),
                     ],
                   ],
@@ -56,9 +56,9 @@ class ReviewListItem extends StatelessWidget {
                 ],
                 if (isMine && review.isPending) ...[
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Đang chờ duyệt — chỉ bạn thấy đánh giá này',
-                    style: TextStyle(fontSize: 11, color: AppColors.textSecondary, fontStyle: FontStyle.italic),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(fontStyle: FontStyle.italic),
                   ),
                 ],
               ],

@@ -83,11 +83,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const Icon(Icons.travel_explore,
                         size: 56, color: AppColors.primary),
                     const SizedBox(height: AppSpacing.md),
-                    const Text(
+                    Text(
                       'Đăng nhập',
                       textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     TextFormField(

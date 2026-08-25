@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/skeleton_loaders.dart';
 import '../providers/tour_providers.dart';
 import '../widgets/tour_card.dart';
 
@@ -15,24 +17,14 @@ class TourListScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Tour gợi ý')),
       body: toursAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const SkeletonList(),
         error: (error, _) => Center(child: Text('Lỗi tải tour: $error')),
         data: (tours) {
           if (tours.isEmpty) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.card_travel, size: 56, color: AppColors.textSecondary),
-                    SizedBox(height: AppSpacing.md),
-                    Text('Chưa có tour nào', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                    SizedBox(height: AppSpacing.xs),
-                    Text('Tour gợi ý sẽ do quản trị viên thêm.', style: TextStyle(color: AppColors.textSecondary)),
-                  ],
-                ),
-              ),
+            return const EmptyState(
+              icon: Icons.card_travel,
+              title: 'Chưa có tour nào',
+              message: 'Tour gợi ý sẽ do quản trị viên thêm.',
             );
           }
           return ListView.separated(

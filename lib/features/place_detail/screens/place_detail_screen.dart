@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_network_image.dart';
+import '../../../core/widgets/skeleton_loaders.dart';
 import '../../home/models/place.dart';
 import '../../home/widgets/place_image_placeholder.dart';
 import '../../review/providers/review_providers.dart';
@@ -29,7 +31,7 @@ class PlaceDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       body: placeAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const SkeletonDetailPage(),
         error: (error, _) => Center(child: Text('Lỗi tải địa điểm: $error')),
         data: (place) {
           if (place == null) {
@@ -63,7 +65,7 @@ class _PlaceDetailContent extends ConsumerWidget {
           flexibleSpace: FlexibleSpaceBar(
             background: place.coverImage.isEmpty
                 ? PlaceImagePlaceholder(place: place)
-                : Image.network(place.coverImage, fit: BoxFit.cover),
+                : AppNetworkImage(url: place.coverImage),
           ),
         ),
         SliverToBoxAdapter(
@@ -75,7 +77,7 @@ class _PlaceDetailContent extends ConsumerWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(place.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
+                      child: Text(place.name, style: Theme.of(context).textTheme.headlineSmall),
                     ),
                     if (place.has360)
                       Container(
@@ -84,7 +86,10 @@ class _PlaceDetailContent extends ConsumerWidget {
                           color: AppColors.primary,
                           borderRadius: BorderRadius.circular(AppRadius.sm),
                         ),
-                        child: const Text('360° VR', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+                        child: Text(
+                          '360° VR',
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.white),
+                        ),
                       ),
                   ],
                 ),
@@ -93,7 +98,10 @@ class _PlaceDetailContent extends ConsumerWidget {
                   children: [
                     StarRating(rating: place.ratingAvg),
                     const SizedBox(width: AppSpacing.xs),
-                    Text('${place.ratingAvg.toStringAsFixed(1)} (${place.ratingCount} đánh giá)'),
+                    Text(
+                      '${place.ratingAvg.toStringAsFixed(1)} (${place.ratingCount} đánh giá)',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -101,7 +109,7 @@ class _PlaceDetailContent extends ConsumerWidget {
                   spacing: AppSpacing.xs,
                   children: place.tags
                       .map((tag) => Chip(
-                            label: Text(tag, style: const TextStyle(fontSize: 12)),
+                            label: Text(tag, style: Theme.of(context).textTheme.bodySmall),
                             backgroundColor: AppColors.primary.withOpacity(0.08),
                             side: BorderSide.none,
                             visualDensity: VisualDensity.compact,
@@ -130,25 +138,28 @@ class _PlaceDetailContent extends ConsumerWidget {
                   ),
                 ],
                 const SizedBox(height: AppSpacing.lg),
-                const Text('Giới thiệu', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                Text('Giới thiệu', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.xs),
-                Text(place.description, style: const TextStyle(color: AppColors.textPrimary)),
+                Text(place.description, style: Theme.of(context).textTheme.bodyLarge),
                 const SizedBox(height: AppSpacing.lg),
                 const Divider(),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   'Đánh giá (${reviewsAsync.valueOrNull?.where((r) => r.status == 'approved').length ?? 0})',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: AppSpacing.md),
                 ReviewForm(targetType: 'place', targetId: place.id, existingReview: myReview),
                 const SizedBox(height: AppSpacing.md),
                 reviewsAsync.when(
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () => const SkeletonList(itemCount: 2),
                   error: (error, _) => Text('Lỗi tải đánh giá: $error'),
                   data: (reviews) {
                     if (reviews.isEmpty) {
-                      return const Text('Chưa có đánh giá nào cho địa điểm này.', style: TextStyle(color: AppColors.textSecondary));
+                      return Text(
+                        'Chưa có đánh giá nào cho địa điểm này.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+                      );
                     }
                     return Column(
                       children: [
@@ -197,7 +208,7 @@ class _InfoRow extends StatelessWidget {
         children: [
           Icon(icon, size: 18, color: AppColors.textSecondary),
           const SizedBox(width: AppSpacing.sm),
-          Expanded(child: Text(text)),
+          Expanded(child: Text(text, style: Theme.of(context).textTheme.bodyMedium)),
         ],
       ),
     );
@@ -223,14 +234,17 @@ class _OpeningHours extends StatelessWidget {
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: sameAllWeek
-                ? Text('Giờ mở cửa: ${values.first} (cả tuần)')
+                ? Text('Giờ mở cửa: ${values.first} (cả tuần)', style: Theme.of(context).textTheme.bodyMedium)
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Giờ mở cửa:'),
+                      Text('Giờ mở cửa:', style: Theme.of(context).textTheme.bodyMedium),
                       for (final day in _weekdayOrder)
                         if (openingHours[day] != null)
-                          Text('${_weekdayLabels[day]}: ${openingHours[day]}', style: const TextStyle(fontSize: 13)),
+                          Text(
+                            '${_weekdayLabels[day]}: ${openingHours[day]}',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
                     ],
                   ),
           ),

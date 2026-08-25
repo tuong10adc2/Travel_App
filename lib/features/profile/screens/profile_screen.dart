@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/skeleton_loaders.dart';
 import '../../auth/data/auth_repository.dart';
 import '../providers/profile_providers.dart';
 
@@ -69,7 +70,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ],
       ),
       body: userDoc.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const SkeletonDetailPage(),
         error: (error, _) => Center(child: Text('Lỗi tải hồ sơ: $error')),
         data: (data) {
           if (data == null) {

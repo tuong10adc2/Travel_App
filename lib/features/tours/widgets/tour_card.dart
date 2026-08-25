@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_network_image.dart';
 import '../models/tour.dart';
 
 class TourCard extends StatelessWidget {
@@ -49,7 +50,7 @@ class TourCard extends StatelessWidget {
                         child: Icon(Icons.card_travel, size: 32, color: Colors.white70),
                       ),
                     )
-                  : Image.network(tour.coverImage, fit: BoxFit.cover),
+                  : AppNetworkImage(url: tour.coverImage),
             ),
             Expanded(
               child: Padding(
@@ -61,31 +62,31 @@ class TourCard extends StatelessWidget {
                       tour.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                      style: Theme.of(context).textTheme.titleSmall,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       tour.description,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Row(
                       children: [
                         const Icon(Icons.calendar_month_outlined, size: 14, color: AppColors.textSecondary),
                         const SizedBox(width: 4),
-                        Text('${tour.durationDays} ngày', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                        Text('${tour.durationDays} ngày', style: Theme.of(context).textTheme.bodySmall),
                         const SizedBox(width: AppSpacing.sm),
                         const Icon(Icons.place_outlined, size: 14, color: AppColors.textSecondary),
                         const SizedBox(width: 4),
-                        Text('${tour.placeIds.length} điểm', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                        Text('${tour.placeIds.length} điểm', style: Theme.of(context).textTheme.bodySmall),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
                       _priceLabel,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primary),
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(color: AppColors.primary),
                     ),
                   ],
                 ),

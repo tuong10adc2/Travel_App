@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_network_image.dart';
 import '../models/place.dart';
 import 'place_image_placeholder.dart';
 
@@ -39,7 +40,7 @@ class PlaceCard extends StatelessWidget {
               children: [
                 place.coverImage.isEmpty
                     ? PlaceImagePlaceholder(place: place)
-                    : Image.network(place.coverImage, fit: BoxFit.cover),
+                    : AppNetworkImage(url: place.coverImage),
                 if (place.ratingAvg > 0)
                   Positioned(
                     top: AppSpacing.sm,
@@ -53,14 +54,14 @@ class PlaceCard extends StatelessWidget {
                           const SizedBox(width: 2),
                           Text(
                             place.ratingAvg.toStringAsFixed(1),
-                            style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.white),
                           ),
                         ],
                       ),
                     ),
                   ),
                 if (place.has360)
-                  const Positioned(
+                  Positioned(
                     top: AppSpacing.sm,
                     right: AppSpacing.sm,
                     child: _Badge(
@@ -68,9 +69,12 @@ class PlaceCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.threed_rotation, size: 12, color: Colors.white),
-                          SizedBox(width: 2),
-                          Text('360° VR', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600)),
+                          const Icon(Icons.threed_rotation, size: 12, color: Colors.white),
+                          const SizedBox(width: 2),
+                          Text(
+                            '360° VR',
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.white, fontSize: 10),
+                          ),
                         ],
                       ),
                     ),
@@ -87,25 +91,25 @@ class PlaceCard extends StatelessWidget {
                   place.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   place.description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Row(
                   children: [
                     const Icon(Icons.access_time, size: 12, color: AppColors.textSecondary),
                     const SizedBox(width: 4),
-                    Text(_durationLabel, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                    Text(_durationLabel, style: Theme.of(context).textTheme.labelSmall),
                     const Spacer(),
                     Text(
                       _priceLabel,
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primary),
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.primary),
                     ),
                   ],
                 ),

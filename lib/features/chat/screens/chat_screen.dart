@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/skeleton_loaders.dart';
 import '../data/chat_repository.dart';
 import '../providers/chat_providers.dart';
 import '../widgets/chat_message_bubble.dart';
@@ -83,7 +85,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         children: [
           Expanded(
             child: messagesAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const SkeletonList(itemCount: 4),
               error: (error, _) => Center(child: Text('Lỗi tải hội thoại: $error')),
               data: (messages) {
                 if (messages.isEmpty && !isWaiting) {
@@ -140,24 +142,10 @@ class _WelcomeState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.smart_toy_outlined, size: 56, color: AppColors.textSecondary),
-            SizedBox(height: AppSpacing.md),
-            Text('Trợ lý du lịch AI', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-            SizedBox(height: AppSpacing.xs),
-            Text(
-              'Hỏi mình về địa điểm, lên lịch trình hay mẹo du lịch nhé!',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textSecondary),
-            ),
-          ],
-        ),
-      ),
+    return const EmptyState(
+      icon: Icons.smart_toy_outlined,
+      title: 'Trợ lý du lịch AI',
+      message: 'Hỏi mình về địa điểm, lên lịch trình hay mẹo du lịch nhé!',
     );
   }
 }

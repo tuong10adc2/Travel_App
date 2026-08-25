@@ -17,6 +17,7 @@ import { Check, EyeOff, Sparkles, Star, Trash2 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
+import { useConfirm } from "@/contexts/confirm-context";
 import { logAction } from "@/lib/audit-log";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -59,6 +60,7 @@ export default function ReviewsPage() {
 function ReviewsPageInner() {
   const { user } = useAuth();
   const toast = useToast();
+  const confirm = useConfirm();
   const searchParams = useSearchParams();
   const userIdFilter = searchParams.get("userId");
 
@@ -121,7 +123,13 @@ function ReviewsPageInner() {
   }
 
   async function handleDelete(r: Review) {
-    if (!confirm("Xoá đánh giá này? Hành động không thể hoàn tác.")) return;
+    const ok = await confirm({
+      title: "Xoá đánh giá này?",
+      description: "Hành động không thể hoàn tác.",
+      confirmLabel: "Xoá",
+      danger: true,
+    });
+    if (!ok) return;
     setBusyId(r.id);
     try {
       await deleteDoc(doc(db, "reviews", r.id));
