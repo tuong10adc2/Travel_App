@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/pressable_scale.dart';
 import '../../../core/widgets/skeleton_loaders.dart';
 import '../data/chat_repository.dart';
 import '../providers/chat_providers.dart';
@@ -122,10 +123,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  IconButton.filled(
-                    onPressed: isWaiting ? null : _send,
-                    icon: const Icon(Icons.send),
-                    style: IconButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+                  PressableScale(
+                    child: IconButton.filled(
+                      onPressed: isWaiting ? null : _send,
+                      icon: const Icon(Icons.send),
+                      style: IconButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+                    ),
                   ),
                 ],
               ),
@@ -161,9 +164,9 @@ class _TypingIndicator extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: context.colors.surface,
           borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: AppColors.textSecondary.withOpacity(0.15)),
+          border: Border.all(color: context.colors.textSecondary.withOpacity(0.15)),
         ),
         child: const SizedBox(
           width: 20,

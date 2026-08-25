@@ -83,7 +83,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                   decoration: const InputDecoration(labelText: 'Ngày bắt đầu'),
                   child: Row(
                     children: [
-                      const Icon(Icons.calendar_today_outlined, size: 18, color: AppColors.textSecondary),
+                      Icon(Icons.calendar_today_outlined, size: 18, color: context.colors.textSecondary),
                       const SizedBox(width: AppSpacing.sm),
                       Text(formatDateVi(_startDate)),
                     ],

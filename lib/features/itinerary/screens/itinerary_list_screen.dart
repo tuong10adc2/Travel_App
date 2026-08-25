@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/date_format.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/pressable_scale.dart';
 import '../../../core/widgets/skeleton_loaders.dart';
 import '../models/itinerary.dart';
 import '../providers/itinerary_providers.dart';
@@ -18,10 +19,12 @@ class ItineraryListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Lịch trình của tôi')),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/itineraries/new'),
-        icon: const Icon(Icons.add),
-        label: const Text('Tạo lịch trình'),
+      floatingActionButton: PressableScale(
+        child: FloatingActionButton.extended(
+          onPressed: () => context.push('/itineraries/new'),
+          icon: const Icon(Icons.add),
+          label: const Text('Tạo lịch trình'),
+        ),
       ),
       body: itinerariesAsync.when(
         loading: () => const SkeletonList(),

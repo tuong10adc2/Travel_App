@@ -38,9 +38,12 @@ class PlaceCard extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                place.coverImage.isEmpty
-                    ? PlaceImagePlaceholder(place: place)
-                    : AppNetworkImage(url: place.coverImage),
+                Hero(
+                  tag: 'place-image-${place.id}',
+                  child: place.coverImage.isEmpty
+                      ? PlaceImagePlaceholder(place: place)
+                      : AppNetworkImage(url: place.coverImage),
+                ),
                 if (place.ratingAvg > 0)
                   Positioned(
                     top: AppSpacing.sm,
@@ -103,7 +106,7 @@ class PlaceCard extends StatelessWidget {
                 const SizedBox(height: AppSpacing.xs),
                 Row(
                   children: [
-                    const Icon(Icons.access_time, size: 12, color: AppColors.textSecondary),
+                    Icon(Icons.access_time, size: 12, color: context.colors.textSecondary),
                     const SizedBox(width: 4),
                     Text(_durationLabel, style: Theme.of(context).textTheme.labelSmall),
                     const Spacer(),

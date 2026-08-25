@@ -152,7 +152,7 @@ class _DaySelector extends StatelessWidget {
                 onSelected: (_) => onSelect(day),
                 selectedColor: AppColors.primary,
                 labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: selectedDay == day ? Colors.white : AppColors.textPrimary,
+                      color: selectedDay == day ? Colors.white : context.colors.textPrimary,
                     ),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
                 showCheckmark: false,
@@ -181,7 +181,7 @@ class _EmptyDay extends StatelessWidget {
         child: Text(
           'Chưa có địa điểm nào trong ngày này.\nBấm "Thêm địa điểm" bên dưới.',
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
         ),
       ),
     );
@@ -210,7 +210,7 @@ class _ItineraryItemTile extends StatelessWidget {
       child: ListTile(
         leading: ReorderableDragStartListener(
           index: index,
-          child: const Icon(Icons.drag_indicator, color: AppColors.textSecondary),
+          child: Icon(Icons.drag_indicator, color: context.colors.textSecondary),
         ),
         title: Text(
           place?.name ?? '(Địa điểm không còn tồn tại)',

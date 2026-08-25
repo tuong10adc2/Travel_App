@@ -64,9 +64,9 @@ class _ReviewFormState extends ConsumerState<ReviewForm> {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColors.textSecondary.withOpacity(0.15)),
+        border: Border.all(color: context.colors.textSecondary.withOpacity(0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
