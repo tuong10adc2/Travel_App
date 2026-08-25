@@ -18,6 +18,7 @@ import '../../features/saved/screens/saved_places_screen.dart';
 import '../../features/tours/screens/tour_detail_screen.dart';
 import '../../features/tours/screens/tour_list_screen.dart';
 import '../../features/vr360/screens/vr360_viewer_screen.dart';
+import 'main_shell.dart';
 
 const _authRoutes = ['/login', '/register', '/forgot-password'];
 
@@ -58,13 +59,28 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/forgot-password',
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomeScreen(),
-      ),
-      GoRoute(
-        path: '/profile',
-        builder: (context, state) => const ProfileScreen(),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) => MainShell(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/tours', builder: (context, state) => const TourListScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/itineraries', builder: (context, state) => const ItineraryListScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/chat', builder: (context, state) => const ChatScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/saved', builder: (context, state) => const SavedPlacesScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
+          ]),
+        ],
       ),
       GoRoute(
         path: '/place/:id',
@@ -76,14 +92,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           placeId: state.pathParameters['id']!,
           initialMediaId: state.uri.queryParameters['mediaId'],
         ),
-      ),
-      GoRoute(
-        path: '/saved',
-        builder: (context, state) => const SavedPlacesScreen(),
-      ),
-      GoRoute(
-        path: '/itineraries',
-        builder: (context, state) => const ItineraryListScreen(),
       ),
       GoRoute(
         path: '/itineraries/new',
@@ -99,14 +107,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           itineraryId: state.pathParameters['id']!,
           dayIndex: int.tryParse(state.uri.queryParameters['day'] ?? '') ?? 0,
         ),
-      ),
-      GoRoute(
-        path: '/chat',
-        builder: (context, state) => const ChatScreen(),
-      ),
-      GoRoute(
-        path: '/tours',
-        builder: (context, state) => const TourListScreen(),
       ),
       GoRoute(
         path: '/tours/:id',
