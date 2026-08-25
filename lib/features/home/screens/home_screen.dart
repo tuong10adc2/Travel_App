@@ -18,8 +18,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  int _navIndex = 0;
-
   @override
   void initState() {
     super.initState();
@@ -28,34 +26,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(pushNotificationServiceProvider).init();
     });
-  }
-
-  void _onNavTap(int index) {
-    if (index == _navIndex) return;
-    switch (index) {
-      case 1:
-        context.push('/tours');
-        return;
-      case 2:
-        context.push('/itineraries');
-        return;
-      case 3:
-        context.push('/chat');
-        return;
-      case 4:
-        context.push('/saved');
-        return;
-      case 5:
-        context.push('/profile');
-        return;
-    }
-    if (index != 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Chức năng đang phát triển, sẽ có ở giai đoạn sau.')),
-      );
-      return;
-    }
-    setState(() => _navIndex = index);
   }
 
   @override
@@ -73,7 +43,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _Header(onProfileTap: () => context.push('/profile')),
+                    _Header(onProfileTap: () => context.go('/profile')),
                     const SizedBox(height: AppSpacing.lg),
                     _SearchField(
                       onChanged: (value) => ref.read(placeSearchQueryProvider.notifier).state = value,
@@ -124,18 +94,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _navIndex,
-        onDestinationSelected: _onNavTap,
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.explore_outlined), selectedIcon: Icon(Icons.explore), label: 'Khám phá'),
-          NavigationDestination(icon: Icon(Icons.map_outlined), selectedIcon: Icon(Icons.map), label: 'Tours'),
-          NavigationDestination(icon: Icon(Icons.calendar_month_outlined), selectedIcon: Icon(Icons.calendar_month), label: 'Lịch trình'),
-          NavigationDestination(icon: Icon(Icons.smart_toy_outlined), selectedIcon: Icon(Icons.smart_toy), label: 'Trợ lý'),
-          NavigationDestination(icon: Icon(Icons.bookmark_border), selectedIcon: Icon(Icons.bookmark), label: 'Đã lưu'),
-          NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Hồ sơ'),
-        ],
       ),
     );
   }
