@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "travelapp-7f140"
-  }
+  },
+  "targets": {
+    "travelapp-7f140": {
+      "hosting": {
+        "webapp": [
+          "travelapp-7f140-web"
+        ],
+        "admin": [
+          "travelapp-7f140-admin"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
