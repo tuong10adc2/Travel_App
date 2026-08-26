@@ -6,6 +6,7 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { Search, MapPin } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { Input } from "@/components/ui/input";
+import { PatternOverlay } from "@/components/ui/pattern-overlay";
 import { Reveal } from "@/components/ui/reveal";
 import { PlaceCard } from "@/components/place-card";
 import { cn } from "@/lib/cn";
@@ -40,7 +41,9 @@ function ExploreInner() {
   }, [places, search, selectedTag]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <div className="relative overflow-hidden">
+      <PatternOverlay />
+      <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Khám phá địa điểm</h1>
         <p className="mt-2 text-muted-foreground">Tìm kiếm và lọc theo sở thích của bạn</p>
@@ -107,6 +110,7 @@ function ExploreInner() {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

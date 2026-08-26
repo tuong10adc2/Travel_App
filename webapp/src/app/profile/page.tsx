@@ -11,6 +11,7 @@ import { RequireAuth } from "@/components/require-auth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Field, Input, Label } from "@/components/ui/input";
+import { PatternOverlay } from "@/components/ui/pattern-overlay";
 import { PLACE_TAGS, type AppUser } from "@/lib/types";
 
 function formatDate(ts: unknown) {
@@ -75,7 +76,9 @@ function ProfileForm({ profile }: { profile: AppUser }) {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
+    <div className="relative overflow-hidden">
+      <PatternOverlay />
+      <div className="relative mx-auto max-w-2xl px-4 py-10 sm:px-6">
       <div className="mb-6 flex items-center gap-4">
         <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-brand-600 p-0.5">
           <div className="flex h-full w-full items-center justify-center rounded-full bg-surface text-2xl font-semibold text-brand-700">
@@ -90,14 +93,16 @@ function ProfileForm({ profile }: { profile: AppUser }) {
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-3">
-        <Card className="flex flex-col items-center gap-1 p-4 text-center">
-          <Bookmark className="h-5 w-5 text-brand-600" />
-          <span className="text-xl font-semibold text-foreground">{savedCount ?? "—"}</span>
-          <span className="text-xs text-muted-foreground">Đã lưu</span>
+        <Card className="relative flex flex-col items-center gap-1 overflow-hidden p-4 text-center">
+          <PatternOverlay opacity={0.7} />
+          <Bookmark className="relative h-5 w-5 text-brand-600" />
+          <span className="relative text-xl font-semibold text-foreground">{savedCount ?? "—"}</span>
+          <span className="relative text-xs text-muted-foreground">Đã lưu</span>
         </Card>
-        <Card className="flex flex-col items-center gap-1 p-4 text-center">
-          <CalendarRange className="h-5 w-5 text-brand-600" />
-          <span className="text-xl font-semibold text-foreground">{itineraryCount ?? "—"}</span>
+        <Card className="relative flex flex-col items-center gap-1 overflow-hidden p-4 text-center">
+          <PatternOverlay opacity={0.7} />
+          <CalendarRange className="relative h-5 w-5 text-brand-600" />
+          <span className="relative text-xl font-semibold text-foreground">{itineraryCount ?? "—"}</span>
           <span className="text-xs text-muted-foreground">Lịch trình</span>
         </Card>
       </div>
@@ -158,6 +163,7 @@ function ProfileForm({ profile }: { profile: AppUser }) {
         <Button variant="outline" onClick={() => signOut()} className="w-full">
           <LogOut className="h-4 w-4" /> Đăng xuất
         </Button>
+      </div>
       </div>
     </div>
   );
