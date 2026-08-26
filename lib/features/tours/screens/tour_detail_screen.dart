@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/date_format.dart';
 import '../../../core/widgets/app_network_image.dart';
+import '../../../core/widgets/frosted_sliver_app_bar.dart';
 import '../../../core/widgets/skeleton_loaders.dart';
 import '../../home/models/place.dart';
 import '../../home/widgets/place_image_placeholder.dart';
@@ -42,38 +43,58 @@ class TourDetailScreen extends ConsumerWidget {
   }
 }
 
-class _TourDetailContent extends ConsumerWidget {
+class _TourDetailContent extends ConsumerStatefulWidget {
   const _TourDetailContent({required this.tour});
 
   final Tour tour;
 
+  @override
+  ConsumerState<_TourDetailContent> createState() => _TourDetailContentState();
+}
+
+class _TourDetailContentState extends ConsumerState<_TourDetailContent> {
+  final _scrollController = ScrollController();
+
   String get _priceLabel {
+    final tour = widget.tour;
     if (tour.price <= 0) return 'Liên hệ';
-    final s = tour.price.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => '.');
+    final s = tour.price
+        .toString()
+        .replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => '.');
     return '${s}đ'; // ignore: unnecessary_brace_in_string_interps -- tránh nhập nhằng với ký tự "đ" liền sau
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tour = widget.tour;
     final target = (targetType: 'tour', targetId: tour.id);
     final reviewsAsync = ref.watch(reviewsForTargetProvider(target));
     final myReview = ref.watch(myReviewForTargetProvider(target));
     final placesById = ref.watch(placesByIdProvider);
-    final places = tour.placeIds.map((id) => placesById[id]).whereType<Place>().toList();
+    final places =
+        tour.placeIds.map((id) => placesById[id]).whereType<Place>().toList();
 
     return CustomScrollView(
+      controller: _scrollController,
       slivers: [
-        SliverAppBar(
-          pinned: true,
+        FrostedSliverAppBar(
+          controller: _scrollController,
           expandedHeight: 220,
-          backgroundColor: AppColors.primary,
-          flexibleSpace: FlexibleSpaceBar(
-            background: Hero(
-              tag: 'tour-image-${tour.id}',
-              child: tour.coverImage.isEmpty
-                  ? Container(color: AppColors.primary, child: const Center(child: Icon(Icons.card_travel, size: 56, color: Colors.white70)))
-                  : AppNetworkImage(url: tour.coverImage),
-            ),
+          background: Hero(
+            tag: 'tour-image-${tour.id}',
+            child: tour.coverImage.isEmpty
+                ? Container(
+                    color: AppColors.primary,
+                    child: const Center(
+                        child: Icon(Icons.card_travel,
+                            size: 56, color: Colors.white70)))
+                : AppNetworkImage(url: tour.coverImage),
           ),
         ),
         SliverToBoxAdapter(
@@ -82,35 +103,48 @@ class _TourDetailContent extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(tour.name, style: Theme.of(context).textTheme.headlineSmall),
+                Text(tour.name,
+                    style: Theme.of(context).textTheme.headlineSmall),
                 const SizedBox(height: AppSpacing.xs),
                 Row(
                   children: [
-                    StarRating(rating: (reviewsAsync.valueOrNull?.isEmpty ?? true) ? 0.0 : _avgRating(reviewsAsync.valueOrNull!)),
+                    StarRating(
+                        rating: (reviewsAsync.valueOrNull?.isEmpty ?? true)
+                            ? 0.0
+                            : _avgRating(reviewsAsync.valueOrNull!)),
                     const SizedBox(width: AppSpacing.xs),
-                    Text('${reviewsAsync.valueOrNull?.where((r) => r.status == 'approved').length ?? 0} đánh giá'),
+                    Text(
+                        '${reviewsAsync.valueOrNull?.where((r) => r.status == 'approved').length ?? 0} đánh giá'),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Row(
                   children: [
-                    Icon(Icons.calendar_month_outlined, size: 18, color: context.colors.textSecondary),
+                    Icon(Icons.calendar_month_outlined,
+                        size: 18, color: context.colors.textSecondary),
                     const SizedBox(width: AppSpacing.sm),
                     Text('${tour.durationDays} ngày'),
                     const SizedBox(width: AppSpacing.lg),
-                    Icon(Icons.place_outlined, size: 18, color: context.colors.textSecondary),
+                    Icon(Icons.place_outlined,
+                        size: 18, color: context.colors.textSecondary),
                     const SizedBox(width: AppSpacing.sm),
                     Text('${tour.placeIds.length} địa điểm'),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                Text(_priceLabel, style: Theme.of(context).textTheme.titleLarge?.copyWith(color: AppColors.primary)),
+                Text(_priceLabel,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge
+                        ?.copyWith(color: AppColors.primary)),
                 const SizedBox(height: AppSpacing.lg),
-                Text('Giới thiệu', style: Theme.of(context).textTheme.titleMedium),
+                Text('Giới thiệu',
+                    style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.xs),
                 Text(tour.description),
                 const SizedBox(height: AppSpacing.lg),
-                Text('Địa điểm trong tour', style: Theme.of(context).textTheme.titleMedium),
+                Text('Địa điểm trong tour',
+                    style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.sm),
                 for (final place in places)
                   Card(
@@ -125,7 +159,8 @@ class _TourDetailContent extends ConsumerWidget {
                             : AppNetworkImage(url: place.coverImage),
                       ),
                       title: Text(place.name),
-                      subtitle: Text(place.address, maxLines: 1, overflow: TextOverflow.ellipsis),
+                      subtitle: Text(place.address,
+                          maxLines: 1, overflow: TextOverflow.ellipsis),
                       onTap: () => context.push('/place/${place.id}'),
                     ),
                   ),
@@ -133,7 +168,8 @@ class _TourDetailContent extends ConsumerWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: () => _showAddToItineraryDialog(context, ref, tour),
+                    onPressed: () =>
+                        _showAddToItineraryDialog(context, ref, tour),
                     icon: const Icon(Icons.playlist_add),
                     label: const Text('Thêm vào lịch trình của tôi'),
                   ),
@@ -146,7 +182,10 @@ class _TourDetailContent extends ConsumerWidget {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: AppSpacing.md),
-                ReviewForm(targetType: 'tour', targetId: tour.id, existingReview: myReview),
+                ReviewForm(
+                    targetType: 'tour',
+                    targetId: tour.id,
+                    existingReview: myReview),
                 const SizedBox(height: AppSpacing.md),
                 reviewsAsync.when(
                   loading: () => const SkeletonList(itemCount: 3),
@@ -155,13 +194,18 @@ class _TourDetailContent extends ConsumerWidget {
                     if (reviews.isEmpty) {
                       return Text(
                         'Chưa có đánh giá nào cho tour này.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(color: context.colors.textSecondary),
                       );
                     }
                     return Column(
                       children: [
                         for (final review in reviews)
-                          ReviewListItem(review: review, isMine: review.userId == myReview?.userId),
+                          ReviewListItem(
+                              review: review,
+                              isMine: review.userId == myReview?.userId),
                       ],
                     );
                   },
@@ -181,7 +225,8 @@ class _TourDetailContent extends ConsumerWidget {
     return sum / approved.length;
   }
 
-  Future<void> _showAddToItineraryDialog(BuildContext context, WidgetRef ref, Tour tour) async {
+  Future<void> _showAddToItineraryDialog(
+      BuildContext context, WidgetRef ref, Tour tour) async {
     final nameController = TextEditingController(text: tour.name);
     var startDate = DateTime.now();
     bool isSubmitting = false;
@@ -195,7 +240,9 @@ class _TourDetailContent extends ConsumerWidget {
               if (nameController.text.trim().isEmpty) return;
               setState(() => isSubmitting = true);
               try {
-                final itineraryId = await ref.read(itineraryRepositoryProvider).createItineraryFromTour(
+                final itineraryId = await ref
+                    .read(itineraryRepositoryProvider)
+                    .createItineraryFromTour(
                       name: nameController.text.trim(),
                       startDate: startDate,
                       placeIds: tour.placeIds,
@@ -206,7 +253,9 @@ class _TourDetailContent extends ConsumerWidget {
               } catch (e) {
                 if (dialogContext.mounted) {
                   ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    SnackBar(content: Text('Không tạo được lịch trình: $e'), backgroundColor: AppColors.error),
+                    SnackBar(
+                        content: Text('Không tạo được lịch trình: $e'),
+                        backgroundColor: AppColors.error),
                   );
                 }
               } finally {
@@ -222,7 +271,8 @@ class _TourDetailContent extends ConsumerWidget {
                 children: [
                   TextField(
                     controller: nameController,
-                    decoration: const InputDecoration(labelText: 'Tên lịch trình'),
+                    decoration:
+                        const InputDecoration(labelText: 'Tên lịch trình'),
                   ),
                   const SizedBox(height: AppSpacing.md),
                   InkWell(
@@ -230,16 +280,21 @@ class _TourDetailContent extends ConsumerWidget {
                       final picked = await showDatePicker(
                         context: dialogContext,
                         initialDate: startDate,
-                        firstDate: DateTime.now().subtract(const Duration(days: 1)),
-                        lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+                        firstDate:
+                            DateTime.now().subtract(const Duration(days: 1)),
+                        lastDate:
+                            DateTime.now().add(const Duration(days: 365 * 2)),
                       );
                       if (picked != null) setState(() => startDate = picked);
                     },
                     child: InputDecorator(
-                      decoration: const InputDecoration(labelText: 'Ngày bắt đầu'),
+                      decoration:
+                          const InputDecoration(labelText: 'Ngày bắt đầu'),
                       child: Row(
                         children: [
-                          Icon(Icons.calendar_today_outlined, size: 18, color: dialogContext.colors.textSecondary),
+                          Icon(Icons.calendar_today_outlined,
+                              size: 18,
+                              color: dialogContext.colors.textSecondary),
                           const SizedBox(width: AppSpacing.sm),
                           Text(formatDateVi(startDate)),
                         ],
@@ -250,7 +305,9 @@ class _TourDetailContent extends ConsumerWidget {
               ),
               actions: [
                 TextButton(
-                  onPressed: isSubmitting ? null : () => Navigator.of(dialogContext).pop(),
+                  onPressed: isSubmitting
+                      ? null
+                      : () => Navigator.of(dialogContext).pop(),
                   child: const Text('Huỷ'),
                 ),
                 ElevatedButton(
@@ -259,7 +316,8 @@ class _TourDetailContent extends ConsumerWidget {
                       ? const SizedBox(
                           height: 18,
                           width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
                         )
                       : const Text('Tạo lịch trình'),
                 ),

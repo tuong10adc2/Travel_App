@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/fade_slide_in.dart';
 import '../../../core/widgets/skeleton_loaders.dart';
 import '../../home/widgets/place_card.dart';
 import '../providers/saved_providers.dart';
@@ -37,7 +38,8 @@ class SavedPlacesScreen extends ConsumerWidget {
               childAspectRatio: 0.72,
             ),
             itemCount: places.length,
-            itemBuilder: (context, index) => PlaceCard(place: places[index]),
+            itemBuilder: (context, index) =>
+                FadeSlideIn.staggered(index: index, child: PlaceCard(place: places[index])),
           );
         },
       ),

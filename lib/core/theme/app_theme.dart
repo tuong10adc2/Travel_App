@@ -105,7 +105,8 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
       divider: Color.lerp(divider, other.divider, t)!,
       shimmerBase: Color.lerp(shimmerBase, other.shimmerBase, t)!,
-      shimmerHighlight: Color.lerp(shimmerHighlight, other.shimmerHighlight, t)!,
+      shimmerHighlight:
+          Color.lerp(shimmerHighlight, other.shimmerHighlight, t)!,
     );
   }
 }
@@ -197,7 +198,9 @@ class AppTheme {
       brightness: brightness,
       primary: primary,
       secondary: AppColors.secondary,
-      error: brightness == Brightness.dark ? const Color(0xFFF47171) : AppColors.error,
+      error: brightness == Brightness.dark
+          ? const Color(0xFFF47171)
+          : AppColors.error,
       surface: colors.surface,
     );
     final textTheme = _textTheme(colors);
@@ -216,9 +219,16 @@ class AppTheme {
         centerTitle: false,
         titleTextStyle: textTheme.titleLarge,
       ),
+      // elevation: 0 khiến mọi Card phẳng dính vào nền, không có lớp lang —
+      // nâng nhẹ (1.5) + shadow màu thương hiệu mờ (thay vì đen trần) để có
+      // chiều sâu mà vẫn "nhẹ", không kéo bóng nặng kiểu Material cũ.
       cardTheme: CardTheme(
         color: colors.surface,
-        elevation: 0,
+        elevation: 1.5,
+        shadowColor: brightness == Brightness.dark
+            ? Colors.black.withOpacity(0.5)
+            : AppColors.primary.withOpacity(0.16),
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
         ),
