@@ -90,9 +90,11 @@ class AuthRepository {
         idToken: googleAuth.idToken,
       );
 
-      final userCredential = await _firebaseAuth.signInWithCredential(credential);
+      final userCredential =
+          await _firebaseAuth.signInWithCredential(credential);
       final user = userCredential.user!;
-      await _createUserDocument(user, displayName: user.displayName ?? googleUser.displayName ?? '');
+      await _createUserDocument(user,
+          displayName: user.displayName ?? googleUser.displayName ?? '');
       return user;
     } on FirebaseAuthException catch (e) {
       throw AuthException.fromFirebase(e);
@@ -102,6 +104,7 @@ class AuthRepository {
   Future<void> updateProfile({
     required String displayName,
     String? phoneNumber,
+    List<String>? preferences,
   }) async {
     final user = _firebaseAuth.currentUser;
     if (user == null) return;
@@ -110,6 +113,7 @@ class AuthRepository {
     await _firestore.collection('users').doc(user.uid).update({
       'displayName': displayName,
       'phoneNumber': phoneNumber,
+      if (preferences != null) 'preferences': preferences,
       'updatedAt': FieldValue.serverTimestamp(),
     });
   }
@@ -124,7 +128,8 @@ class AuthRepository {
   /// Tạo `users/{uid}` khớp field bắt buộc trong `firestore.rules`
   /// (role mặc định 'user', isDisabled = false) — chỉ tạo nếu chưa tồn tại,
   /// để không ghi đè khi đăng nhập lại qua provider khác (vd. Google).
-  Future<void> _createUserDocument(User user, {required String displayName}) async {
+  Future<void> _createUserDocument(User user,
+      {required String displayName}) async {
     final docRef = _firestore.collection('users').doc(user.uid);
     final snapshot = await docRef.get();
     if (snapshot.exists) return;

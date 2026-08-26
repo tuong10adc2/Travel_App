@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../theme/app_theme.dart';
+import '../widgets/pressable_scale.dart';
 
-/// Khung Scaffold + thanh điều hướng nổi dùng chung cho 6 tab chính. Thay
-/// `NavigationBar` thẳng hàng mặc định bằng 1 pill bo tròn nổi cách đáy màn
-/// hình, với 2 nút tròn "nổi bật" (Khám phá, Trợ lý AI) nhô lên giữa — đối
-/// xứng 2-2-2 quanh tâm thay vì lệch về 1 bên. `StatefulShellRoute.
-/// indexedStack` vẫn giữ mỗi tab 1 Navigator/stack riêng nên thanh không
-/// biến mất khi chuyển tab hay khi back trong từng tab.
+/// Khung Scaffold + thanh điều hướng nổi dùng chung cho 6 tab chính. Cả 6 ô
+/// đều là icon tròn ngang hàng nhau trong 1 pill bo tròn nổi cách đáy màn
+/// hình — ô đang chọn mới "nổi" lên (dịch lên nhẹ + đổi màu đặc), không có
+/// tab nào mặc định nổi cao như bản trước. `StatefulShellRoute.indexedStack`
+/// vẫn giữ mỗi tab 1 Navigator/stack riêng nên thanh không biến mất khi
+/// chuyển tab hay khi back trong từng tab.
 class MainShell extends StatelessWidget {
   const MainShell({super.key, required this.navigationShell});
 
@@ -55,7 +56,12 @@ class _NavItemData {
   final String label;
 }
 
-const _flatLeft = [
+const _items = [
+  _NavItemData(
+      index: _kHome,
+      icon: Icons.explore_outlined,
+      selectedIcon: Icons.explore,
+      label: 'Khám phá'),
   _NavItemData(
       index: _kTours,
       icon: Icons.map_outlined,
@@ -67,8 +73,11 @@ const _flatLeft = [
     selectedIcon: Icons.calendar_month,
     label: 'Lịch trình',
   ),
-];
-const _flatRight = [
+  _NavItemData(
+      index: _kChat,
+      icon: Icons.smart_toy_outlined,
+      selectedIcon: Icons.smart_toy,
+      label: 'Trợ lý'),
   _NavItemData(
       index: _kSaved,
       icon: Icons.bookmark_border,
@@ -80,18 +89,6 @@ const _flatRight = [
       selectedIcon: Icons.person,
       label: 'Hồ sơ'),
 ];
-const _raised = [
-  _NavItemData(
-      index: _kHome,
-      icon: Icons.explore_outlined,
-      selectedIcon: Icons.explore,
-      label: 'Khám phá'),
-  _NavItemData(
-      index: _kChat,
-      icon: Icons.smart_toy_outlined,
-      selectedIcon: Icons.smart_toy,
-      label: 'Trợ lý'),
-];
 
 class _FloatingNavBar extends StatelessWidget {
   const _FloatingNavBar({required this.currentIndex, required this.onSelect});
@@ -100,8 +97,8 @@ class _FloatingNavBar extends StatelessWidget {
   final ValueChanged<int> onSelect;
 
   static const _barHeight = 64.0;
-  static const _raisedSize = 52.0;
-  static const _totalHeight = 96.0;
+  static const _circleSize = 44.0;
+  static const _totalHeight = 84.0;
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +110,6 @@ class _FloatingNavBar extends StatelessWidget {
         height: _totalHeight,
         child: Stack(
           clipBehavior: Clip.none,
-          alignment: Alignment.bottomCenter,
           children: [
             Positioned(
               left: 12,
@@ -121,7 +117,6 @@ class _FloatingNavBar extends StatelessWidget {
               bottom: 8,
               child: Container(
                 height: _barHeight,
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
                 decoration: BoxDecoration(
                   color: colors.surface,
                   borderRadius: BorderRadius.circular(_barHeight / 2),
@@ -133,37 +128,25 @@ class _FloatingNavBar extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Row(
-                  children: [
-                    for (final item in _flatLeft)
-                      Expanded(
-                          child: _FlatTab(
-                              item: item,
-                              selected: currentIndex == item.index,
-                              onSelect: onSelect)),
-                    const SizedBox(width: 120),
-                    for (final item in _flatRight)
-                      Expanded(
-                          child: _FlatTab(
-                              item: item,
-                              selected: currentIndex == item.index,
-                              onSelect: onSelect)),
-                  ],
-                ),
               ),
             ),
             Positioned(
-              bottom: 34,
+              left: 12,
+              right: 12,
+              bottom: 8,
+              height: _barHeight,
               child: Row(
-                mainAxisSize: MainAxisSize.min,
                 children: [
-                  for (final item in _raised) ...[
-                    _RaisedTab(
-                        item: item,
-                        selected: currentIndex == item.index,
-                        onSelect: onSelect),
-                    if (item != _raised.last) const SizedBox(width: 14),
-                  ],
+                  for (final item in _items)
+                    Expanded(
+                      child: Center(
+                        child: _NavCircle(
+                          item: item,
+                          selected: currentIndex == item.index,
+                          onSelect: onSelect,
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -174,80 +157,54 @@ class _FloatingNavBar extends StatelessWidget {
   }
 }
 
-class _FlatTab extends StatelessWidget {
-  const _FlatTab(
+class _NavCircle extends StatelessWidget {
+  const _NavCircle(
       {required this.item, required this.selected, required this.onSelect});
 
   final _NavItemData item;
   final bool selected;
   final ValueChanged<int> onSelect;
 
+  static const _size = _FloatingNavBar._circleSize;
+
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-    final color = selected ? AppColors.primary : colors.textSecondary;
-
-    return InkWell(
-      onTap: () => onSelect(item.index),
-      customBorder: const StadiumBorder(),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(selected ? item.selectedIcon : item.icon,
-              size: 22, color: color),
-          const SizedBox(height: 2),
-          Text(
-            item.label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context)
-                .textTheme
-                .labelSmall
-                ?.copyWith(fontSize: 10, color: color),
+    return Tooltip(
+      message: item.label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => onSelect(item.index),
+        child: PressableScale(
+          child: AnimatedSlide(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOut,
+            // Chỉ ô đang chọn mới nhích lên (~12px) — không cao như bản
+            // trước, các ô còn lại nằm ngang hàng trong pill.
+            offset: selected ? const Offset(0, -0.28) : Offset.zero,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOut,
+              width: _size,
+              height: _size,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: selected ? AppColors.primary : Colors.transparent,
+                boxShadow: selected
+                    ? [
+                        BoxShadow(
+                            color: AppColors.primary.withOpacity(0.35),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4))
+                      ]
+                    : null,
+              ),
+              child: Icon(
+                selected ? item.selectedIcon : item.icon,
+                size: 22,
+                color: selected ? Colors.white : context.colors.textSecondary,
+              ),
+            ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _RaisedTab extends StatelessWidget {
-  const _RaisedTab(
-      {required this.item, required this.selected, required this.onSelect});
-
-  final _NavItemData item;
-  final bool selected;
-  final ValueChanged<int> onSelect;
-
-  static const _size = _FloatingNavBar._raisedSize;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => onSelect(item.index),
-      customBorder: const CircleBorder(),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        width: _size,
-        height: _size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: selected
-              ? AppColors.primary
-              : AppColors.primary.withOpacity(0.12),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                      color: AppColors.primary.withOpacity(0.35),
-                      blurRadius: 14,
-                      offset: const Offset(0, 4))
-                ]
-              : null,
-        ),
-        child: Icon(
-          selected ? item.selectedIcon : item.icon,
-          size: 24,
-          color: selected ? Colors.white : AppColors.primary,
         ),
       ),
     );
