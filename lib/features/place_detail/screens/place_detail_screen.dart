@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_network_image.dart';
+import '../../../core/widgets/frosted_sliver_app_bar.dart';
 import '../../../core/widgets/skeleton_loaders.dart';
 import '../../home/models/place.dart';
 import '../../home/widgets/place_image_placeholder.dart';
@@ -15,8 +16,13 @@ import '../../saved/widgets/save_toggle_button.dart';
 import '../providers/place_detail_providers.dart';
 
 const _weekdayLabels = {
-  'mon': 'Thứ 2', 'tue': 'Thứ 3', 'wed': 'Thứ 4', 'thu': 'Thứ 5',
-  'fri': 'Thứ 6', 'sat': 'Thứ 7', 'sun': 'Chủ nhật',
+  'mon': 'Thứ 2',
+  'tue': 'Thứ 3',
+  'wed': 'Thứ 4',
+  'thu': 'Thứ 5',
+  'fri': 'Thứ 6',
+  'sat': 'Thứ 7',
+  'sun': 'Chủ nhật',
 };
 const _weekdayOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -44,31 +50,44 @@ class PlaceDetailScreen extends ConsumerWidget {
   }
 }
 
-class _PlaceDetailContent extends ConsumerWidget {
+class _PlaceDetailContent extends ConsumerStatefulWidget {
   const _PlaceDetailContent({required this.place});
 
   final Place place;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_PlaceDetailContent> createState() =>
+      _PlaceDetailContentState();
+}
+
+class _PlaceDetailContentState extends ConsumerState<_PlaceDetailContent> {
+  final _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final place = widget.place;
     final target = (targetType: 'place', targetId: place.id);
     final reviewsAsync = ref.watch(reviewsForTargetProvider(target));
     final myReview = ref.watch(myReviewForTargetProvider(target));
 
     return CustomScrollView(
+      controller: _scrollController,
       slivers: [
-        SliverAppBar(
-          pinned: true,
+        FrostedSliverAppBar(
+          controller: _scrollController,
           expandedHeight: 240,
-          backgroundColor: AppColors.primary,
           actions: [SaveToggleButton(placeId: place.id)],
-          flexibleSpace: FlexibleSpaceBar(
-            background: Hero(
-              tag: 'place-image-${place.id}',
-              child: place.coverImage.isEmpty
-                  ? PlaceImagePlaceholder(place: place)
-                  : AppNetworkImage(url: place.coverImage),
-            ),
+          background: Hero(
+            tag: 'place-image-${place.id}',
+            child: place.coverImage.isEmpty
+                ? PlaceImagePlaceholder(place: place)
+                : AppNetworkImage(url: place.coverImage),
           ),
         ),
         SliverToBoxAdapter(
@@ -80,18 +99,23 @@ class _PlaceDetailContent extends ConsumerWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(place.name, style: Theme.of(context).textTheme.headlineSmall),
+                      child: Text(place.name,
+                          style: Theme.of(context).textTheme.headlineSmall),
                     ),
                     if (place.has360)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm, vertical: 4),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
                           borderRadius: BorderRadius.circular(AppRadius.sm),
                         ),
                         child: Text(
                           '360° VR',
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.white),
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelSmall
+                              ?.copyWith(color: Colors.white),
                         ),
                       ),
                   ],
@@ -112,8 +136,10 @@ class _PlaceDetailContent extends ConsumerWidget {
                   spacing: AppSpacing.xs,
                   children: place.tags
                       .map((tag) => Chip(
-                            label: Text(tag, style: Theme.of(context).textTheme.bodySmall),
-                            backgroundColor: AppColors.primary.withOpacity(0.08),
+                            label: Text(tag,
+                                style: Theme.of(context).textTheme.bodySmall),
+                            backgroundColor:
+                                AppColors.primary.withOpacity(0.08),
                             side: BorderSide.none,
                             visualDensity: VisualDensity.compact,
                           ))
@@ -121,9 +147,14 @@ class _PlaceDetailContent extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 _InfoRow(icon: Icons.place_outlined, text: place.address),
-                _InfoRow(icon: Icons.access_time, text: _durationLabel(place.visitDurationMinutes)),
-                _InfoRow(icon: Icons.confirmation_number_outlined, text: _priceLabel(place.ticketPrice)),
-                if (place.openingHours.isNotEmpty) _OpeningHours(openingHours: place.openingHours),
+                _InfoRow(
+                    icon: Icons.access_time,
+                    text: _durationLabel(place.visitDurationMinutes)),
+                _InfoRow(
+                    icon: Icons.confirmation_number_outlined,
+                    text: _priceLabel(place.ticketPrice)),
+                if (place.openingHours.isNotEmpty)
+                  _OpeningHours(openingHours: place.openingHours),
                 if (place.has360) ...[
                   const SizedBox(height: AppSpacing.sm),
                   SizedBox(
@@ -135,15 +166,18 @@ class _PlaceDetailContent extends ConsumerWidget {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.primary,
                         side: const BorderSide(color: AppColors.primary),
-                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                        padding:
+                            const EdgeInsets.symmetric(vertical: AppSpacing.sm),
                       ),
                     ),
                   ),
                 ],
                 const SizedBox(height: AppSpacing.lg),
-                Text('Giới thiệu', style: Theme.of(context).textTheme.titleMedium),
+                Text('Giới thiệu',
+                    style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.xs),
-                Text(place.description, style: Theme.of(context).textTheme.bodyLarge),
+                Text(place.description,
+                    style: Theme.of(context).textTheme.bodyLarge),
                 const SizedBox(height: AppSpacing.lg),
                 const Divider(),
                 const SizedBox(height: AppSpacing.sm),
@@ -152,7 +186,10 @@ class _PlaceDetailContent extends ConsumerWidget {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: AppSpacing.md),
-                ReviewForm(targetType: 'place', targetId: place.id, existingReview: myReview),
+                ReviewForm(
+                    targetType: 'place',
+                    targetId: place.id,
+                    existingReview: myReview),
                 const SizedBox(height: AppSpacing.md),
                 reviewsAsync.when(
                   loading: () => const SkeletonList(itemCount: 2),
@@ -161,13 +198,18 @@ class _PlaceDetailContent extends ConsumerWidget {
                     if (reviews.isEmpty) {
                       return Text(
                         'Chưa có đánh giá nào cho địa điểm này.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(color: context.colors.textSecondary),
                       );
                     }
                     return Column(
                       children: [
                         for (final review in reviews)
-                          ReviewListItem(review: review, isMine: review.userId == myReview?.userId),
+                          ReviewListItem(
+                              review: review,
+                              isMine: review.userId == myReview?.userId),
                       ],
                     );
                   },
@@ -191,7 +233,9 @@ class _PlaceDetailContent extends ConsumerWidget {
 
   String _priceLabel(int price) {
     if (price <= 0) return 'Vé vào cổng: Miễn phí';
-    final s = price.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => '.');
+    final s = price
+        .toString()
+        .replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => '.');
     return 'Vé vào cổng: $sđ';
   }
 }
@@ -211,7 +255,8 @@ class _InfoRow extends StatelessWidget {
         children: [
           Icon(icon, size: 18, color: context.colors.textSecondary),
           const SizedBox(width: AppSpacing.sm),
-          Expanded(child: Text(text, style: Theme.of(context).textTheme.bodyMedium)),
+          Expanded(
+              child: Text(text, style: Theme.of(context).textTheme.bodyMedium)),
         ],
       ),
     );
@@ -237,11 +282,13 @@ class _OpeningHours extends StatelessWidget {
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: sameAllWeek
-                ? Text('Giờ mở cửa: ${values.first} (cả tuần)', style: Theme.of(context).textTheme.bodyMedium)
+                ? Text('Giờ mở cửa: ${values.first} (cả tuần)',
+                    style: Theme.of(context).textTheme.bodyMedium)
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Giờ mở cửa:', style: Theme.of(context).textTheme.bodyMedium),
+                      Text('Giờ mở cửa:',
+                          style: Theme.of(context).textTheme.bodyMedium),
                       for (final day in _weekdayOrder)
                         if (openingHours[day] != null)
                           Text(

@@ -18,6 +18,7 @@ import '../../features/saved/screens/saved_places_screen.dart';
 import '../../features/tours/screens/tour_detail_screen.dart';
 import '../../features/tours/screens/tour_list_screen.dart';
 import '../../features/vr360/screens/vr360_viewer_screen.dart';
+import 'fade_scale_page.dart';
 import 'main_shell.dart';
 
 const _authRoutes = ['/login', '/register', '/forgot-password'];
@@ -45,72 +46,104 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => const SplashScreen(),
+        pageBuilder: (context, state) =>
+            fadeScalePage(key: state.pageKey, child: const SplashScreen()),
       ),
       GoRoute(
         path: '/login',
-        builder: (context, state) => const LoginScreen(),
+        pageBuilder: (context, state) =>
+            fadeScalePage(key: state.pageKey, child: const LoginScreen()),
       ),
       GoRoute(
         path: '/register',
-        builder: (context, state) => const RegisterScreen(),
+        pageBuilder: (context, state) =>
+            fadeScalePage(key: state.pageKey, child: const RegisterScreen()),
       ),
       GoRoute(
         path: '/forgot-password',
-        builder: (context, state) => const ForgotPasswordScreen(),
+        pageBuilder: (context, state) => fadeScalePage(
+            key: state.pageKey, child: const ForgotPasswordScreen()),
       ),
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) => MainShell(navigationShell: navigationShell),
+        builder: (context, state, navigationShell) =>
+            MainShell(navigationShell: navigationShell),
         branches: [
           StatefulShellBranch(routes: [
-            GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
+            GoRoute(
+                path: '/home', builder: (context, state) => const HomeScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: '/tours', builder: (context, state) => const TourListScreen()),
+            GoRoute(
+                path: '/tours',
+                builder: (context, state) => const TourListScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: '/itineraries', builder: (context, state) => const ItineraryListScreen()),
+            GoRoute(
+                path: '/itineraries',
+                builder: (context, state) => const ItineraryListScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: '/chat', builder: (context, state) => const ChatScreen()),
+            GoRoute(
+                path: '/chat', builder: (context, state) => const ChatScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: '/saved', builder: (context, state) => const SavedPlacesScreen()),
+            GoRoute(
+                path: '/saved',
+                builder: (context, state) => const SavedPlacesScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
+            GoRoute(
+                path: '/profile',
+                builder: (context, state) => const ProfileScreen()),
           ]),
         ],
       ),
       GoRoute(
         path: '/place/:id',
-        builder: (context, state) => PlaceDetailScreen(placeId: state.pathParameters['id']!),
+        pageBuilder: (context, state) => fadeScalePage(
+          key: state.pageKey,
+          child: PlaceDetailScreen(placeId: state.pathParameters['id']!),
+        ),
       ),
       GoRoute(
         path: '/place/:id/vr360',
-        builder: (context, state) => Vr360ViewerScreen(
-          placeId: state.pathParameters['id']!,
-          initialMediaId: state.uri.queryParameters['mediaId'],
+        pageBuilder: (context, state) => fadeScalePage(
+          key: state.pageKey,
+          child: Vr360ViewerScreen(
+            placeId: state.pathParameters['id']!,
+            initialMediaId: state.uri.queryParameters['mediaId'],
+          ),
         ),
       ),
       GoRoute(
         path: '/itineraries/new',
-        builder: (context, state) => const CreateItineraryScreen(),
+        pageBuilder: (context, state) => fadeScalePage(
+            key: state.pageKey, child: const CreateItineraryScreen()),
       ),
       GoRoute(
         path: '/itineraries/:id',
-        builder: (context, state) => ItineraryDetailScreen(itineraryId: state.pathParameters['id']!),
+        pageBuilder: (context, state) => fadeScalePage(
+          key: state.pageKey,
+          child:
+              ItineraryDetailScreen(itineraryId: state.pathParameters['id']!),
+        ),
       ),
       GoRoute(
         path: '/itineraries/:id/add-place',
-        builder: (context, state) => AddPlaceToItineraryScreen(
-          itineraryId: state.pathParameters['id']!,
-          dayIndex: int.tryParse(state.uri.queryParameters['day'] ?? '') ?? 0,
+        pageBuilder: (context, state) => fadeScalePage(
+          key: state.pageKey,
+          child: AddPlaceToItineraryScreen(
+            itineraryId: state.pathParameters['id']!,
+            dayIndex: int.tryParse(state.uri.queryParameters['day'] ?? '') ?? 0,
+          ),
         ),
       ),
       GoRoute(
         path: '/tours/:id',
-        builder: (context, state) => TourDetailScreen(tourId: state.pathParameters['id']!),
+        pageBuilder: (context, state) => fadeScalePage(
+          key: state.pageKey,
+          child: TourDetailScreen(tourId: state.pathParameters['id']!),
+        ),
       ),
     ],
   );

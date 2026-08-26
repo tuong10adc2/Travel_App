@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/services/push_notification_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/background_blobs.dart';
+import '../../../core/widgets/fade_slide_in.dart';
 import '../../../core/widgets/skeleton_loaders.dart';
 import '../providers/places_providers.dart';
 import '../widgets/place_card.dart';
@@ -34,65 +36,79 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final selectedTag = ref.watch(selectedTagProvider);
 
     return Scaffold(
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
-              sliver: SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _Header(onProfileTap: () => context.go('/profile')),
-                    const SizedBox(height: AppSpacing.lg),
-                    _SearchField(
-                      onChanged: (value) => ref.read(placeSearchQueryProvider.notifier).state = value,
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    const _PromoBanner(),
-                    const SizedBox(height: AppSpacing.lg),
-                    _TagFilterRow(
-                      selectedTag: selectedTag,
-                      onSelect: (tag) => ref.read(selectedTagProvider.notifier).state = tag,
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Text('Đề xuất cho bạn', style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: AppSpacing.sm),
-                  ],
+      body: DecorativeBackground(
+        child: SafeArea(
+          child: CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _Header(onProfileTap: () => context.go('/profile')),
+                      const SizedBox(height: AppSpacing.lg),
+                      _SearchField(
+                        onChanged: (value) => ref
+                            .read(placeSearchQueryProvider.notifier)
+                            .state = value,
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      const _PromoBanner(),
+                      const SizedBox(height: AppSpacing.lg),
+                      _TagFilterRow(
+                        selectedTag: selectedTag,
+                        onSelect: (tag) =>
+                            ref.read(selectedTagProvider.notifier).state = tag,
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Text('Đề xuất cho bạn',
+                          style: Theme.of(context).textTheme.titleMedium),
+                      const SizedBox(height: AppSpacing.sm),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            placesAsync.when(
-              loading: () => const SliverToBoxAdapter(child: SkeletonCardGrid()),
-              error: (error, _) => SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(child: Text('Lỗi tải địa điểm: $error')),
-              ),
-              data: (places) {
-                if (places.isEmpty) {
-                  return const SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Center(child: Text('Không tìm thấy địa điểm phù hợp')),
+              placesAsync.when(
+                loading: () =>
+                    const SliverToBoxAdapter(child: SkeletonCardGrid()),
+                error: (error, _) => SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(child: Text('Lỗi tải địa điểm: $error')),
+                ),
+                data: (places) {
+                  if (places.isEmpty) {
+                    return const SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(
+                          child: Text('Không tìm thấy địa điểm phù hợp')),
+                    );
+                  }
+                  return SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
+                    sliver: SliverGrid(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: AppSpacing.sm,
+                        crossAxisSpacing: AppSpacing.sm,
+                        childAspectRatio: 0.72,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => FadeSlideIn.staggered(
+                          index: index,
+                          child: PlaceCard(place: places[index]),
+                        ),
+                        childCount: places.length,
+                      ),
+                    ),
                   );
-                }
-                return SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
-                  sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: AppSpacing.sm,
-                      crossAxisSpacing: AppSpacing.sm,
-                      childAspectRatio: 0.72,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) => PlaceCard(place: places[index]),
-                      childCount: places.length,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -118,7 +134,8 @@ class _Header extends StatelessWidget {
         ),
         const SizedBox(width: AppSpacing.sm),
         Expanded(
-          child: Text('TngGuide', style: Theme.of(context).textTheme.titleLarge),
+          child:
+              Text('TngGuide', style: Theme.of(context).textTheme.titleLarge),
         ),
         IconButton(
           onPressed: onProfileTap,
@@ -144,8 +161,11 @@ class _SearchField extends StatelessWidget {
         prefixIcon: const Icon(Icons.search),
         filled: true,
         fillColor: context.colors.surface,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.lg), borderSide: BorderSide.none),
-        contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: AppSpacing.md),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            borderSide: BorderSide.none),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 14, horizontal: AppSpacing.md),
       ),
     );
   }
@@ -172,12 +192,18 @@ class _PromoBanner extends StatelessWidget {
         children: [
           Text(
             'Khám phá hành trình mới',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white),
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge
+                ?.copyWith(color: Colors.white),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             'Những địa điểm được gợi ý riêng cho chuyến đi của bạn',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white70),
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: Colors.white70),
           ),
         ],
       ),
@@ -198,11 +224,17 @@ class _TagFilterRow extends StatelessWidget {
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          _TagChip(label: 'Tất cả', selected: selectedTag == null, onTap: () => onSelect(null)),
+          _TagChip(
+              label: 'Tất cả',
+              selected: selectedTag == null,
+              onTap: () => onSelect(null)),
           for (final tag in _tags)
             Padding(
               padding: const EdgeInsets.only(left: AppSpacing.sm),
-              child: _TagChip(label: tag, selected: selectedTag == tag, onTap: () => onSelect(tag)),
+              child: _TagChip(
+                  label: tag,
+                  selected: selectedTag == tag,
+                  onTap: () => onSelect(tag)),
             ),
         ],
       ),
@@ -211,7 +243,8 @@ class _TagFilterRow extends StatelessWidget {
 }
 
 class _TagChip extends StatelessWidget {
-  const _TagChip({required this.label, required this.selected, required this.onTap});
+  const _TagChip(
+      {required this.label, required this.selected, required this.onTap});
 
   final String label;
   final bool selected;
@@ -228,7 +261,9 @@ class _TagChip extends StatelessWidget {
       labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
             color: selected ? Colors.white : context.colors.textPrimary,
           ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg), side: BorderSide.none),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          side: BorderSide.none),
       showCheckmark: false,
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/fade_slide_in.dart';
 import '../../../core/widgets/skeleton_loaders.dart';
 import '../providers/tour_providers.dart';
 import '../widgets/tour_card.dart';
@@ -32,7 +33,8 @@ class TourListScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.md),
             itemCount: tours.length,
             separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.sm),
-            itemBuilder: (context, index) => TourCard(tour: tours[index]),
+            itemBuilder: (context, index) =>
+                FadeSlideIn.staggered(index: index, child: TourCard(tour: tours[index])),
           );
         },
       ),
