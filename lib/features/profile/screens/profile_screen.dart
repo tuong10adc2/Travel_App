@@ -348,17 +348,23 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-            vertical: AppSpacing.md, horizontal: AppSpacing.sm),
-        child: Column(
-          children: [
-            Icon(icon, color: AppColors.primary, size: 22),
-            const SizedBox(height: 4),
-            Text('$count', style: Theme.of(context).textTheme.titleLarge),
-            Text(label, style: Theme.of(context).textTheme.labelSmall),
-          ],
-        ),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          const Positioned.fill(child: PatternOverlay(opacity: 0.7)),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+                vertical: AppSpacing.md, horizontal: AppSpacing.sm),
+            child: Column(
+              children: [
+                Icon(icon, color: AppColors.primary, size: 22),
+                const SizedBox(height: 4),
+                Text('$count', style: Theme.of(context).textTheme.titleLarge),
+                Text(label, style: Theme.of(context).textTheme.labelSmall),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

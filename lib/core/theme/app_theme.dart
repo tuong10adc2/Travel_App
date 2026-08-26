@@ -54,14 +54,17 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   final Color shimmerBase;
   final Color shimmerHighlight;
 
+  // Nền/surface ấm (be/kem nhạt) thay vì trắng tinh + xám lạnh — trắng tinh
+  // trên diện rộng nhìn "trơ", còn 1 chút hơi ấm (be) giúp card nổi khối rõ
+  // hơn mà vẫn sáng, gần giống card ứng dụng quản lý mà bạn tham khảo.
   static const light = AppSemanticColors(
-    background: Color(0xFFF7F7F5),
-    surface: Color(0xFFFFFFFF),
+    background: Color(0xFFF5F1E7),
+    surface: Color(0xFFFFFCF5),
     textPrimary: Color(0xFF1C1C1E),
     textSecondary: Color(0xFF6B6B6F),
-    divider: Color(0xFFE7E7E4),
-    shimmerBase: Color(0xFFE9E9E6),
-    shimmerHighlight: Color(0xFFF6F6F4),
+    divider: Color(0xFFE9E2D0),
+    shimmerBase: Color(0xFFEDE6D6),
+    shimmerHighlight: Color(0xFFF9F5EA),
   );
 
   static const dark = AppSemanticColors(
@@ -229,8 +232,11 @@ class AppTheme {
             ? Colors.black.withOpacity(0.5)
             : AppColors.primary.withOpacity(0.16),
         surfaceTintColor: Colors.transparent,
+        // Viền mảnh màu ấm (đồng bộ với divider) — card có "khung" rõ ràng
+        // thay vì chỉ trôi nổi bằng shadow, giống card tham khảo.
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
+          side: BorderSide(color: colors.divider),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
