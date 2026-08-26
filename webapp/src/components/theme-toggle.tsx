@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
+import { useTranslations } from "@/contexts/language-context";
 import { cn } from "@/lib/cn";
 
 type Theme = "light" | "dark";
@@ -20,6 +21,7 @@ function effectiveTheme(): Theme {
 }
 
 export function ThemeToggle({ className }: { className?: string }) {
+  const t = useTranslations();
   const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
@@ -47,7 +49,7 @@ export function ThemeToggle({ className }: { className?: string }) {
     <button
       type="button"
       onClick={toggle}
-      aria-label={theme === "dark" ? "Chuyển sang giao diện sáng" : "Chuyển sang giao diện tối"}
+      aria-label={theme === "dark" ? t("common.switchToLight") : t("common.switchToDark")}
       className={cn(
         "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-surface-muted hover:text-foreground",
         className

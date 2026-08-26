@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
+import { useLanguage, useTranslations } from "@/contexts/language-context";
 import { useToast } from "@/contexts/toast-context";
 import { RequireAuth } from "@/components/require-auth";
 import { PlaceImage } from "@/components/ui/place-image";
@@ -50,12 +51,13 @@ function dayCount(it: Itinerary): number {
   return Math.max(1, Math.round((end.getTime() - start.getTime()) / 86400000) + 1);
 }
 
-function dayLabel(it: Itinerary, dayIndex: number): string {
+function dayLabel(it: Itinerary, dayIndex: number, t: (key: string, params?: Record<string, string | number>) => string, locale: string): string {
   const start = toDate(it.startDate);
-  if (!start) return `Ngày ${dayIndex + 1}`;
+  const dayText = t("common.day", { n: dayIndex + 1 });
+  if (!start) return dayText;
   const d = new Date(start);
   d.setDate(d.getDate() + dayIndex);
-  return `Ngày ${dayIndex + 1} · ${d.toLocaleDateString("vi-VN")}`;
+  return `${dayText} · ${d.toLocaleDateString(locale)}`;
 }
 
 function PlacePickerModal({
@@ -65,6 +67,7 @@ function PlacePickerModal({
   onPick: (place: Place) => void;
   onClose: () => void;
 }) {
+  const t = useTranslations();
   const [places, setPlaces] = useState<Place[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -86,19 +89,19 @@ function PlacePickerModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="flex max-h-[80vh] w-full max-w-md flex-col rounded-2xl bg-surface p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-base font-semibold text-foreground">Thêm địa điểm</h3>
+          <h3 className="text-base font-semibold text-foreground">{t("itineraryDetail.pickerTitle")}</h3>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
             <X className="h-5 w-5" />
           </button>
         </div>
         <div className="relative mb-3">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input className="pl-9" placeholder="Tìm địa điểm..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input className="pl-9" placeholder={t("itineraryDetail.pickerSearchPlaceholder")} value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <div className="flex-1 space-y-2 overflow-y-auto">
-          {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
+          {loading && <p className="text-sm text-muted-foreground">{t("common.loading")}</p>}
           {!loading && filtered.length === 0 && (
-            <p className="text-sm text-muted-foreground">Không tìm thấy địa điểm.</p>
+            <p className="text-sm text-muted-foreground">{t("itineraryDetail.pickerEmpty")}</p>
           )}
           {filtered.map((p) => (
             <button
@@ -124,6 +127,9 @@ function ItineraryDetailInner() {
   const router = useRouter();
   const { user } = useAuth();
   const toast = useToast();
+  const t = useTranslations();
+  const { language } = useLanguage();
+  const locale = language === "en" ? "en-US" : "vi-VN";
 
   const [itinerary, setItinerary] = useState<Itinerary | null>(null);
   const [items, setItems] = useState<ItineraryItem[]>([]);
@@ -197,7 +203,7 @@ function ItineraryDetailInner() {
         updatedAt: serverTimestamp(),
       });
     } catch {
-      toast.error("Không thể thêm ngày.");
+      toast.error(t("itineraryDetail.toastAddDayFailed"));
     }
   }
 
@@ -212,9 +218,9 @@ function ItineraryDetailInner() {
         note: "",
         createdAt: serverTimestamp(),
       });
-      toast.success(`Đã thêm "${place.name}".`);
+      toast.success(t("itineraryDetail.toastAdded", { name: place.name }));
     } catch {
-      toast.error("Không thể thêm địa điểm.");
+      toast.error(t("itineraryDetail.toastAddFailed"));
     } finally {
       setPickerDay(null);
     }
@@ -224,7 +230,7 @@ function ItineraryDetailInner() {
     try {
       await deleteDoc(doc(db, "itineraries", params.id, "itinerary_items", itemId));
     } catch {
-      toast.error("Không thể xoá địa điểm.");
+      toast.error(t("itineraryDetail.toastRemoveFailed"));
     }
   }
 
@@ -251,17 +257,17 @@ function ItineraryDetailInner() {
     try {
       await batch.commit();
     } catch {
-      toast.error("Không thể sắp xếp lại thứ tự.");
+      toast.error(t("itineraryDetail.toastReorderFailed"));
     }
   }
 
   async function handleDeleteItinerary() {
-    if (!itinerary || !confirm(`Xoá lịch trình "${itinerary.name}"?`)) return;
+    if (!itinerary || !confirm(t("itineraryDetail.confirmDelete", { name: itinerary.name }))) return;
     try {
       await deleteDoc(doc(db, "itineraries", itinerary.id));
       router.push("/itineraries");
     } catch {
-      toast.error("Không thể xoá lịch trình.");
+      toast.error(t("itineraryDetail.toastDeleteFailed"));
     }
   }
 
@@ -276,9 +282,9 @@ function ItineraryDetailInner() {
   if (notFound || !itinerary || itinerary.userId !== user?.uid) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-24 text-center">
-        <p className="text-muted-foreground">Không tìm thấy lịch trình này.</p>
+        <p className="text-muted-foreground">{t("itineraryDetail.notFound")}</p>
         <Link href="/itineraries" className="mt-4 inline-block text-brand-700 hover:underline">
-          Quay lại danh sách lịch trình
+          {t("itineraryDetail.backToList")}
         </Link>
       </div>
     );
@@ -287,17 +293,17 @@ function ItineraryDetailInner() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
       <Link href="/itineraries" className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-3.5 w-3.5" /> Quay lại danh sách lịch trình
+        <ArrowLeft className="h-3.5 w-3.5" /> {t("itineraryDetail.backToList")}
       </Link>
 
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{itinerary.name}</h1>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={handleAddDay}>
-            <CalendarPlus className="h-4 w-4" /> Thêm ngày
+            <CalendarPlus className="h-4 w-4" /> {t("itineraryDetail.addDay")}
           </Button>
           <Button variant="outline" size="sm" onClick={handleDeleteItinerary} className="hover:border-danger-600 hover:text-danger-600">
-            <Trash2 className="h-4 w-4" /> Xoá lịch trình
+            <Trash2 className="h-4 w-4" /> {t("itineraryDetail.deleteItinerary")}
           </Button>
         </div>
       </div>
@@ -306,14 +312,14 @@ function ItineraryDetailInner() {
         {days.map(({ dayIndex, items: dayItems }) => (
           <div key={dayIndex} className="rounded-2xl border border-border bg-surface p-5">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-semibold text-foreground">{dayLabel(itinerary, dayIndex)}</h2>
+              <h2 className="font-semibold text-foreground">{dayLabel(itinerary, dayIndex, t, locale)}</h2>
               <Button variant="secondary" size="sm" onClick={() => setPickerDay(dayIndex)}>
-                <Plus className="h-3.5 w-3.5" /> Thêm địa điểm
+                <Plus className="h-3.5 w-3.5" /> {t("itineraryDetail.addPlace")}
               </Button>
             </div>
 
             {dayItems.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Chưa có địa điểm nào trong ngày này.</p>
+              <p className="text-sm text-muted-foreground">{t("itineraryDetail.emptyDay")}</p>
             ) : (
               <div className="space-y-2">
                 {dayItems.map((item) => {
@@ -344,7 +350,7 @@ function ItineraryDetailInner() {
                           </Link>
                         </>
                       ) : (
-                        <div className="flex-1 text-sm text-muted-foreground">Đang tải...</div>
+                        <div className="flex-1 text-sm text-muted-foreground">{t("common.loading")}</div>
                       )}
                       <button
                         onClick={() => handleRemoveItem(item.id)}

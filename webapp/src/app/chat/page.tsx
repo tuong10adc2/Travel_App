@@ -20,6 +20,7 @@ import { httpsCallable } from "firebase/functions";
 import { Bot, Loader2, Map as MapIcon, Send, Sparkles, Star, X } from "lucide-react";
 import { db, functions } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
+import { useTranslations } from "@/contexts/language-context";
 import { useToast } from "@/contexts/toast-context";
 import { RequireAuth } from "@/components/require-auth";
 import { PlaceImage } from "@/components/ui/place-image";
@@ -39,12 +40,13 @@ function ChatInner() {
   const { user } = useAuth();
   const router = useRouter();
   const toast = useToast();
+  const t = useTranslations();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [placesCache, setPlacesCache] = useState<Record<string, Place>>({});
   const [planModal, setPlanModal] = useState<{ dayIndex: number; placeIds: string[] }[] | null>(null);
-  const [planName, setPlanName] = useState("Lịch trình gợi ý từ AI");
+  const [planName, setPlanName] = useState(t("chat.defaultPlanName"));
   const [planStartDate, setPlanStartDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [creatingPlan, setCreatingPlan] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -60,7 +62,7 @@ function ChatInner() {
 
       const itineraryRef = await addDoc(collection(db, "itineraries"), {
         userId: user.uid,
-        name: planName.trim() || "Lịch trình gợi ý từ AI",
+        name: planName.trim() || t("chat.defaultPlanName"),
         startDate: Timestamp.fromDate(start),
         endDate: Timestamp.fromDate(end),
         isShared: false,
@@ -77,11 +79,11 @@ function ChatInner() {
       });
       await batch.commit();
 
-      toast.success("Đã tạo lịch trình từ gợi ý AI.");
+      toast.success(t("chat.toastCreated"));
       setPlanModal(null);
       router.push(`/itineraries/${itineraryRef.id}`);
     } catch {
-      toast.error("Không thể tạo lịch trình.");
+      toast.error(t("chat.toastCreateFailed"));
     } finally {
       setCreatingPlan(false);
     }
@@ -170,11 +172,9 @@ function ChatInner() {
     } catch (err) {
       const code = (err as { code?: string })?.code ?? "";
       if (code === "functions/not-found" || code === "functions/internal" || code === "functions/unavailable") {
-        toast.error(
-          "Trợ lý AI hiện chưa khả dụng (backend chưa được triển khai). Vui lòng thử lại sau."
-        );
+        toast.error(t("chat.toastUnavailable"));
       } else {
-        toast.error("Không thể gửi tin nhắn, vui lòng thử lại.");
+        toast.error(t("chat.toastSendFailed"));
       }
     } finally {
       setSending(false);
@@ -190,8 +190,8 @@ function ChatInner() {
           <Bot className="h-5 w-5" />
         </div>
         <div>
-          <p className="font-semibold text-foreground">Trợ lý du lịch AI</p>
-          <p className="text-xs text-muted-foreground">Hỏi về lịch sử, văn hoá, ẩm thực hay địa điểm ẩn</p>
+          <p className="font-semibold text-foreground">{t("chat.assistantName")}</p>
+          <p className="text-xs text-muted-foreground">{t("chat.assistantSubtitle")}</p>
         </div>
       </div>
 
@@ -199,8 +199,8 @@ function ChatInner() {
         {messages.length === 0 && (
           <div className="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
             <Sparkles className="mb-3 h-8 w-8 text-brand-300" />
-            <p>Hỏi mình bất cứ điều gì về du lịch Việt Nam!</p>
-            <p className="mt-1 text-sm">vd: &ldquo;Gợi ý địa điểm thiên nhiên gần Đà Lạt&rdquo;</p>
+            <p>{t("chat.emptyTitle")}</p>
+            <p className="mt-1 text-sm">{t("chat.emptyExample")}</p>
           </div>
         )}
         {messages.map((m) => (
@@ -240,7 +240,7 @@ function ChatInner() {
                     .filter((d) => d.placeIds.length > 0)
                     .map((day, i) => (
                       <div key={day.dayIndex} className={i > 0 ? "mt-2" : ""}>
-                        <p className="text-xs font-semibold text-foreground">Ngày {i + 1}</p>
+                        <p className="text-xs font-semibold text-foreground">{t("common.day", { n: i + 1 })}</p>
                         <div className="mt-1 flex flex-wrap gap-1">
                           {day.placeIds.map((id) => (
                             <span
@@ -259,7 +259,7 @@ function ChatInner() {
                     className="mt-3 w-full"
                     onClick={() => setPlanModal(m.itineraryPlan!)}
                   >
-                    <MapIcon className="h-3.5 w-3.5" /> Tạo lịch trình từ gợi ý này
+                    <MapIcon className="h-3.5 w-3.5" /> {t("chat.createItineraryFromSuggestion")}
                   </Button>
                 </div>
               )}
@@ -269,7 +269,7 @@ function ChatInner() {
         {sending && (
           <div className="flex justify-start">
             <div className="flex items-center gap-2 rounded-2xl rounded-bl-sm border border-border bg-surface px-4 py-2.5 text-sm text-muted-foreground">
-              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Đang trả lời...
+              <Loader2 className="h-3.5 w-3.5 animate-spin" /> {t("chat.typing")}
             </div>
           </div>
         )}
@@ -280,7 +280,7 @@ function ChatInner() {
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Nhập câu hỏi của bạn..."
+          placeholder={t("chat.inputPlaceholder")}
           className="h-11 flex-1 rounded-full border border-border bg-surface px-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         />
         <Button type="submit" size="icon" className="rounded-full" disabled={!input.trim() || sending}>
@@ -293,7 +293,7 @@ function ChatInner() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-sm rounded-2xl bg-surface p-6 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-base font-semibold text-foreground">Tạo lịch trình từ gợi ý AI</h3>
+              <h3 className="text-base font-semibold text-foreground">{t("chat.createItineraryFromSuggestionTitle")}</h3>
               <button
                 onClick={() => setPlanModal(null)}
                 className="text-muted-foreground hover:text-foreground"
@@ -302,14 +302,14 @@ function ChatInner() {
               </button>
             </div>
             <div className="space-y-4">
-              <Field label="Tên lịch trình">
+              <Field label={t("common.itineraryName")}>
                 <Input value={planName} onChange={(e) => setPlanName(e.target.value)} />
               </Field>
-              <Field label="Ngày bắt đầu">
+              <Field label={t("common.startDate")}>
                 <Input type="date" value={planStartDate} onChange={(e) => setPlanStartDate(e.target.value)} />
               </Field>
               <Button className="w-full" onClick={handleCreateItineraryFromPlan} loading={creatingPlan}>
-                Tạo lịch trình
+                {t("common.createItinerary")}
               </Button>
             </div>
           </div>

@@ -27,33 +27,20 @@ import { db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/ui/reveal";
 import { PlaceCard } from "@/components/place-card";
+import { useTranslations } from "@/contexts/language-context";
 import type { Place } from "@/lib/types";
-
-const FEATURES = [
-  {
-    icon: MessageCircle,
-    title: "Trợ lý AI hỏi đáp",
-    desc: "Hỏi về lịch sử, văn hoá, ẩm thực hay địa điểm ẩn — AI gợi ý đúng nơi phù hợp sở thích của bạn.",
-  },
-  {
-    icon: View,
-    title: "Trải nghiệm VR 360°",
-    desc: "Xem trước không gian thực tế tại từng địa điểm trước khi đặt chân tới, xoay 360° mượt mà.",
-  },
-  {
-    icon: CalendarRange,
-    title: "Lịch trình thông minh",
-    desc: "Tạo lịch trình theo ngày, thêm/sắp xếp điểm đến tự do, biến tour gợi ý thành hành trình của riêng bạn.",
-  },
-  {
-    icon: Languages,
-    title: "Đa ngôn ngữ",
-    desc: "Giao diện và trợ lý hỗ trợ tiếng Việt và tiếng Anh, phù hợp cả du khách trong và ngoài nước.",
-  },
-];
 
 export default function HomePage() {
   const router = useRouter();
+  const t = useTranslations();
+
+  const FEATURES = [
+    { icon: MessageCircle, title: t("home.feature1Title"), desc: t("home.feature1Desc") },
+    { icon: View, title: t("home.feature2Title"), desc: t("home.feature2Desc") },
+    { icon: CalendarRange, title: t("home.feature3Title"), desc: t("home.feature3Desc") },
+    { icon: Languages, title: t("home.feature4Title"), desc: t("home.feature4Desc") },
+  ];
+
   const [search, setSearch] = useState("");
   const [featured, setFeatured] = useState<Place[]>([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
@@ -116,19 +103,18 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-5xl px-4 py-20 text-center sm:px-6 lg:px-8 lg:py-28">
           <Reveal y={16}>
             <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5" /> Trợ lý du lịch AI cho Việt Nam
+              <Sparkles className="h-3.5 w-3.5" /> {t("home.badge")}
             </div>
           </Reveal>
           <Reveal y={16} delay={80}>
             <h1 className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
-              Người bạn đồng hành AI cho
-              <br className="hidden sm:block" /> mọi nẻo đường Việt Nam
+              {t("home.titleLine1")}
+              <br className="hidden sm:block" /> {t("home.titleLine2")}
             </h1>
           </Reveal>
           <Reveal y={16} delay={160}>
-            <p className="mx-auto mt-5 max-w-2xl text-base text-white/85 sm:text-lg">
-              Trợ lý du lịch số riêng bạn — mang đến tri thức bản địa và dẫn đường thông minh
-              tới mọi miền đất nước.
+            <p className="mx-auto mt-5 max-w-2xl whitespace-pre-line text-base text-white/85 sm:text-lg">
+              {t("home.subtitle")}
             </p>
           </Reveal>
 
@@ -141,11 +127,11 @@ export default function HomePage() {
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Bạn muốn đi đâu tiếp theo?"
+                placeholder={t("home.searchPlaceholder")}
                 className="h-11 flex-1 border-none bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
               />
               <Button type="submit" size="lg">
-                Khám phá ngay
+                {t("home.exploreNow")}
               </Button>
             </form>
           </Reveal>
@@ -153,10 +139,10 @@ export default function HomePage() {
           <Reveal y={16} delay={320}>
             <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-sm text-white/80">
               <Link href="/chat" className="flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 transition-colors hover:bg-white/20">
-                <MessageCircle className="h-3.5 w-3.5" /> Hỏi trợ lý AI
+                <MessageCircle className="h-3.5 w-3.5" /> {t("home.askAi")}
               </Link>
               <Link href="/tours" className="flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 transition-colors hover:bg-white/20">
-                <Compass className="h-3.5 w-3.5" /> Xem tour gợi ý
+                <Compass className="h-3.5 w-3.5" /> {t("home.viewSuggestedTours")}
               </Link>
             </div>
           </Reveal>
@@ -167,10 +153,10 @@ export default function HomePage() {
       <section className="border-b border-border bg-surface">
         <div className="mx-auto grid max-w-5xl grid-cols-2 gap-6 px-4 py-10 sm:px-6 md:grid-cols-4 lg:px-8">
           {[
-            { value: `${stats.places}+`, label: "Địa điểm & di tích" },
-            { value: `${stats.with360}`, label: "Trải nghiệm VR 360°" },
-            { value: `${stats.tours}+`, label: "Tour gợi ý sẵn" },
-            { value: "24/7", label: "Đồng hành cùng AI" },
+            { value: `${stats.places}+`, label: t("home.statPlaces") },
+            { value: `${stats.with360}`, label: t("home.stat360") },
+            { value: `${stats.tours}+`, label: t("home.statTours") },
+            { value: "24/7", label: t("home.statAi") },
           ].map((s, i) => (
             <Reveal key={s.label} delay={i * 80} className="text-center">
               <p className="text-3xl font-bold text-brand-700">{s.value}</p>
@@ -184,10 +170,10 @@ export default function HomePage() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <Reveal className="mx-auto mb-12 max-w-2xl text-center">
           <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
-            Tương lai của hành trình khám phá
+            {t("home.featuresTitle")}
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Công nghệ tinh tế hoà quyện cùng am hiểu bản địa.
+            {t("home.featuresSubtitle")}
           </p>
         </Reveal>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -210,11 +196,11 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal className="mb-8 flex items-end justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Địa điểm nổi bật</h2>
-              <p className="mt-2 text-muted-foreground">Những điểm đến được yêu thích nhất</p>
+              <h2 className="text-2xl font-bold text-foreground sm:text-3xl">{t("home.featuredPlacesTitle")}</h2>
+              <p className="mt-2 text-muted-foreground">{t("home.featuredPlacesSubtitle")}</p>
             </div>
             <Link href="/explore" className="hidden items-center gap-1 text-sm font-medium text-brand-700 hover:underline sm:flex">
-              Xem tất cả <ArrowRight className="h-4 w-4" />
+              {t("home.viewAll")} <ArrowRight className="h-4 w-4" />
             </Link>
           </Reveal>
           {loadingFeatured ? (
@@ -226,7 +212,7 @@ export default function HomePage() {
           ) : featured.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border bg-surface p-12 text-center text-muted-foreground">
               <MapPin className="mx-auto mb-3 h-6 w-6 opacity-40" />
-              Chưa có địa điểm nổi bật nào.
+              {t("home.noFeatured")}
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -239,7 +225,7 @@ export default function HomePage() {
           )}
           <div className="mt-8 text-center sm:hidden">
             <Link href="/explore">
-              <Button variant="outline">Xem tất cả địa điểm</Button>
+              <Button variant="outline">{t("home.viewAllPlaces")}</Button>
             </Link>
           </div>
         </div>
@@ -250,20 +236,20 @@ export default function HomePage() {
         <Reveal>
           <div className="flex flex-col items-center justify-between gap-6 rounded-3xl bg-gradient-to-br from-brand-700 to-brand-900 px-8 py-12 text-center text-white sm:flex-row sm:text-left">
             <div>
-              <h2 className="text-2xl font-bold">Sẵn sàng cho chuyến đi tiếp theo?</h2>
+              <h2 className="text-2xl font-bold">{t("home.ctaTitle")}</h2>
               <p className="mt-2 text-white/80">
-                Tạo lịch trình cá nhân hoặc hỏi trợ lý AI ngay hôm nay.
+                {t("home.ctaSubtitle")}
               </p>
             </div>
             <div className="flex shrink-0 gap-3">
               <Link href="/itineraries/new">
                 <Button variant="white" size="lg">
-                  Tạo lịch trình
+                  {t("common.createItinerary")}
                 </Button>
               </Link>
               <Link href="/chat">
                 <Button variant="outlineInverse" size="lg">
-                  Hỏi trợ lý AI
+                  {t("home.askAi")}
                 </Button>
               </Link>
             </div>

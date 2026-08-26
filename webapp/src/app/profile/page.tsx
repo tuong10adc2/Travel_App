@@ -6,6 +6,7 @@ import { updateProfile } from "firebase/auth";
 import { Bookmark, CalendarRange, Loader2, LogOut, User } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
+import { useLanguage, useTranslations } from "@/contexts/language-context";
 import { useToast } from "@/contexts/toast-context";
 import { RequireAuth } from "@/components/require-auth";
 import { Button } from "@/components/ui/button";
@@ -14,9 +15,9 @@ import { Field, Input, Label } from "@/components/ui/input";
 import { PatternOverlay } from "@/components/ui/pattern-overlay";
 import { PLACE_TAGS, type AppUser } from "@/lib/types";
 
-function formatDate(ts: unknown) {
+function formatDate(ts: unknown, locale: string) {
   const d = (ts as { toDate?: () => Date } | undefined)?.toDate?.();
-  return d ? d.toLocaleDateString("vi-VN") : null;
+  return d ? d.toLocaleDateString(locale) : null;
 }
 
 /// Đếm nhanh 1 collection lọc theo userId — dùng chung style với
@@ -40,6 +41,8 @@ function useOwnedCount(collectionName: string, uid: string | undefined) {
 function ProfileForm({ profile }: { profile: AppUser }) {
   const { user, signOut } = useAuth();
   const toast = useToast();
+  const t = useTranslations();
+  const { setLanguage: setAppLanguage } = useLanguage();
   const [name, setName] = useState(profile.displayName ?? "");
   const [phone, setPhone] = useState(profile.phoneNumber ?? "");
   const [language, setLanguage] = useState<"vi" | "en">(profile.language ?? "vi");
@@ -48,7 +51,7 @@ function ProfileForm({ profile }: { profile: AppUser }) {
 
   const savedCount = useOwnedCount("saved_places", user?.uid);
   const itineraryCount = useOwnedCount("itineraries", user?.uid);
-  const joinedLabel = formatDate(profile.createdAt);
+  const joinedLabel = formatDate(profile.createdAt, language === "en" ? "en-US" : "vi-VN");
 
   function toggleTag(tag: string) {
     setPreferences((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
@@ -67,9 +70,10 @@ function ProfileForm({ profile }: { profile: AppUser }) {
         preferences,
         updatedAt: serverTimestamp(),
       });
-      toast.success("Đã cập nhật hồ sơ.");
+      setAppLanguage(language);
+      toast.success(t("profile.toastUpdated"));
     } catch {
-      toast.error("Không thể cập nhật hồ sơ.");
+      toast.error(t("profile.toastUpdateFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -86,9 +90,11 @@ function ProfileForm({ profile }: { profile: AppUser }) {
           </div>
         </div>
         <div>
-          <h1 className="text-xl font-bold text-foreground">{profile?.displayName || "Hồ sơ cá nhân"}</h1>
+          <h1 className="text-xl font-bold text-foreground">{profile?.displayName || t("profile.defaultTitle")}</h1>
           <p className="text-sm text-muted-foreground">{user?.email}</p>
-          {joinedLabel && <p className="text-xs text-muted-foreground">Thành viên từ {joinedLabel}</p>}
+          {joinedLabel && (
+            <p className="text-xs text-muted-foreground">{t("profile.memberSince", { date: joinedLabel })}</p>
+          )}
         </div>
       </div>
 
@@ -97,25 +103,25 @@ function ProfileForm({ profile }: { profile: AppUser }) {
           <PatternOverlay opacity={0.7} />
           <Bookmark className="relative h-5 w-5 text-brand-600" />
           <span className="relative text-xl font-semibold text-foreground">{savedCount ?? "—"}</span>
-          <span className="relative text-xs text-muted-foreground">Đã lưu</span>
+          <span className="relative text-xs text-muted-foreground">{t("profile.savedCount")}</span>
         </Card>
         <Card className="relative flex flex-col items-center gap-1 overflow-hidden p-4 text-center">
           <PatternOverlay opacity={0.7} />
           <CalendarRange className="relative h-5 w-5 text-brand-600" />
           <span className="relative text-xl font-semibold text-foreground">{itineraryCount ?? "—"}</span>
-          <span className="text-xs text-muted-foreground">Lịch trình</span>
+          <span className="text-xs text-muted-foreground">{t("profile.itineraryCount")}</span>
         </Card>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-border bg-surface p-6">
-        <Field label="Họ tên">
+        <Field label={t("profile.name")}>
           <Input value={name} onChange={(e) => setName(e.target.value)} />
         </Field>
-        <Field label="Số điện thoại">
-          <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0901 234 567" />
+        <Field label={t("profile.phone")}>
+          <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t("profile.phonePlaceholder")} />
         </Field>
         <div>
-          <Label>Ngôn ngữ giao diện</Label>
+          <Label>{t("profile.languageLabel")}</Label>
           <div className="flex gap-2">
             {(["vi", "en"] as const).map((l) => (
               <button
@@ -126,14 +132,14 @@ function ProfileForm({ profile }: { profile: AppUser }) {
                   language === l ? "border-brand-600 bg-brand-50 text-brand-700" : "border-border text-muted-foreground"
                 }`}
               >
-                {l === "vi" ? "Tiếng Việt" : "English"}
+                {l === "vi" ? t("profile.languageVi") : t("profile.languageEn")}
               </button>
             ))}
           </div>
         </div>
         <div>
-          <Label>Sở thích du lịch</Label>
-          <p className="mb-2 text-xs text-muted-foreground">Giúp trợ lý AI gợi ý địa điểm sát với bạn hơn.</p>
+          <Label>{t("profile.preferencesLabel")}</Label>
+          <p className="mb-2 text-xs text-muted-foreground">{t("profile.preferencesHint")}</p>
           <div className="flex flex-wrap gap-2">
             {PLACE_TAGS.map((tag) => {
               const selected = preferences.includes(tag);
@@ -155,13 +161,13 @@ function ProfileForm({ profile }: { profile: AppUser }) {
           </div>
         </div>
         <Button type="submit" loading={submitting}>
-          <User className="h-4 w-4" /> Lưu thay đổi
+          <User className="h-4 w-4" /> {t("profile.saveChanges")}
         </Button>
       </form>
 
       <div className="mt-6 rounded-2xl border border-border bg-surface p-6">
         <Button variant="outline" onClick={() => signOut()} className="w-full">
-          <LogOut className="h-4 w-4" /> Đăng xuất
+          <LogOut className="h-4 w-4" /> {t("common.logout")}
         </Button>
       </div>
       </div>

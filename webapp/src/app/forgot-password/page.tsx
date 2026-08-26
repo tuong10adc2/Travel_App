@@ -7,8 +7,10 @@ import { Compass, MailCheck } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
+import { useTranslations } from "@/contexts/language-context";
 
 export default function ForgotPasswordPage() {
+  const t = useTranslations();
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
@@ -22,7 +24,7 @@ export default function ForgotPasswordPage() {
       await sendPasswordResetEmail(auth, email.trim());
       setSent(true);
     } catch {
-      setError("Không thể gửi email đặt lại mật khẩu. Kiểm tra lại địa chỉ email.");
+      setError(t("forgotPassword.error"));
     } finally {
       setSubmitting(false);
     }
@@ -36,8 +38,8 @@ export default function ForgotPasswordPage() {
             <Compass className="h-6 w-6" />
           </div>
           <div className="text-center">
-            <h1 className="text-xl font-semibold text-foreground">Quên mật khẩu</h1>
-            <p className="text-sm text-muted-foreground">Nhập email để nhận liên kết đặt lại mật khẩu</p>
+            <h1 className="text-xl font-semibold text-foreground">{t("forgotPassword.title")}</h1>
+            <p className="text-sm text-muted-foreground">{t("forgotPassword.subtitle")}</p>
           </div>
         </div>
         <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
@@ -45,31 +47,31 @@ export default function ForgotPasswordPage() {
             <div className="space-y-3 text-center">
               <MailCheck className="mx-auto h-8 w-8 text-brand-600" />
               <p className="text-sm text-foreground">
-                Đã gửi email đặt lại mật khẩu tới <span className="font-medium">{email}</span>.
-                Kiểm tra hộp thư của bạn.
+                {t("forgotPassword.sentMessagePrefix")} <span className="font-medium">{email}</span>.{" "}
+                {t("forgotPassword.sentMessageSuffix")}
               </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <Field label="Email">
+              <Field label={t("common.email")}>
                 <Input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="ban@email.com"
+                  placeholder={t("common.emailPlaceholder")}
                 />
               </Field>
               {error && <p className="rounded-lg bg-danger-50 px-3 py-2 text-sm text-danger-600">{error}</p>}
               <Button type="submit" className="w-full" size="lg" loading={submitting}>
-                Gửi liên kết đặt lại
+                {t("forgotPassword.sendLink")}
               </Button>
             </form>
           )}
         </div>
         <p className="mt-6 text-center text-sm text-muted-foreground">
           <Link href="/login" className="font-medium text-brand-700 hover:underline">
-            Quay lại đăng nhập
+            {t("forgotPassword.backToLogin")}
           </Link>
         </p>
       </div>

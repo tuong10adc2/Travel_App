@@ -16,6 +16,7 @@ import {
 import { Star } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
+import { useTranslations } from "@/contexts/language-context";
 import { useToast } from "@/contexts/toast-context";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
@@ -23,16 +24,16 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/cn";
 import type { Review, ReviewTargetType } from "@/lib/types";
 
-function useTargetLookup() {
+function useTargetLookup(fallbackName: string) {
   const [cache, setCache] = useState<Record<string, string>>({});
   async function resolve(id: string) {
     if (!id || cache[id] !== undefined) return;
     try {
       const snap = await getDoc(doc(db, "users", id));
       const data = snap.data() as { displayName?: string } | undefined;
-      setCache((c) => ({ ...c, [id]: data?.displayName || "Người dùng" }));
+      setCache((c) => ({ ...c, [id]: data?.displayName || fallbackName }));
     } catch {
-      setCache((c) => ({ ...c, [id]: "Người dùng" }));
+      setCache((c) => ({ ...c, [id]: fallbackName }));
     }
   }
   return { cache, resolve };
@@ -64,10 +65,11 @@ export function ReviewSection({
 }) {
   const { user } = useAuth();
   const toast = useToast();
+  const t = useTranslations();
   const [approved, setApproved] = useState<Review[]>([]);
   const [mine, setMine] = useState<Review | null>(null);
   const [loading, setLoading] = useState(true);
-  const users = useTargetLookup();
+  const users = useTargetLookup(t("reviews.anonymousUser"));
 
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -115,7 +117,7 @@ export function ReviewSection({
     e.preventDefault();
     if (!user) return;
     if (rating === 0) {
-      toast.error("Vui lòng chọn số sao đánh giá.");
+      toast.error(t("reviews.toastSelectRating"));
       return;
     }
     setSubmitting(true);
@@ -140,9 +142,9 @@ export function ReviewSection({
           updatedAt: serverTimestamp(),
         });
       }
-      toast.success("Đã gửi đánh giá, đang chờ duyệt.");
+      toast.success(t("reviews.toastSubmitted"));
     } catch {
-      toast.error("Không thể gửi đánh giá, vui lòng thử lại.");
+      toast.error(t("reviews.toastSubmitFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -151,39 +153,39 @@ export function ReviewSection({
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-semibold text-foreground">
-        Đánh giá {approved.length > 0 && `(${approved.length})`}
+        {t("reviews.heading")} {approved.length > 0 && `(${approved.length})`}
       </h2>
 
       {user ? (
         <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-surface p-5">
           {mine?.status === "pending" && (
-            <Badge tone="warning" className="mb-3">Đánh giá của bạn đang chờ duyệt</Badge>
+            <Badge tone="warning" className="mb-3">{t("reviews.pendingBadge")}</Badge>
           )}
           <StarPicker value={rating} onChange={setRating} />
           <Textarea
             className="mt-3"
             rows={3}
-            placeholder="Chia sẻ cảm nhận của bạn..."
+            placeholder={t("reviews.commentPlaceholder")}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
           />
           <Button type="submit" size="sm" className="mt-3" loading={submitting}>
-            {mine ? "Cập nhật đánh giá" : "Gửi đánh giá"}
+            {mine ? t("reviews.update") : t("reviews.submit")}
           </Button>
         </form>
       ) : (
         <div className="rounded-2xl border border-dashed border-border bg-surface p-5 text-sm text-muted-foreground">
           <Link href="/login" className="font-medium text-brand-700 hover:underline">
-            Đăng nhập
+            {t("reviews.loginToReview")}
           </Link>{" "}
-          để viết đánh giá.
+          {t("reviews.loginToReviewSuffix")}
         </div>
       )}
 
       {loading ? (
-        <p className="text-sm text-muted-foreground">Đang tải đánh giá...</p>
+        <p className="text-sm text-muted-foreground">{t("reviews.loadingReviews")}</p>
       ) : approved.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Chưa có đánh giá nào được duyệt.</p>
+        <p className="text-sm text-muted-foreground">{t("reviews.empty")}</p>
       ) : (
         <div className="space-y-4">
           {approved

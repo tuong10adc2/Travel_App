@@ -13,22 +13,24 @@ import {
   X,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
+import { useTranslations } from "@/contexts/language-context";
 import { cn } from "@/lib/cn";
 import { ThemeToggle } from "@/components/theme-toggle";
-
-const NAV_LINKS = [
-  { href: "/explore", label: "Khám phá" },
-  { href: "/tours", label: "Tours" },
-  { href: "/itineraries", label: "Lịch trình" },
-  { href: "/chat", label: "Trợ lý AI" },
-  { href: "/saved", label: "Đã lưu" },
-];
 
 export function Navbar() {
   const pathname = usePathname();
   const { user, profile, signOut } = useAuth();
+  const t = useTranslations();
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const NAV_LINKS = [
+    { href: "/explore", label: t("nav.explore") },
+    { href: "/tours", label: t("nav.tours") },
+    { href: "/itineraries", label: t("nav.itineraries") },
+    { href: "/chat", label: t("nav.chat") },
+    { href: "/saved", label: t("nav.saved") },
+  ];
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-surface/90 backdrop-blur">
@@ -71,7 +73,7 @@ export function Navbar() {
                   {(profile?.displayName || user.email || "?").charAt(0).toUpperCase()}
                 </div>
                 <span className="max-w-[120px] truncate text-sm font-medium text-foreground">
-                  {profile?.displayName || "Tài khoản"}
+                  {profile?.displayName || t("common.account")}
                 </span>
                 <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
@@ -81,19 +83,19 @@ export function Navbar() {
                     href="/profile"
                     className="flex items-center gap-2 px-4 py-2.5 text-sm text-foreground hover:bg-surface-muted"
                   >
-                    <UserIcon className="h-4 w-4" /> Hồ sơ cá nhân
+                    <UserIcon className="h-4 w-4" /> {t("nav.profile")}
                   </Link>
                   <Link
                     href="/itineraries"
                     className="flex items-center gap-2 px-4 py-2.5 text-sm text-foreground hover:bg-surface-muted lg:hidden"
                   >
-                    <Map className="h-4 w-4" /> Lịch trình
+                    <Map className="h-4 w-4" /> {t("nav.itineraries")}
                   </Link>
                   <button
                     onClick={() => signOut()}
                     className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-danger-600 hover:bg-danger-50"
                   >
-                    <LogOut className="h-4 w-4" /> Đăng xuất
+                    <LogOut className="h-4 w-4" /> {t("common.logout")}
                   </button>
                 </div>
               )}
@@ -102,12 +104,12 @@ export function Navbar() {
             <>
               <Link href="/login">
                 <span className="rounded-lg px-3.5 py-2 text-sm font-medium text-foreground hover:bg-surface-muted">
-                  Đăng nhập
+                  {t("common.login")}
                 </span>
               </Link>
               <Link href="/register">
                 <span className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">
-                  Đăng ký
+                  {t("common.register")}
                 </span>
               </Link>
             </>
@@ -145,25 +147,25 @@ export function Navbar() {
                   onClick={() => setMobileOpen(false)}
                   className="rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-surface-muted"
                 >
-                  Hồ sơ cá nhân
+                  {t("nav.profile")}
                 </Link>
                 <button
                   onClick={() => signOut()}
                   className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-danger-600 hover:bg-danger-50"
                 >
-                  Đăng xuất
+                  {t("common.logout")}
                 </button>
               </>
             ) : (
               <div className="mt-2 flex gap-2">
                 <Link href="/login" className="flex-1">
                   <span className="flex h-10 items-center justify-center rounded-lg border border-border text-sm font-medium">
-                    Đăng nhập
+                    {t("common.login")}
                   </span>
                 </Link>
                 <Link href="/register" className="flex-1">
                   <span className="flex h-10 items-center justify-center rounded-lg bg-brand-600 text-sm font-medium text-white">
-                    Đăng ký
+                    {t("common.register")}
                   </span>
                 </Link>
               </div>

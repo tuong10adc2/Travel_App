@@ -6,6 +6,7 @@ import { deleteDoc, doc, onSnapshot, serverTimestamp, setDoc } from "firebase/fi
 import { Heart } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
+import { useTranslations } from "@/contexts/language-context";
 import { useToast } from "@/contexts/toast-context";
 import { cn } from "@/lib/cn";
 
@@ -13,6 +14,7 @@ export function SaveToggleButton({ placeId, className }: { placeId: string; clas
   const { user } = useAuth();
   const router = useRouter();
   const toast = useToast();
+  const t = useTranslations();
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -44,7 +46,7 @@ export function SaveToggleButton({ placeId, className }: { placeId: string; clas
         });
       }
     } catch {
-      toast.error("Không thể cập nhật, vui lòng thử lại.");
+      toast.error(t("saveToggle.toastFailed"));
     } finally {
       setBusy(false);
     }
@@ -54,7 +56,7 @@ export function SaveToggleButton({ placeId, className }: { placeId: string; clas
     <button
       onClick={toggle}
       disabled={busy}
-      title={saved ? "Bỏ lưu địa điểm" : "Lưu địa điểm"}
+      title={saved ? t("saveToggle.saved") : t("saveToggle.notSaved")}
       className={cn(
         "flex h-11 w-11 items-center justify-center rounded-full border transition-colors disabled:opacity-50",
         saved

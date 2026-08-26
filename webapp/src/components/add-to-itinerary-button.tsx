@@ -15,6 +15,7 @@ import {
 import { CalendarPlus, X } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
+import { useTranslations } from "@/contexts/language-context";
 import { useToast } from "@/contexts/toast-context";
 import { Button } from "@/components/ui/button";
 import type { Itinerary } from "@/lib/types";
@@ -39,6 +40,7 @@ export function AddToItineraryButton({
   const { user } = useAuth();
   const router = useRouter();
   const toast = useToast();
+  const t = useTranslations();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [itineraries, setItineraries] = useState<Itinerary[]>([]);
@@ -62,7 +64,7 @@ export function AddToItineraryButton({
       setItineraries(list);
       if (list.length > 0) setSelectedId(list[0].id);
     } catch {
-      toast.error("Không tải được danh sách lịch trình.");
+      toast.error(t("addToItinerary.toastLoadFailed"));
     } finally {
       setLoading(false);
     }
@@ -84,10 +86,10 @@ export function AddToItineraryButton({
         note: "",
         createdAt: serverTimestamp(),
       });
-      toast.success(`Đã thêm "${placeName}" vào "${selected.name}".`);
+      toast.success(t("addToItinerary.toastAdded", { place: placeName, itinerary: selected.name }));
       setOpen(false);
     } catch {
-      toast.error("Không thể thêm vào lịch trình.");
+      toast.error(t("addToItinerary.toastAddFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -96,32 +98,32 @@ export function AddToItineraryButton({
   return (
     <>
       <Button variant="outline" onClick={openModal} className={className}>
-        <CalendarPlus className="h-4 w-4" /> Thêm vào lịch trình
+        <CalendarPlus className="h-4 w-4" /> {t("addToItinerary.button")}
       </Button>
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-sm rounded-2xl bg-surface p-6 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-base font-semibold text-foreground">Thêm vào lịch trình</h3>
+              <h3 className="text-base font-semibold text-foreground">{t("addToItinerary.modalTitle")}</h3>
               <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             {loading ? (
-              <p className="text-sm text-muted-foreground">Đang tải...</p>
+              <p className="text-sm text-muted-foreground">{t("common.loading")}</p>
             ) : itineraries.length === 0 ? (
               <div className="text-sm text-muted-foreground">
-                Bạn chưa có lịch trình nào.{" "}
+                {t("addToItinerary.empty")}{" "}
                 <Link href="/itineraries/new" className="font-medium text-brand-700 hover:underline">
-                  Tạo lịch trình mới
+                  {t("addToItinerary.createNew")}
                 </Link>
               </div>
             ) : (
               <div className="space-y-4">
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-foreground">Lịch trình</label>
+                  <label className="mb-1.5 block text-sm font-medium text-foreground">{t("addToItinerary.itineraryLabel")}</label>
                   <select
                     className="h-10 w-full rounded-lg border border-border bg-surface px-3 text-sm"
                     value={selectedId}
@@ -139,7 +141,7 @@ export function AddToItineraryButton({
                 </div>
                 {selected && (
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium text-foreground">Ngày</label>
+                    <label className="mb-1.5 block text-sm font-medium text-foreground">{t("addToItinerary.dayLabel")}</label>
                     <select
                       className="h-10 w-full rounded-lg border border-border bg-surface px-3 text-sm"
                       value={dayIndex}
@@ -147,14 +149,14 @@ export function AddToItineraryButton({
                     >
                       {Array.from({ length: dayCount(selected) }).map((_, i) => (
                         <option key={i} value={i}>
-                          Ngày {i + 1}
+                          {t("addToItinerary.dayOption", { n: i + 1 })}
                         </option>
                       ))}
                     </select>
                   </div>
                 )}
                 <Button className="w-full" onClick={handleAdd} loading={submitting} disabled={!selected}>
-                  Thêm vào lịch trình
+                  {t("addToItinerary.button")}
                 </Button>
               </div>
             )}

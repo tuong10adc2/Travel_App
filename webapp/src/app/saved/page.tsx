@@ -8,10 +8,12 @@ import { useAuth } from "@/contexts/auth-context";
 import { RequireAuth } from "@/components/require-auth";
 import { PlaceCard } from "@/components/place-card";
 import { Reveal } from "@/components/ui/reveal";
+import { useTranslations } from "@/contexts/language-context";
 import type { Place, SavedPlace } from "@/lib/types";
 
 function SavedInner() {
   const { user } = useAuth();
+  const t = useTranslations();
   const [saved, setSaved] = useState<SavedPlace[]>([]);
   const [places, setPlaces] = useState<Record<string, Place>>({});
   const [loading, setLoading] = useState(true);
@@ -49,8 +51,8 @@ function SavedInner() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Đã lưu</h1>
-        <p className="mt-2 text-muted-foreground">Những địa điểm bạn đã đánh dấu để xem sau</p>
+        <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{t("saved.title")}</h1>
+        <p className="mt-2 text-muted-foreground">{t("saved.subtitle")}</p>
       </div>
 
       {loading ? (
@@ -62,7 +64,7 @@ function SavedInner() {
       ) : list.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-surface p-16 text-center text-muted-foreground">
           <Heart className="mx-auto mb-3 h-6 w-6 opacity-40" />
-          Bạn chưa lưu địa điểm nào.
+          {t("saved.empty")}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

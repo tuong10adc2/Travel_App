@@ -9,22 +9,25 @@ import { Compass } from "lucide-react";
 import { auth, db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
+import { useLanguage, useTranslations } from "@/contexts/language-context";
 
-function firebaseAuthErrorMessage(code: string) {
+function firebaseAuthErrorMessage(code: string, t: (key: string) => string) {
   switch (code) {
     case "auth/email-already-in-use":
-      return "Email này đã được đăng ký.";
+      return t("register.errorEmailInUse");
     case "auth/invalid-email":
-      return "Email không hợp lệ.";
+      return t("register.errorInvalidEmail");
     case "auth/weak-password":
-      return "Mật khẩu quá yếu, cần ít nhất 6 ký tự.";
+      return t("register.errorWeakPassword");
     default:
-      return "Đăng ký thất bại. Vui lòng thử lại.";
+      return t("register.errorDefault");
   }
 }
 
 export default function RegisterPage() {
   const router = useRouter();
+  const t = useTranslations();
+  const { language } = useLanguage();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,7 +39,7 @@ export default function RegisterPage() {
     e.preventDefault();
     setError(null);
     if (password !== confirm) {
-      setError("Mật khẩu xác nhận không khớp.");
+      setError(t("register.errorPasswordMismatch"));
       return;
     }
     setSubmitting(true);
@@ -50,14 +53,14 @@ export default function RegisterPage() {
         phoneNumber: null,
         role: "user",
         preferences: [],
-        language: "vi",
+        language,
         isDisabled: false,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
       router.replace("/");
     } catch (err) {
-      setError(firebaseAuthErrorMessage((err as { code?: string })?.code ?? ""));
+      setError(firebaseAuthErrorMessage((err as { code?: string })?.code ?? "", t));
     } finally {
       setSubmitting(false);
     }
@@ -71,55 +74,55 @@ export default function RegisterPage() {
             <Compass className="h-6 w-6" />
           </div>
           <div className="text-center">
-            <h1 className="text-xl font-semibold text-foreground">Tạo tài khoản</h1>
-            <p className="text-sm text-muted-foreground">Bắt đầu hành trình khám phá của bạn</p>
+            <h1 className="text-xl font-semibold text-foreground">{t("register.title")}</h1>
+            <p className="text-sm text-muted-foreground">{t("register.subtitle")}</p>
           </div>
         </div>
         <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Field label="Họ tên">
-              <Input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Nguyễn Văn A" />
+            <Field label={t("common.name")}>
+              <Input required value={name} onChange={(e) => setName(e.target.value)} placeholder={t("register.namePlaceholder")} />
             </Field>
-            <Field label="Email">
+            <Field label={t("common.email")}>
               <Input
                 type="email"
                 required
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="ban@email.com"
+                placeholder={t("common.emailPlaceholder")}
               />
             </Field>
-            <Field label="Mật khẩu" hint="Tối thiểu 6 ký tự">
+            <Field label={t("common.password")} hint={t("register.passwordHint")}>
               <Input
                 type="password"
                 required
                 autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder={t("common.passwordPlaceholder")}
               />
             </Field>
-            <Field label="Xác nhận mật khẩu">
+            <Field label={t("register.confirmPassword")}>
               <Input
                 type="password"
                 required
                 autoComplete="new-password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
-                placeholder="••••••••"
+                placeholder={t("common.passwordPlaceholder")}
               />
             </Field>
             {error && <p className="rounded-lg bg-danger-50 px-3 py-2 text-sm text-danger-600">{error}</p>}
             <Button type="submit" className="w-full" size="lg" loading={submitting}>
-              Đăng ký
+              {t("common.register")}
             </Button>
           </form>
         </div>
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          Đã có tài khoản?{" "}
+          {t("register.haveAccount")}{" "}
           <Link href="/login" className="font-medium text-brand-700 hover:underline">
-            Đăng nhập
+            {t("common.login")}
           </Link>
         </p>
       </div>
