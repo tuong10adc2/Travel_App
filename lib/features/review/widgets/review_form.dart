@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/review_repository.dart';
 import '../models/review.dart';
 import 'star_rating.dart';
@@ -34,9 +35,10 @@ class _ReviewFormState extends ConsumerState<ReviewForm> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_rating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng chọn số sao đánh giá')),
+        SnackBar(content: Text(l10n.pleaseSelectRating)),
       );
       return;
     }
@@ -50,7 +52,7 @@ class _ReviewFormState extends ConsumerState<ReviewForm> {
           );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đã gửi đánh giá, chờ duyệt trước khi hiển thị công khai.')),
+          SnackBar(content: Text(l10n.reviewSubmittedPendingApproval)),
         );
       }
     } finally {
@@ -60,6 +62,7 @@ class _ReviewFormState extends ConsumerState<ReviewForm> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -72,7 +75,7 @@ class _ReviewFormState extends ConsumerState<ReviewForm> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            widget.existingReview == null ? 'Viết đánh giá của bạn' : 'Sửa đánh giá của bạn',
+            widget.existingReview == null ? l10n.writeReviewTitle : l10n.editReviewTitle,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -81,7 +84,7 @@ class _ReviewFormState extends ConsumerState<ReviewForm> {
           TextField(
             controller: _commentController,
             maxLines: 3,
-            decoration: const InputDecoration(hintText: 'Chia sẻ trải nghiệm của bạn...'),
+            decoration: InputDecoration(hintText: l10n.reviewCommentHint),
           ),
           const SizedBox(height: AppSpacing.sm),
           Align(
@@ -94,7 +97,7 @@ class _ReviewFormState extends ConsumerState<ReviewForm> {
                       width: 18,
                       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                     )
-                  : Text(widget.existingReview == null ? 'Gửi đánh giá' : 'Cập nhật'),
+                  : Text(widget.existingReview == null ? l10n.submitReviewButton : l10n.updateReviewButton),
             ),
           ),
         ],

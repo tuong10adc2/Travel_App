@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/date_format.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/itinerary_repository.dart';
 
 class CreateItineraryScreen extends ConsumerStatefulWidget {
@@ -47,7 +48,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Không tạo được lịch trình: $e'), backgroundColor: AppColors.error),
+          SnackBar(content: Text(AppLocalizations.of(context)!.createItineraryError(e)), backgroundColor: AppColors.error),
         );
       }
     } finally {
@@ -57,8 +58,9 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Tạo lịch trình mới')),
+      appBar: AppBar(title: Text(l10n.createItineraryTitle)),
       body: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Form(
@@ -68,10 +70,10 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Tên lịch trình'),
+                decoration: InputDecoration(labelText: l10n.itineraryNameLabel),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Vui lòng nhập tên lịch trình';
+                    return l10n.itineraryNameRequiredError;
                   }
                   return null;
                 },
@@ -80,7 +82,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
               InkWell(
                 onTap: _pickStartDate,
                 child: InputDecorator(
-                  decoration: const InputDecoration(labelText: 'Ngày bắt đầu'),
+                  decoration: InputDecoration(labelText: l10n.startDateLabel),
                   child: Row(
                     children: [
                       Icon(Icons.calendar_today_outlined, size: 18, color: context.colors.textSecondary),
@@ -99,7 +101,7 @@ class _CreateItineraryScreenState extends ConsumerState<CreateItineraryScreen> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
-                    : const Text('Tạo lịch trình'),
+                    : Text(l10n.createItineraryButton),
               ),
             ],
           ),

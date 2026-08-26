@@ -4,9 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/services/push_notification_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/tag_labels.dart';
 import '../../../core/widgets/background_blobs.dart';
 import '../../../core/widgets/fade_slide_in.dart';
 import '../../../core/widgets/skeleton_loaders.dart';
+import '../../../l10n/app_localizations.dart';
 import '../providers/places_providers.dart';
 import '../widgets/place_card.dart';
 
@@ -34,6 +36,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final placesAsync = ref.watch(filteredPlacesProvider);
     final selectedTag = ref.watch(selectedTagProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: DecorativeBackground(
@@ -63,7 +66,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ref.read(selectedTagProvider.notifier).state = tag,
                       ),
                       const SizedBox(height: AppSpacing.lg),
-                      Text('Đề xuất cho bạn',
+                      Text(l10n.recommendedForYou,
                           style: Theme.of(context).textTheme.titleMedium),
                       const SizedBox(height: AppSpacing.sm),
                     ],
@@ -75,14 +78,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const SliverToBoxAdapter(child: SkeletonCardGrid()),
                 error: (error, _) => SliverFillRemaining(
                   hasScrollBody: false,
-                  child: Center(child: Text('Lỗi tải địa điểm: $error')),
+                  child: Center(child: Text(l10n.placesLoadError(error))),
                 ),
                 data: (places) {
                   if (places.isEmpty) {
-                    return const SliverFillRemaining(
+                    return SliverFillRemaining(
                       hasScrollBody: false,
                       child: Center(
-                          child: Text('Không tìm thấy địa điểm phù hợp')),
+                          child: Text(l10n.noMatchingPlacesFound)),
                     );
                   }
                   return SliverPadding(
@@ -140,7 +143,7 @@ class _Header extends StatelessWidget {
         IconButton(
           onPressed: onProfileTap,
           icon: const Icon(Icons.person_outline),
-          tooltip: 'Hồ sơ cá nhân',
+          tooltip: AppLocalizations.of(context)!.profileTitle,
         ),
       ],
     );
@@ -157,7 +160,7 @@ class _SearchField extends StatelessWidget {
     return TextField(
       onChanged: onChanged,
       decoration: InputDecoration(
-        hintText: 'Tìm địa điểm...',
+        hintText: AppLocalizations.of(context)!.searchPlacesHint,
         prefixIcon: const Icon(Icons.search),
         filled: true,
         fillColor: context.colors.surface,
@@ -176,6 +179,7 @@ class _PromoBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppRadius.lg),
       child: Container(
@@ -196,7 +200,7 @@ class _PromoBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Khám phá hành trình mới',
+                  l10n.discoverNewJourney,
                   style: Theme.of(context)
                       .textTheme
                       .titleLarge
@@ -204,7 +208,7 @@ class _PromoBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
-                  'Những địa điểm được gợi ý riêng cho chuyến đi của bạn',
+                  l10n.suggestedPlacesForYou,
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium
@@ -233,14 +237,14 @@ class _TagFilterRow extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         children: [
           _TagChip(
-              label: 'Tất cả',
+              label: AppLocalizations.of(context)!.filterAll,
               selected: selectedTag == null,
               onTap: () => onSelect(null)),
           for (final tag in _tags)
             Padding(
               padding: const EdgeInsets.only(left: AppSpacing.sm),
               child: _TagChip(
-                  label: tag,
+                  label: tagLabel(context, tag),
                   selected: selectedTag == tag,
                   onTap: () => onSelect(tag)),
             ),

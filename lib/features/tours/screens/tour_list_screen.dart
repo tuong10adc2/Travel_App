@@ -5,6 +5,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/fade_slide_in.dart';
 import '../../../core/widgets/skeleton_loaders.dart';
+import '../../../l10n/app_localizations.dart';
 import '../providers/tour_providers.dart';
 import '../widgets/tour_card.dart';
 
@@ -14,19 +15,20 @@ class TourListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final toursAsync = ref.watch(toursProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Tour gợi ý')),
+      appBar: AppBar(title: Text(l10n.suggestedToursTitle)),
       body: toursAsync.when(
         loading: () => const SkeletonList(),
-        error: (error, _) => Center(child: Text('Lỗi tải tour: $error')),
+        error: (error, _) => Center(child: Text(l10n.toursLoadError(error))),
         data: (tours) {
           if (tours.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.card_travel,
               illustrationAsset: 'assets/illustrations/empty_tours.svg',
-              title: 'Chưa có tour nào',
-              message: 'Tour gợi ý sẽ do quản trị viên thêm.',
+              title: l10n.noToursYetTitle,
+              message: l10n.noToursYetMessage,
             );
           }
           return ListView.separated(

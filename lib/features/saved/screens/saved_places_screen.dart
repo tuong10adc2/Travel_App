@@ -5,6 +5,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/fade_slide_in.dart';
 import '../../../core/widgets/skeleton_loaders.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../home/widgets/place_card.dart';
 import '../providers/saved_providers.dart';
 
@@ -14,19 +15,20 @@ class SavedPlacesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final savedAsync = ref.watch(savedPlacesProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Đã lưu')),
+      appBar: AppBar(title: Text(l10n.navSaved)),
       body: savedAsync.when(
         loading: () => const SkeletonCardGrid(),
-        error: (error, _) => Center(child: Text('Lỗi tải danh sách đã lưu: $error')),
+        error: (error, _) => Center(child: Text(l10n.savedPlacesLoadError(error))),
         data: (places) {
           if (places.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.bookmark_border,
               illustrationAsset: 'assets/illustrations/empty_saved.svg',
-              title: 'Chưa lưu địa điểm nào',
-              message: 'Bấm biểu tượng trái tim ở màn Chi tiết địa điểm để lưu vào đây.',
+              title: l10n.noSavedPlacesTitle,
+              message: l10n.noSavedPlacesMessage,
             );
           }
           return GridView.builder(

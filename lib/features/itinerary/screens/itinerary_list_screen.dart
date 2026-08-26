@@ -7,6 +7,7 @@ import '../../../core/utils/date_format.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/pressable_scale.dart';
 import '../../../core/widgets/skeleton_loaders.dart';
+import '../../../l10n/app_localizations.dart';
 import '../models/itinerary.dart';
 import '../providers/itinerary_providers.dart';
 
@@ -16,26 +17,27 @@ class ItineraryListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final itinerariesAsync = ref.watch(myItinerariesProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Lịch trình của tôi')),
+      appBar: AppBar(title: Text(l10n.myItinerariesTitle)),
       floatingActionButton: PressableScale(
         child: FloatingActionButton.extended(
           onPressed: () => context.push('/itineraries/new'),
           icon: const Icon(Icons.add),
-          label: const Text('Tạo lịch trình'),
+          label: Text(l10n.createItineraryButton),
         ),
       ),
       body: itinerariesAsync.when(
         loading: () => const SkeletonList(),
-        error: (error, _) => Center(child: Text('Lỗi tải lịch trình: $error')),
+        error: (error, _) => Center(child: Text(l10n.itineraryLoadError(error))),
         data: (itineraries) {
           if (itineraries.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.calendar_month_outlined,
               illustrationAsset: 'assets/illustrations/empty_itinerary.svg',
-              title: 'Chưa có lịch trình nào',
-              message: 'Bấm "Tạo lịch trình" để bắt đầu lên kế hoạch chuyến đi.',
+              title: l10n.noItinerariesYetTitle,
+              message: l10n.noItinerariesYetMessage,
             );
           }
           return ListView.separated(
@@ -64,6 +66,7 @@ class _ItineraryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final end = itinerary.endDate ?? itinerary.startDate;
     final dayCount = end.difference(itinerary.startDate).inDays + 1;
+    final l10n = AppLocalizations.of(context)!;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -76,7 +79,7 @@ class _ItineraryTile extends StatelessWidget {
         ),
         title: Text(itinerary.name, style: Theme.of(context).textTheme.titleSmall),
         subtitle: Text(
-          '${formatDateVi(itinerary.startDate)} · $dayCount ngày',
+          '${formatDateVi(itinerary.startDate)} · ${l10n.dayCount(dayCount)}',
           style: Theme.of(context).textTheme.bodySmall,
         ),
         trailing: const Icon(Icons.chevron_right),

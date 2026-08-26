@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:panorama/panorama.dart' as pano;
 
 import '../../../core/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../models/media_360.dart';
 import '../providers/vr360_providers.dart';
 
@@ -24,22 +25,23 @@ class _Vr360ViewerScreenState extends ConsumerState<Vr360ViewerScreen> {
   @override
   Widget build(BuildContext context) {
     final mediaAsync = ref.watch(media360ForPlaceProvider(widget.placeId));
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
-        title: mediaAsync.valueOrNull?.isNotEmpty == true ? _titleFor(mediaAsync.valueOrNull!) : const Text('VR 360°'),
+        title: mediaAsync.valueOrNull?.isNotEmpty == true ? _titleFor(mediaAsync.valueOrNull!, l10n) : Text(l10n.vr360FallbackTitle),
         actions: [
           IconButton(
             onPressed: kIsWeb
                 ? () => ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Xoay theo cảm biến chỉ hỗ trợ trên thiết bị di động thật.')),
+                      SnackBar(content: Text(l10n.gyroMobileOnlyMessage)),
                     )
                 : () => setState(() => _gyroOn = !_gyroOn),
             icon: Icon(_gyroOn && !kIsWeb ? Icons.screen_rotation : Icons.screen_rotation_alt_outlined),
-            tooltip: _gyroOn && !kIsWeb ? 'Tắt xoay theo cảm biến' : 'Bật xoay theo cảm biến',
+            tooltip: _gyroOn && !kIsWeb ? l10n.gyroOffTooltip : l10n.gyroOnTooltip,
           ),
         ],
       ),
@@ -47,7 +49,7 @@ class _Vr360ViewerScreenState extends ConsumerState<Vr360ViewerScreen> {
         loading: () => const Center(child: CircularProgressIndicator(color: Colors.white)),
         error: (error, _) => Center(
           child: Text(
-            'Lỗi tải dữ liệu 360°: $error',
+            l10n.media360LoadError(error),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
           ),
         ),
@@ -55,7 +57,7 @@ class _Vr360ViewerScreenState extends ConsumerState<Vr360ViewerScreen> {
           if (mediaList.isEmpty) {
             return Center(
               child: Text(
-                'Chưa có ảnh 360° cho địa điểm này.',
+                l10n.no360ForPlace,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white70),
               ),
             );
@@ -103,12 +105,12 @@ class _Vr360ViewerScreenState extends ConsumerState<Vr360ViewerScreen> {
     );
   }
 
-  Widget _titleFor(List<Media360> mediaList) {
+  Widget _titleFor(List<Media360> mediaList, AppLocalizations l10n) {
     final current = mediaList.firstWhere(
       (m) => m.id == (_currentMediaId ?? widget.initialMediaId),
       orElse: () => mediaList.first,
     );
-    return Text(current.title.isNotEmpty ? current.title : 'VR 360°');
+    return Text(current.title.isNotEmpty ? current.title : l10n.vr360FallbackTitle);
   }
 }
 
@@ -169,7 +171,7 @@ class _HotspotMarker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: label.isNotEmpty ? label : 'Xem điểm nhìn khác',
+      message: label.isNotEmpty ? label : AppLocalizations.of(context)!.viewOtherHotspotTooltip,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(999),
@@ -200,7 +202,7 @@ class _LoadingSkeleton extends StatelessWidget {
             const CircularProgressIndicator(color: Colors.white),
             const SizedBox(height: AppSpacing.md),
             Text(
-              'Đang tải ảnh 360°...',
+              AppLocalizations.of(context)!.loading360Message,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white70),
             ),
           ],
@@ -222,7 +224,7 @@ class _RotateHint extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Text(
-        'Vuốt hoặc nghiêng thiết bị để xoay 360°',
+        AppLocalizations.of(context)!.rotateHint360,
         style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Colors.white),
       ),
     );
@@ -249,7 +251,7 @@ class _ViewpointSelector extends StatelessWidget {
           final media = mediaList[index];
           final selected = media.id == currentId;
           return ChoiceChip(
-            label: Text(media.title.isNotEmpty ? media.title : 'Điểm nhìn ${index + 1}'),
+            label: Text(media.title.isNotEmpty ? media.title : AppLocalizations.of(context)!.viewpointLabel(index + 1)),
             selected: selected,
             onSelected: (_) => onSelect(media.id),
             selectedColor: AppColors.primary,

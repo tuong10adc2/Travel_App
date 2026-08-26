@@ -1,0 +1,251 @@
+{
+  "@@locale": "vi",
+
+  "appTitle": "Trợ lý du lịch AI",
+
+  "navExplore": "Khám phá",
+  "navTours": "Tours",
+  "navItineraries": "Lịch trình",
+  "navChat": "Trợ lý",
+  "navSaved": "Đã lưu",
+  "navProfile": "Hồ sơ",
+
+  "login": "Đăng nhập",
+  "register": "Đăng ký",
+  "emailLabel": "Email",
+  "emailInvalidError": "Vui lòng nhập email hợp lệ",
+  "passwordLabel": "Mật khẩu",
+  "passwordTooShortError": "Mật khẩu cần ít nhất 6 ký tự",
+  "forgotPasswordLink": "Quên mật khẩu?",
+  "loginWithGoogle": "Đăng nhập với Google",
+  "noAccountRegisterNow": "Chưa có tài khoản? Đăng ký ngay",
+  "fullNameLabel": "Họ tên",
+  "fullNameRequiredError": "Vui lòng nhập họ tên",
+  "confirmPasswordLabel": "Xác nhận mật khẩu",
+  "confirmPasswordMismatchError": "Mật khẩu xác nhận không khớp",
+  "haveAccountLoginNow": "Đã có tài khoản? Đăng nhập",
+  "forgotPasswordTitle": "Quên mật khẩu",
+  "forgotPasswordInstructions": "Nhập email đã đăng ký, chúng tôi sẽ gửi liên kết đặt lại mật khẩu.",
+  "sendResetEmailButton": "Gửi email khôi phục",
+  "resetEmailSentMessage": "Đã gửi email khôi phục mật khẩu, vui lòng kiểm tra hộp thư.",
+
+  "authErrorInvalidEmail": "Email không hợp lệ.",
+  "authErrorUserDisabled": "Tài khoản này đã bị khoá.",
+  "authErrorUserNotFound": "Không tìm thấy tài khoản với email này.",
+  "authErrorWrongPassword": "Email hoặc mật khẩu không đúng.",
+  "authErrorEmailInUse": "Email này đã được đăng ký.",
+  "authErrorWeakPassword": "Mật khẩu quá yếu, cần ít nhất 6 ký tự.",
+  "authErrorOperationNotAllowed": "Phương thức đăng nhập này chưa được bật.",
+  "authErrorTooManyRequests": "Bạn thao tác quá nhiều lần, vui lòng thử lại sau.",
+  "authErrorNetworkFailed": "Lỗi kết nối mạng, vui lòng thử lại.",
+  "authErrorGeneric": "Đã có lỗi xảy ra ({code}), vui lòng thử lại.",
+  "@authErrorGeneric": {
+    "placeholders": { "code": { "type": "String" } }
+  },
+
+  "chatLoadError": "Lỗi tải hội thoại: {error}",
+  "@chatLoadError": {
+    "placeholders": { "error": { "type": "Object" } }
+  },
+  "chatFunctionErrorFallback": "Đã có lỗi khi gọi trợ lý AI.",
+  "chatGenericError": "Đã có lỗi: {error}",
+  "@chatGenericError": {
+    "placeholders": { "error": { "type": "Object" } }
+  },
+  "chatInputHint": "Hỏi về địa điểm, lịch trình...",
+  "chatWelcomeMessage": "Hỏi mình về địa điểm, lên lịch trình hay mẹo du lịch nhé!",
+
+  "dayLabel": "Ngày {number}",
+  "@dayLabel": {
+    "placeholders": { "number": { "type": "Object" } }
+  },
+  "createItineraryFromSuggestion": "Tạo lịch trình từ gợi ý này",
+  "aiSuggestedItineraryName": "Lịch trình gợi ý từ AI",
+  "itineraryNameLabel": "Tên lịch trình",
+  "startDateLabel": "Ngày bắt đầu",
+  "cancel": "Huỷ",
+  "createItineraryButton": "Tạo lịch trình",
+  "createItineraryError": "Không tạo được lịch trình: {error}",
+  "@createItineraryError": {
+    "placeholders": { "error": { "type": "Object" } }
+  },
+
+  "tagHistory": "Lịch sử",
+  "tagCuisine": "Ẩm thực",
+  "tagNature": "Thiên nhiên",
+  "tagCulture": "Văn hoá",
+  "tagBeach": "Biển đảo",
+  "tagMountain": "Núi rừng",
+
+  "filterAll": "Tất cả",
+  "recommendedForYou": "Đề xuất cho bạn",
+  "placesLoadError": "Lỗi tải địa điểm: {error}",
+  "@placesLoadError": {
+    "placeholders": { "error": { "type": "Object" } }
+  },
+  "noMatchingPlacesFound": "Không tìm thấy địa điểm phù hợp",
+  "profileTitle": "Hồ sơ cá nhân",
+  "searchPlacesHint": "Tìm địa điểm...",
+  "discoverNewJourney": "Khám phá hành trình mới",
+  "suggestedPlacesForYou": "Những địa điểm được gợi ý riêng cho chuyến đi của bạn",
+
+  "durationHours": "{hours} giờ",
+  "@durationHours": {
+    "placeholders": { "hours": { "type": "String" } }
+  },
+  "durationMinutes": "{minutes} phút",
+  "@durationMinutes": {
+    "placeholders": { "minutes": { "type": "Object" } }
+  },
+  "free": "Miễn phí",
+
+  "myItinerariesTitle": "Lịch trình của tôi",
+  "noItinerariesYetTitle": "Chưa có lịch trình nào",
+  "noItinerariesYetMessage": "Bấm \"Tạo lịch trình\" để bắt đầu lên kế hoạch chuyến đi.",
+  "dayCount": "{count} ngày",
+  "@dayCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "itineraryLoadError": "Lỗi tải lịch trình: {error}",
+  "@itineraryLoadError": {
+    "placeholders": { "error": { "type": "Object" } }
+  },
+  "itineraryFallbackTitle": "Lịch trình",
+  "itineraryNotFound": "Không tìm thấy lịch trình.",
+  "addDayButton": "Thêm ngày",
+  "addPlaceButton": "Thêm địa điểm",
+  "emptyDayMessage": "Chưa có địa điểm nào trong ngày này.\nBấm \"Thêm địa điểm\" bên dưới.",
+  "placeNoLongerExists": "(Địa điểm không còn tồn tại)",
+  "removeFromItineraryTooltip": "Xoá khỏi lịch trình",
+  "createItineraryTitle": "Tạo lịch trình mới",
+  "itineraryNameRequiredError": "Vui lòng nhập tên lịch trình",
+  "addPlaceToDayTitle": "Thêm địa điểm · Ngày {day}",
+  "@addPlaceToDayTitle": {
+    "placeholders": { "day": { "type": "Object" } }
+  },
+  "placeAddedToDay": "Đã thêm \"{placeName}\" vào Ngày {day}",
+  "@placeAddedToDay": {
+    "placeholders": {
+      "placeName": { "type": "String" },
+      "day": { "type": "Object" }
+    }
+  },
+
+  "weekdayMon": "Thứ 2",
+  "weekdayTue": "Thứ 3",
+  "weekdayWed": "Thứ 4",
+  "weekdayThu": "Thứ 5",
+  "weekdayFri": "Thứ 6",
+  "weekdaySat": "Thứ 7",
+  "weekdaySun": "Chủ nhật",
+
+  "placeNotFound": "Không tìm thấy địa điểm.",
+  "vr360Badge": "360° VR",
+  "reviewCountParen": "({count} đánh giá)",
+  "@reviewCountParen": {
+    "placeholders": { "count": { "type": "Object" } }
+  },
+  "experienceVr360Button": "Trải nghiệm ngay 360°",
+  "introductionHeading": "Giới thiệu",
+  "reviewsHeading": "Đánh giá ({count})",
+  "@reviewsHeading": {
+    "placeholders": { "count": { "type": "Object" } }
+  },
+  "noReviewsForPlace": "Chưa có đánh giá nào cho địa điểm này.",
+  "visitDurationUnknown": "Chưa rõ thời gian tham quan",
+  "visitDurationLabel": "Thời gian tham quan: {duration}",
+  "@visitDurationLabel": {
+    "placeholders": { "duration": { "type": "String" } }
+  },
+  "ticketPriceLabel": "Vé vào cổng: {price}",
+  "@ticketPriceLabel": {
+    "placeholders": { "price": { "type": "String" } }
+  },
+  "openingHoursAllWeek": "Giờ mở cửa: {hours} (cả tuần)",
+  "@openingHoursAllWeek": {
+    "placeholders": { "hours": { "type": "String" } }
+  },
+  "openingHoursLabel": "Giờ mở cửa:",
+
+  "pleaseSelectRating": "Vui lòng chọn số sao đánh giá",
+  "reviewSubmittedPendingApproval": "Đã gửi đánh giá, chờ duyệt trước khi hiển thị công khai.",
+  "writeReviewTitle": "Viết đánh giá của bạn",
+  "editReviewTitle": "Sửa đánh giá của bạn",
+  "reviewCommentHint": "Chia sẻ trải nghiệm của bạn...",
+  "submitReviewButton": "Gửi đánh giá",
+  "updateReviewButton": "Cập nhật",
+  "reviewPendingNotice": "Đang chờ duyệt — chỉ bạn thấy đánh giá này",
+
+  "savedPlacesLoadError": "Lỗi tải danh sách đã lưu: {error}",
+  "@savedPlacesLoadError": {
+    "placeholders": { "error": { "type": "Object" } }
+  },
+  "noSavedPlacesTitle": "Chưa lưu địa điểm nào",
+  "noSavedPlacesMessage": "Bấm biểu tượng trái tim ở màn Chi tiết địa điểm để lưu vào đây.",
+  "unsaveTooltip": "Bỏ lưu",
+  "saveTooltip": "Lưu địa điểm",
+
+  "suggestedToursTitle": "Tour gợi ý",
+  "toursLoadError": "Lỗi tải tour: {error}",
+  "@toursLoadError": {
+    "placeholders": { "error": { "type": "Object" } }
+  },
+  "noToursYetTitle": "Chưa có tour nào",
+  "noToursYetMessage": "Tour gợi ý sẽ do quản trị viên thêm.",
+  "tourNotFound": "Không tìm thấy tour.",
+  "contactForPrice": "Liên hệ",
+  "reviewCountPlain": "{count} đánh giá",
+  "@reviewCountPlain": {
+    "placeholders": { "count": { "type": "Object" } }
+  },
+  "placeCountLabel": "{count} địa điểm",
+  "@placeCountLabel": {
+    "placeholders": { "count": { "type": "Object" } }
+  },
+  "placesInTourHeading": "Địa điểm trong tour",
+  "addToMyItinerary": "Thêm vào lịch trình của tôi",
+  "noReviewsForTour": "Chưa có đánh giá nào cho tour này.",
+  "reviewsLoadError": "Lỗi tải đánh giá: {error}",
+  "@reviewsLoadError": {
+    "placeholders": { "error": { "type": "Object" } }
+  },
+
+  "vr360FallbackTitle": "VR 360°",
+  "gyroMobileOnlyMessage": "Xoay theo cảm biến chỉ hỗ trợ trên thiết bị di động thật.",
+  "gyroOffTooltip": "Tắt xoay theo cảm biến",
+  "gyroOnTooltip": "Bật xoay theo cảm biến",
+  "media360LoadError": "Lỗi tải dữ liệu 360°: {error}",
+  "@media360LoadError": {
+    "placeholders": { "error": { "type": "Object" } }
+  },
+  "no360ForPlace": "Chưa có ảnh 360° cho địa điểm này.",
+  "viewOtherHotspotTooltip": "Xem điểm nhìn khác",
+  "loading360Message": "Đang tải ảnh 360°...",
+  "rotateHint360": "Vuốt hoặc nghiêng thiết bị để xoay 360°",
+  "viewpointLabel": "Điểm nhìn {number}",
+  "@viewpointLabel": {
+    "placeholders": { "number": { "type": "Object" } }
+  },
+
+  "updateProfileFailedMessage": "Cập nhật thất bại, vui lòng thử lại.",
+  "profileLoadError": "Lỗi tải hồ sơ: {error}",
+  "@profileLoadError": {
+    "placeholders": { "error": { "type": "Object" } }
+  },
+  "userInfoNotFound": "Không tìm thấy thông tin người dùng.",
+  "defaultTravelerName": "Bạn du lịch",
+  "memberSince": "Thành viên từ {date}",
+  "@memberSince": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "phoneNumberLabel": "Số điện thoại",
+  "travelPreferencesHeading": "Sở thích du lịch",
+  "travelPreferencesSubtitle": "Giúp trợ lý AI gợi ý địa điểm sát với bạn hơn.",
+  "save": "Lưu",
+  "editProfileButton": "Sửa thông tin",
+  "logout": "Đăng xuất",
+
+  "languageSectionTitle": "Ngôn ngữ",
+  "languageVietnamese": "Tiếng Việt",
+  "languageEnglish": "English"
+}

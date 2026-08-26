@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_network_image.dart';
+import '../../../l10n/app_localizations.dart';
 import '../models/place.dart';
 import 'place_image_placeholder.dart';
 
@@ -11,14 +12,17 @@ class PlaceCard extends StatelessWidget {
 
   final Place place;
 
-  String get _durationLabel {
+  String _durationLabel(AppLocalizations l10n) {
     if (place.visitDurationMinutes <= 0) return '';
     final hours = place.visitDurationMinutes / 60;
-    return hours >= 1 ? '${hours.toStringAsFixed(hours.truncateToDouble() == hours ? 0 : 1)} giờ' : '${place.visitDurationMinutes} phút';
+    return hours >= 1
+        ? l10n.durationHours(
+            hours.toStringAsFixed(hours.truncateToDouble() == hours ? 0 : 1))
+        : l10n.durationMinutes(place.visitDurationMinutes);
   }
 
-  String get _priceLabel {
-    if (place.ticketPrice <= 0) return 'Miễn phí';
+  String _priceLabel(AppLocalizations l10n) {
+    if (place.ticketPrice <= 0) return l10n.free;
     final s = place.ticketPrice.toString();
     final withDots = s.replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => '.');
     return '${withDots}đ'; // ignore: unnecessary_brace_in_string_interps -- tránh nhập nhằng với ký tự "đ" liền sau
@@ -26,6 +30,7 @@ class PlaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -75,7 +80,7 @@ class PlaceCard extends StatelessWidget {
                           const Icon(Icons.threed_rotation, size: 12, color: Colors.white),
                           const SizedBox(width: 2),
                           Text(
-                            '360° VR',
+                            l10n.vr360Badge,
                             style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.white, fontSize: 10),
                           ),
                         ],
@@ -108,10 +113,10 @@ class PlaceCard extends StatelessWidget {
                   children: [
                     Icon(Icons.access_time, size: 12, color: context.colors.textSecondary),
                     const SizedBox(width: 4),
-                    Text(_durationLabel, style: Theme.of(context).textTheme.labelSmall),
+                    Text(_durationLabel(l10n), style: Theme.of(context).textTheme.labelSmall),
                     const Spacer(),
                     Text(
-                      _priceLabel,
+                      _priceLabel(l10n),
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.primary),
                     ),
                   ],

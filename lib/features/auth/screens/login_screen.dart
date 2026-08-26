@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/auth_exception.dart';
 import '../data/auth_repository.dart';
 import '../widgets/auth_background.dart';
@@ -37,7 +38,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             password: _passwordController.text,
           );
     } on AuthException catch (e) {
-      if (mounted) _showError(e.message);
+      if (mounted) _showError(e.localizedMessage(AppLocalizations.of(context)!));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -48,7 +49,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       await ref.read(authRepositoryProvider).signInWithGoogle();
     } on AuthException catch (e) {
-      if (mounted) _showError(e.message);
+      if (mounted) _showError(e.localizedMessage(AppLocalizations.of(context)!));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -62,6 +63,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: AuthBackground(
         child: Center(
@@ -84,7 +86,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         size: 56, color: AppColors.primary),
                     const SizedBox(height: AppSpacing.md),
                     Text(
-                      'Đăng nhập',
+                      l10n.login,
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
@@ -92,10 +94,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(labelText: 'Email'),
+                      decoration: InputDecoration(labelText: l10n.emailLabel),
                       validator: (value) {
                         if (value == null || !value.contains('@')) {
-                          return 'Vui lòng nhập email hợp lệ';
+                          return l10n.emailInvalidError;
                         }
                         return null;
                       },
@@ -105,7 +107,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       controller: _passwordController,
                       obscureText: _obscurePassword,
                       decoration: InputDecoration(
-                        labelText: 'Mật khẩu',
+                        labelText: l10n.passwordLabel,
                         suffixIcon: IconButton(
                           icon: Icon(_obscurePassword
                               ? Icons.visibility_off
@@ -116,7 +118,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.length < 6) {
-                          return 'Mật khẩu cần ít nhất 6 ký tự';
+                          return l10n.passwordTooShortError;
                         }
                         return null;
                       },
@@ -127,7 +129,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         onPressed: _isLoading
                             ? null
                             : () => context.push('/forgot-password'),
-                        child: const Text('Quên mật khẩu?'),
+                        child: Text(l10n.forgotPasswordLink),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
@@ -140,19 +142,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               child: CircularProgressIndicator(
                                   strokeWidth: 2, color: Colors.white),
                             )
-                          : const Text('Đăng nhập'),
+                          : Text(l10n.login),
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     OutlinedButton.icon(
                       onPressed: _isLoading ? null : _submitGoogle,
                       icon: const Icon(Icons.g_mobiledata),
-                      label: const Text('Đăng nhập với Google'),
+                      label: Text(l10n.loginWithGoogle),
                     ),
                     const SizedBox(height: AppSpacing.md),
                     TextButton(
                       onPressed:
                           _isLoading ? null : () => context.push('/register'),
-                      child: const Text('Chưa có tài khoản? Đăng ký ngay'),
+                      child: Text(l10n.noAccountRegisterNow),
                     ),
                   ],
                 ),

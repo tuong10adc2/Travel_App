@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 import '../widgets/pressable_scale.dart';
 
@@ -56,39 +57,39 @@ class _NavItemData {
   final String label;
 }
 
-const _items = [
-  _NavItemData(
-      index: _kHome,
-      icon: Icons.explore_outlined,
-      selectedIcon: Icons.explore,
-      label: 'Khám phá'),
-  _NavItemData(
-      index: _kTours,
-      icon: Icons.map_outlined,
-      selectedIcon: Icons.map,
-      label: 'Tours'),
-  _NavItemData(
-    index: _kItineraries,
-    icon: Icons.calendar_month_outlined,
-    selectedIcon: Icons.calendar_month,
-    label: 'Lịch trình',
-  ),
-  _NavItemData(
-      index: _kChat,
-      icon: Icons.smart_toy_outlined,
-      selectedIcon: Icons.smart_toy,
-      label: 'Trợ lý'),
-  _NavItemData(
-      index: _kSaved,
-      icon: Icons.bookmark_border,
-      selectedIcon: Icons.bookmark,
-      label: 'Đã lưu'),
-  _NavItemData(
-      index: _kProfile,
-      icon: Icons.person_outline,
-      selectedIcon: Icons.person,
-      label: 'Hồ sơ'),
-];
+List<_NavItemData> _navItems(AppLocalizations l10n) => [
+      _NavItemData(
+          index: _kHome,
+          icon: Icons.explore_outlined,
+          selectedIcon: Icons.explore,
+          label: l10n.navExplore),
+      _NavItemData(
+          index: _kTours,
+          icon: Icons.map_outlined,
+          selectedIcon: Icons.map,
+          label: l10n.navTours),
+      _NavItemData(
+        index: _kItineraries,
+        icon: Icons.calendar_month_outlined,
+        selectedIcon: Icons.calendar_month,
+        label: l10n.navItineraries,
+      ),
+      _NavItemData(
+          index: _kChat,
+          icon: Icons.smart_toy_outlined,
+          selectedIcon: Icons.smart_toy,
+          label: l10n.navChat),
+      _NavItemData(
+          index: _kSaved,
+          icon: Icons.bookmark_border,
+          selectedIcon: Icons.bookmark,
+          label: l10n.navSaved),
+      _NavItemData(
+          index: _kProfile,
+          icon: Icons.person_outline,
+          selectedIcon: Icons.person,
+          label: l10n.navProfile),
+    ];
 
 class _FloatingNavBar extends StatelessWidget {
   const _FloatingNavBar({required this.currentIndex, required this.onSelect});
@@ -103,6 +104,7 @@ class _FloatingNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final items = _navItems(AppLocalizations.of(context)!);
 
     return SafeArea(
       top: false,
@@ -137,7 +139,7 @@ class _FloatingNavBar extends StatelessWidget {
               height: _barHeight,
               child: Row(
                 children: [
-                  for (final item in _items)
+                  for (final item in items)
                     Expanded(
                       child: Center(
                         child: _NavCircle(

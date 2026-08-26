@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/date_format.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../home/models/place.dart';
 import '../../home/widgets/place_card.dart';
 import '../../itinerary/data/itinerary_repository.dart';
@@ -95,6 +96,7 @@ class _ItineraryPlanCard extends ConsumerWidget {
     final placesById = ref.watch(placesByIdProvider);
     final nonEmptyDays = itineraryPlan.where((day) => day.isNotEmpty).toList();
     if (nonEmptyDays.isEmpty) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context)!;
 
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.sm),
@@ -114,7 +116,7 @@ class _ItineraryPlanCard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Ngày ${i + 1}', style: Theme.of(context).textTheme.titleSmall),
+                    Text(l10n.dayLabel(i + 1), style: Theme.of(context).textTheme.titleSmall),
                     const SizedBox(height: AppSpacing.xs),
                     Wrap(
                       spacing: AppSpacing.xs,
@@ -134,7 +136,7 @@ class _ItineraryPlanCard extends ConsumerWidget {
               child: OutlinedButton.icon(
                 onPressed: () => _showCreateItineraryDialog(context, ref, nonEmptyDays),
                 icon: const Icon(Icons.map_outlined, size: 18),
-                label: const Text('Tạo lịch trình từ gợi ý này'),
+                label: Text(l10n.createItineraryFromSuggestion),
               ),
             ),
           ],
@@ -148,7 +150,8 @@ class _ItineraryPlanCard extends ConsumerWidget {
     WidgetRef ref,
     List<List<String>> placeIdsByDay,
   ) async {
-    final nameController = TextEditingController(text: 'Lịch trình gợi ý từ AI');
+    final l10n = AppLocalizations.of(context)!;
+    final nameController = TextEditingController(text: l10n.aiSuggestedItineraryName);
     var startDate = DateTime.now();
     bool isSubmitting = false;
 
@@ -171,7 +174,7 @@ class _ItineraryPlanCard extends ConsumerWidget {
               } catch (e) {
                 if (dialogContext.mounted) {
                   ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    SnackBar(content: Text('Không tạo được lịch trình: $e'), backgroundColor: AppColors.error),
+                    SnackBar(content: Text(l10n.createItineraryError(e)), backgroundColor: AppColors.error),
                   );
                 }
               } finally {
@@ -180,14 +183,14 @@ class _ItineraryPlanCard extends ConsumerWidget {
             }
 
             return AlertDialog(
-              title: const Text('Tạo lịch trình từ gợi ý này'),
+              title: Text(l10n.createItineraryFromSuggestion),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextField(
                     controller: nameController,
-                    decoration: const InputDecoration(labelText: 'Tên lịch trình'),
+                    decoration: InputDecoration(labelText: l10n.itineraryNameLabel),
                   ),
                   const SizedBox(height: AppSpacing.md),
                   InkWell(
@@ -201,7 +204,7 @@ class _ItineraryPlanCard extends ConsumerWidget {
                       if (picked != null) setState(() => startDate = picked);
                     },
                     child: InputDecorator(
-                      decoration: const InputDecoration(labelText: 'Ngày bắt đầu'),
+                      decoration: InputDecoration(labelText: l10n.startDateLabel),
                       child: Row(
                         children: [
                           Icon(Icons.calendar_today_outlined, size: 18, color: dialogContext.colors.textSecondary),
@@ -216,7 +219,7 @@ class _ItineraryPlanCard extends ConsumerWidget {
               actions: [
                 TextButton(
                   onPressed: isSubmitting ? null : () => Navigator.of(dialogContext).pop(),
-                  child: const Text('Huỷ'),
+                  child: Text(l10n.cancel),
                 ),
                 ElevatedButton(
                   onPressed: isSubmitting ? null : submit,
@@ -226,7 +229,7 @@ class _ItineraryPlanCard extends ConsumerWidget {
                           width: 18,
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                         )
-                      : const Text('Tạo lịch trình'),
+                      : Text(l10n.createItineraryButton),
                 ),
               ],
             );

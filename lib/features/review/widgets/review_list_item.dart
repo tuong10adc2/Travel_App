@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../models/review.dart';
 import 'star_rating.dart';
 
@@ -57,7 +58,7 @@ class ReviewListItem extends StatelessWidget {
                 if (isMine && review.isPending) ...[
                   const SizedBox(height: 4),
                   Text(
-                    'Đang chờ duyệt — chỉ bạn thấy đánh giá này',
+                    AppLocalizations.of(context)!.reviewPendingNotice,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(fontStyle: FontStyle.italic),
                   ),
                 ],
