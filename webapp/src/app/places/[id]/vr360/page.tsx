@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { collection, doc, getDoc, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { db } from "@/lib/firebase";
+import { useTranslations } from "@/contexts/language-context";
 import { cn } from "@/lib/cn";
 import type { Media360, Place } from "@/lib/types";
 import "@photo-sphere-viewer/core/index.css";
@@ -13,6 +14,7 @@ import "@photo-sphere-viewer/markers-plugin/index.css";
 
 export default function PlaceVr360Page() {
   const params = useParams<{ id: string }>();
+  const t = useTranslations();
   const placeId = params.id;
   const [place, setPlace] = useState<Place | null>(null);
   const [items, setItems] = useState<Media360[]>([]);
@@ -106,7 +108,7 @@ export default function PlaceVr360Page() {
           href={`/places/${placeId}`}
           className="flex items-center gap-1.5 rounded-full bg-black/50 px-3.5 py-2 text-sm text-white backdrop-blur hover:bg-black/70"
         >
-          <ArrowLeft className="h-4 w-4" /> {place?.name ?? "Quay lại"}
+          <ArrowLeft className="h-4 w-4" /> {place?.name ?? t("vr360.back")}
         </Link>
       </div>
 
@@ -118,7 +120,7 @@ export default function PlaceVr360Page() {
         )}
         {!loading && items.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center text-white/70">
-            Địa điểm này chưa có ảnh 360°.
+            {t("vr360.empty")}
           </div>
         )}
         <div ref={containerRef} className="h-full w-full" />

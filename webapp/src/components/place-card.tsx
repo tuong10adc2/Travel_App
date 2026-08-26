@@ -1,10 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import { Star, Clock, MapPin } from "lucide-react";
 import { PlaceImage } from "@/components/ui/place-image";
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "@/contexts/language-context";
 import type { Place } from "@/lib/types";
 
 export function PlaceCard({ place }: { place: Place }) {
+  const t = useTranslations();
   return (
     <Link
       href={`/places/${place.id}`}
@@ -24,7 +28,7 @@ export function PlaceCard({ place }: { place: Place }) {
         )}
         {place.isFeatured && (
           <Badge tone="accent" className="absolute right-3 top-3 bg-white/90">
-            Nổi bật
+            {t("common.featured")}
           </Badge>
         )}
       </div>
@@ -44,8 +48,8 @@ export function PlaceCard({ place }: { place: Place }) {
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
               <Clock className="h-3.5 w-3.5" />
               {Math.round(place.visitDurationMinutes / 60) > 0
-                ? `${(place.visitDurationMinutes / 60).toFixed(1)}h`
-                : `${place.visitDurationMinutes}p`}
+                ? t("common.durationHours", { h: (place.visitDurationMinutes / 60).toFixed(1) })
+                : t("common.durationMinutes", { m: place.visitDurationMinutes })}
             </span>
           ) : null}
         </div>

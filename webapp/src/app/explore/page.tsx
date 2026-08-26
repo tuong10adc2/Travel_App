@@ -9,11 +9,13 @@ import { Input } from "@/components/ui/input";
 import { PatternOverlay } from "@/components/ui/pattern-overlay";
 import { Reveal } from "@/components/ui/reveal";
 import { PlaceCard } from "@/components/place-card";
+import { useTranslations } from "@/contexts/language-context";
 import { cn } from "@/lib/cn";
 import { PLACE_TAGS, type Place } from "@/lib/types";
 
 function ExploreInner() {
   const searchParams = useSearchParams();
+  const t = useTranslations();
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(searchParams.get("q") ?? "");
@@ -45,8 +47,8 @@ function ExploreInner() {
       <PatternOverlay />
       <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Khám phá địa điểm</h1>
-        <p className="mt-2 text-muted-foreground">Tìm kiếm và lọc theo sở thích của bạn</p>
+        <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{t("explore.title")}</h1>
+        <p className="mt-2 text-muted-foreground">{t("explore.subtitle")}</p>
       </div>
 
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -54,7 +56,7 @@ function ExploreInner() {
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             className="pl-10"
-            placeholder="Tìm theo tên hoặc khu vực..."
+            placeholder={t("explore.searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -69,7 +71,7 @@ function ExploreInner() {
                 : "border-border bg-surface text-muted-foreground hover:bg-surface-muted"
             )}
           >
-            Tất cả
+            {t("explore.all")}
           </button>
           {PLACE_TAGS.map((tag) => (
             <button
@@ -88,7 +90,7 @@ function ExploreInner() {
         </div>
       </div>
 
-      <p className="mb-4 text-sm text-muted-foreground">{filtered.length} địa điểm</p>
+      <p className="mb-4 text-sm text-muted-foreground">{t("explore.resultCount", { count: filtered.length })}</p>
 
       {loading ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -99,7 +101,7 @@ function ExploreInner() {
       ) : filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-surface p-16 text-center text-muted-foreground">
           <MapPin className="mx-auto mb-3 h-6 w-6 opacity-40" />
-          Không tìm thấy địa điểm phù hợp.
+          {t("explore.empty")}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

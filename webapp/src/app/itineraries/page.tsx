@@ -6,19 +6,23 @@ import { collection, deleteDoc, doc, onSnapshot, orderBy, query, where } from "f
 import { CalendarRange, MapPinned, Plus, Trash2 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
+import { useLanguage, useTranslations } from "@/contexts/language-context";
 import { useToast } from "@/contexts/toast-context";
 import { RequireAuth } from "@/components/require-auth";
 import { Button } from "@/components/ui/button";
 import type { Itinerary } from "@/lib/types";
 
-function formatDate(ts: unknown) {
+function formatDate(ts: unknown, locale: string) {
   const d = (ts as { toDate?: () => Date } | undefined)?.toDate?.();
-  return d ? d.toLocaleDateString("vi-VN") : "";
+  return d ? d.toLocaleDateString(locale) : "";
 }
 
 function ItinerariesInner() {
   const { user } = useAuth();
   const toast = useToast();
+  const t = useTranslations();
+  const { language } = useLanguage();
+  const locale = language === "en" ? "en-US" : "vi-VN";
   const [items, setItems] = useState<Itinerary[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -34,7 +38,7 @@ function ItinerariesInner() {
       },
       (err) => {
         console.error("Không tải được danh sách lịch trình", err);
-        toast.error("Không tải được danh sách lịch trình.");
+        toast.error(t("itineraries.toastLoadFailed"));
         setLoading(false);
       }
     );
@@ -43,13 +47,13 @@ function ItinerariesInner() {
   }, [user]);
 
   async function handleDelete(it: Itinerary) {
-    if (!confirm(`Xoá lịch trình "${it.name}"?`)) return;
+    if (!confirm(t("itineraries.confirmDelete", { name: it.name }))) return;
     setBusyId(it.id);
     try {
       await deleteDoc(doc(db, "itineraries", it.id));
-      toast.success("Đã xoá lịch trình.");
+      toast.success(t("itineraries.toastDeleted"));
     } catch {
-      toast.error("Không thể xoá lịch trình.");
+      toast.error(t("itineraries.toastDeleteFailed"));
     } finally {
       setBusyId(null);
     }
@@ -59,12 +63,12 @@ function ItinerariesInner() {
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Lịch trình của tôi</h1>
-          <p className="mt-2 text-muted-foreground">Tạo và quản lý các chuyến đi của bạn</p>
+          <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{t("itineraries.title")}</h1>
+          <p className="mt-2 text-muted-foreground">{t("itineraries.subtitle")}</p>
         </div>
         <Link href="/itineraries/new">
           <Button>
-            <Plus className="h-4 w-4" /> Tạo lịch trình
+            <Plus className="h-4 w-4" /> {t("common.createItinerary")}
           </Button>
         </Link>
       </div>
@@ -78,10 +82,10 @@ function ItinerariesInner() {
       ) : items.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-surface p-16 text-center text-muted-foreground">
           <MapPinned className="mx-auto mb-3 h-6 w-6 opacity-40" />
-          Bạn chưa có lịch trình nào.
+          {t("itineraries.empty")}
           <div className="mt-4">
             <Link href="/itineraries/new">
-              <Button variant="outline">Tạo lịch trình đầu tiên</Button>
+              <Button variant="outline">{t("itineraries.createFirst")}</Button>
             </Link>
           </div>
         </div>
@@ -95,7 +99,7 @@ function ItinerariesInner() {
                 </div>
                 <h3 className="line-clamp-1 font-semibold text-foreground">{it.name}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {formatDate(it.startDate)} — {formatDate(it.endDate)}
+                  {formatDate(it.startDate, locale)} — {formatDate(it.endDate, locale)}
                 </p>
               </Link>
               <button

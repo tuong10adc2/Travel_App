@@ -21,14 +21,17 @@ import { Button } from "@/components/ui/button";
 import { SaveToggleButton } from "@/components/save-toggle-button";
 import { AddToItineraryButton } from "@/components/add-to-itinerary-button";
 import { ReviewSection } from "@/components/reviews/review-section";
+import { useTranslations } from "@/contexts/language-context";
 import type { Place } from "@/lib/types";
-
-function formatVnd(n: number) {
-  return n > 0 ? n.toLocaleString("vi-VN") + " đ" : "Miễn phí";
-}
 
 export default function PlaceDetailPage() {
   const params = useParams<{ id: string }>();
+  const t = useTranslations();
+
+  function formatVnd(n: number) {
+    return n > 0 ? n.toLocaleString("vi-VN") + " đ" : t("placeDetail.free");
+  }
+
   const [place, setPlace] = useState<Place | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -63,9 +66,9 @@ export default function PlaceDetailPage() {
   if (notFound || !place) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-24 text-center">
-        <p className="text-muted-foreground">Không tìm thấy địa điểm này.</p>
+        <p className="text-muted-foreground">{t("placeDetail.notFound")}</p>
         <Link href="/explore" className="mt-4 inline-block text-brand-700 hover:underline">
-          Quay lại Khám phá
+          {t("placeDetail.backToExplore")}
         </Link>
       </div>
     );
@@ -80,7 +83,7 @@ export default function PlaceDetailPage() {
         href="/explore"
         className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft className="h-3.5 w-3.5" /> Quay lại Khám phá
+        <ArrowLeft className="h-3.5 w-3.5" /> {t("placeDetail.backToExplore")}
       </Link>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -130,12 +133,12 @@ export default function PlaceDetailPage() {
               <span className="flex items-center gap-1.5 font-medium text-foreground">
                 <Star className="h-4 w-4 fill-warning-600 text-warning-600" />
                 {place.ratingAvg?.toFixed(1) ?? "—"}
-                <span className="font-normal text-muted-foreground">({place.ratingCount ?? 0} đánh giá)</span>
+                <span className="font-normal text-muted-foreground">{t("placeDetail.ratingCount", { count: place.ratingCount ?? 0 })}</span>
               </span>
               {place.visitDurationMinutes ? (
                 <span className="flex items-center gap-1.5 text-muted-foreground">
                   <Clock className="h-4 w-4" />
-                  {(place.visitDurationMinutes / 60).toFixed(1)} giờ tham quan
+                  {t("placeDetail.visitDuration", { hours: (place.visitDurationMinutes / 60).toFixed(1) })}
                 </span>
               ) : null}
               <span className="flex items-center gap-1.5 text-muted-foreground">
@@ -148,7 +151,7 @@ export default function PlaceDetailPage() {
             {hours.length > 0 && (
               <div className="mt-6 rounded-2xl border border-border bg-surface p-5">
                 <h3 className="mb-3 flex items-center gap-2 font-semibold text-foreground">
-                  <Clock className="h-4 w-4" /> Giờ mở cửa
+                  <Clock className="h-4 w-4" /> {t("placeDetail.openingHours")}
                 </h3>
                 <dl className="grid grid-cols-1 gap-1.5 text-sm sm:grid-cols-2">
                   {hours.map((h) => (
@@ -171,14 +174,14 @@ export default function PlaceDetailPage() {
           {place.has360 && (
             <Link href={`/places/${place.id}/vr360`} className="block">
               <Button className="w-full" size="lg">
-                <View className="h-4.5 w-4.5" /> Trải nghiệm VR 360°
+                <View className="h-4.5 w-4.5" /> {t("placeDetail.experienceVr360")}
               </Button>
             </Link>
           )}
           <AddToItineraryButton placeId={place.id} placeName={place.name} className="w-full" />
           <Link href="/chat" className="block">
             <Button variant="ghost" className="w-full">
-              Hỏi trợ lý AI về địa điểm này
+              {t("placeDetail.askAiAboutPlace")}
             </Button>
           </Link>
         </div>
