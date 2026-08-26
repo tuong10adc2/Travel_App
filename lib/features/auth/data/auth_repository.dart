@@ -105,6 +105,7 @@ class AuthRepository {
     required String displayName,
     String? phoneNumber,
     List<String>? preferences,
+    String? language,
   }) async {
     final user = _firebaseAuth.currentUser;
     if (user == null) return;
@@ -114,6 +115,7 @@ class AuthRepository {
       'displayName': displayName,
       'phoneNumber': phoneNumber,
       if (preferences != null) 'preferences': preferences,
+      if (language != null) 'language': language,
       'updatedAt': FieldValue.serverTimestamp(),
     });
   }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/auth_exception.dart';
 import '../data/auth_repository.dart';
 import '../widgets/auth_background.dart';
@@ -35,16 +36,16 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           .sendPasswordResetEmail(_emailController.text.trim());
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text(
-                  'Đã gửi email khôi phục mật khẩu, vui lòng kiểm tra hộp thư.')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.resetEmailSentMessage)),
         );
         context.pop();
       }
     } on AuthException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message), backgroundColor: AppColors.error),
+          SnackBar(
+              content: Text(e.localizedMessage(AppLocalizations.of(context)!)),
+              backgroundColor: AppColors.error),
         );
       }
     } finally {
@@ -54,10 +55,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Quên mật khẩu'),
+        title: Text(l10n.forgotPasswordTitle),
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -79,17 +81,15 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Text(
-                      'Nhập email đã đăng ký, chúng tôi sẽ gửi liên kết đặt lại mật khẩu.',
-                    ),
+                    Text(l10n.forgotPasswordInstructions),
                     const SizedBox(height: AppSpacing.lg),
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(labelText: 'Email'),
+                      decoration: InputDecoration(labelText: l10n.emailLabel),
                       validator: (value) {
                         if (value == null || !value.contains('@')) {
-                          return 'Vui lòng nhập email hợp lệ';
+                          return l10n.emailInvalidError;
                         }
                         return null;
                       },
@@ -104,7 +104,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                               child: CircularProgressIndicator(
                                   strokeWidth: 2, color: Colors.white),
                             )
-                          : const Text('Gửi email khôi phục'),
+                          : Text(l10n.sendResetEmailButton),
                     ),
                   ],
                 ),

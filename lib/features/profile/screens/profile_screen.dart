@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/date_format.dart';
+import '../../../core/utils/tag_labels.dart';
 import '../../../core/widgets/background_blobs.dart';
 import '../../../core/widgets/pressable_scale.dart';
 import '../../../core/widgets/skeleton_loaders.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../auth/data/auth_repository.dart';
 import '../../itinerary/providers/itinerary_providers.dart';
 import '../../saved/providers/saved_providers.dart';
@@ -72,8 +74,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Cập nhật thất bại, vui lòng thử lại.'),
+          SnackBar(
+              content: Text(AppLocalizations.of(context)!.updateProfileFailedMessage),
               backgroundColor: AppColors.error),
         );
       }
@@ -82,21 +84,44 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
+  /// Đổi ngôn ngữ app: ghi lên `users/{uid}.language` qua cùng `updateProfile`
+  /// dùng chung với phần sửa hồ sơ — `localeProvider` (watch Firestore doc)
+  /// sẽ tự cập nhật `MaterialApp.locale` ngay khi stream emit giá trị mới.
+  /// Giữ nguyên displayName/phoneNumber hiện có vì `updateProfile` luôn ghi
+  /// đè field `phoneNumber` (không có `if != null` như `preferences`).
+  Future<void> _setLanguage(Map<String, dynamic> data, String language) async {
+    try {
+      await ref.read(authRepositoryProvider).updateProfile(
+            displayName: (data['displayName'] as String?) ?? '',
+            phoneNumber: data['phoneNumber'] as String?,
+            language: language,
+          );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(AppLocalizations.of(context)!.updateProfileFailedMessage),
+              backgroundColor: AppColors.error),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final userDoc = ref.watch(currentUserDocProvider);
     final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Hồ sơ cá nhân')),
+      appBar: AppBar(title: Text(l10n.profileTitle)),
       body: DecorativeBackground(
         child: userDoc.when(
           loading: () => const SkeletonDetailPage(),
-          error: (error, _) => Center(child: Text('Lỗi tải hồ sơ: $error')),
+          error: (error, _) => Center(child: Text(l10n.profileLoadError(error))),
           data: (data) {
             if (data == null) {
-              return const Center(
-                  child: Text('Không tìm thấy thông tin người dùng.'));
+              return Center(child: Text(l10n.userInfoNotFound));
             }
             if (!_initialized) {
               _nameController.text = (data['displayName'] as String?) ?? '';
@@ -109,8 +134,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             final email = (data['email'] as String?) ?? '';
             final createdAt = data['createdAt'];
             final joinedLabel = createdAt is Timestamp
-                ? 'Thành viên từ ${formatDateVi(createdAt.toDate())}'
+                ? l10n.memberSince(formatDateVi(createdAt.toDate()))
                 : null;
+            final currentLanguage = (data['language'] as String?) ?? 'vi';
 
             return ListView(
               padding: const EdgeInsets.all(AppSpacing.lg),
@@ -140,7 +166,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       Text(
                         (data['displayName'] as String?)?.isNotEmpty == true
                             ? data['displayName'] as String
-                            : 'Bạn du lịch',
+                            : l10n.defaultTravelerName,
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       Text(email, style: Theme.of(context).textTheme.bodySmall),
@@ -178,10 +204,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             controller: _nameController,
                             enabled: _isEditing,
                             decoration:
-                                const InputDecoration(labelText: 'Họ tên'),
+                                InputDecoration(labelText: l10n.fullNameLabel),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'Vui lòng nhập họ tên';
+                                return l10n.fullNameRequiredError;
                               }
                               return null;
                             },
@@ -191,22 +217,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             initialValue: email,
                             enabled: false,
                             decoration:
-                                const InputDecoration(labelText: 'Email'),
+                                InputDecoration(labelText: l10n.emailLabel),
                           ),
                           const SizedBox(height: AppSpacing.md),
                           TextFormField(
                             controller: _phoneController,
                             enabled: _isEditing,
                             keyboardType: TextInputType.phone,
-                            decoration: const InputDecoration(
-                                labelText: 'Số điện thoại'),
+                            decoration: InputDecoration(
+                                labelText: l10n.phoneNumberLabel),
                           ),
                           const SizedBox(height: AppSpacing.lg),
-                          Text('Sở thích du lịch',
+                          Text(l10n.travelPreferencesHeading,
                               style: Theme.of(context).textTheme.titleSmall),
                           const SizedBox(height: 2),
                           Text(
-                            'Giúp trợ lý AI gợi ý địa điểm sát với bạn hơn.',
+                            l10n.travelPreferencesSubtitle,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                           const SizedBox(height: AppSpacing.sm),
@@ -216,7 +242,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             children: [
                               for (final tag in _preferenceTags)
                                 FilterChip(
-                                  label: Text(tag),
+                                  label: Text(tagLabel(context, tag)),
                                   selected: _selectedPreferences.contains(tag),
                                   onSelected: _isEditing
                                       ? (value) => setState(() {
@@ -263,7 +289,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                               _selectedPreferences =
                                                   _preferencesOf(data).toSet();
                                             }),
-                                    child: const Text('Huỷ'),
+                                    child: Text(l10n.cancel),
                                   ),
                                 ),
                                 const SizedBox(width: AppSpacing.md),
@@ -279,7 +305,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                                   strokeWidth: 2,
                                                   color: Colors.white),
                                             )
-                                          : const Text('Lưu'),
+                                          : Text(l10n.save),
                                     ),
                                   ),
                                 ),
@@ -289,13 +315,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             PressableScale(
                               child: ElevatedButton(
                                 onPressed: () => _startEditing(data),
-                                child: const Text('Sửa thông tin'),
+                                child: Text(l10n.editProfileButton),
                               ),
                             ),
                         ],
                       ),
                     ),
                   ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                _LanguageCard(
+                  currentLanguage: currentLanguage,
+                  onSelect: (language) => _setLanguage(data, language),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 OutlinedButton.icon(
@@ -305,11 +336,69 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     side: const BorderSide(color: AppColors.error),
                   ),
                   icon: const Icon(Icons.logout),
-                  label: const Text('Đăng xuất'),
+                  label: Text(l10n.logout),
                 ),
               ],
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+/// Chọn ngôn ngữ app (Tiếng Việt / English) — cùng "ngôn ngữ hình ảnh" với
+/// phần hồ sơ phía trên (Card + FilterChip). Lưu trực tiếp lên Firestore qua
+/// `_setLanguage` (không cần vào chế độ sửa) để đổi ngay lập tức.
+class _LanguageCard extends StatelessWidget {
+  const _LanguageCard({required this.currentLanguage, required this.onSelect});
+
+  final String currentLanguage;
+  final ValueChanged<String> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l10n.languageSectionTitle,
+                style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: AppSpacing.sm),
+            Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: [
+                FilterChip(
+                  label: Text(l10n.languageVietnamese),
+                  selected: currentLanguage == 'vi',
+                  onSelected: (_) => onSelect('vi'),
+                  selectedColor: AppColors.primary.withOpacity(0.16),
+                  checkmarkColor: AppColors.primary,
+                  labelStyle: TextStyle(
+                    color: currentLanguage == 'vi' ? AppColors.primary : null,
+                    fontWeight:
+                        currentLanguage == 'vi' ? FontWeight.w600 : null,
+                  ),
+                ),
+                FilterChip(
+                  label: Text(l10n.languageEnglish),
+                  selected: currentLanguage == 'en',
+                  onSelected: (_) => onSelect('en'),
+                  selectedColor: AppColors.primary.withOpacity(0.16),
+                  checkmarkColor: AppColors.primary,
+                  labelStyle: TextStyle(
+                    color: currentLanguage == 'en' ? AppColors.primary : null,
+                    fontWeight:
+                        currentLanguage == 'en' ? FontWeight.w600 : null,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -322,7 +411,7 @@ class _SavedCountCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final count = ref.watch(savedPlacesProvider).valueOrNull?.length ?? 0;
-    return _StatCard(icon: Icons.bookmark, label: 'Đã lưu', count: count);
+    return _StatCard(icon: Icons.bookmark, label: AppLocalizations.of(context)!.navSaved, count: count);
   }
 }
 
@@ -333,7 +422,7 @@ class _ItineraryCountCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final count = ref.watch(myItinerariesProvider).valueOrNull?.length ?? 0;
     return _StatCard(
-        icon: Icons.calendar_month, label: 'Lịch trình', count: count);
+        icon: Icons.calendar_month, label: AppLocalizations.of(context)!.navItineraries, count: count);
   }
 }
 

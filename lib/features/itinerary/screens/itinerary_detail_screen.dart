@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/skeleton_loaders.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../home/models/place.dart';
 import '../data/itinerary_repository.dart';
 import '../models/itinerary_item.dart';
@@ -54,17 +55,18 @@ class _ItineraryDetailScreenState extends ConsumerState<ItineraryDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final itineraryAsync = ref.watch(itineraryProvider(widget.itineraryId));
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(itineraryAsync.valueOrNull?.name ?? 'Lịch trình'),
+        title: Text(itineraryAsync.valueOrNull?.name ?? l10n.itineraryFallbackTitle),
       ),
       body: itineraryAsync.when(
         loading: () => const SkeletonList(),
-        error: (error, _) => Center(child: Text('Lỗi tải lịch trình: $error')),
+        error: (error, _) => Center(child: Text(l10n.itineraryLoadError(error))),
         data: (itinerary) {
           if (itinerary == null) {
-            return const Center(child: Text('Không tìm thấy lịch trình.'));
+            return Center(child: Text(l10n.itineraryNotFound));
           }
 
           final dayCount = ref.watch(itineraryDayCountProvider(widget.itineraryId));
@@ -110,7 +112,7 @@ class _ItineraryDetailScreenState extends ConsumerState<ItineraryDetailScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () => context.push('/itineraries/${widget.itineraryId}/add-place?day=$selectedDay'),
                     icon: const Icon(Icons.add_location_alt_outlined),
-                    label: const Text('Thêm địa điểm'),
+                    label: Text(l10n.addPlaceButton),
                   ),
                 ),
               ),
@@ -137,6 +139,7 @@ class _DaySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: 52,
       child: ListView(
@@ -147,7 +150,7 @@ class _DaySelector extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(right: AppSpacing.sm),
               child: ChoiceChip(
-                label: Text('Ngày ${day + 1}'),
+                label: Text(l10n.dayLabel(day + 1)),
                 selected: selectedDay == day,
                 onSelected: (_) => onSelect(day),
                 selectedColor: AppColors.primary,
@@ -160,7 +163,7 @@ class _DaySelector extends StatelessWidget {
             ),
           ActionChip(
             avatar: const Icon(Icons.add, size: 18),
-            label: const Text('Thêm ngày'),
+            label: Text(l10n.addDayButton),
             onPressed: onAddDay,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
           ),
@@ -179,7 +182,7 @@ class _EmptyDay extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Text(
-          'Chưa có địa điểm nào trong ngày này.\nBấm "Thêm địa điểm" bên dưới.',
+          AppLocalizations.of(context)!.emptyDayMessage,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
         ),
@@ -204,6 +207,7 @@ class _ItineraryItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       clipBehavior: Clip.antiAlias,
@@ -213,7 +217,7 @@ class _ItineraryItemTile extends StatelessWidget {
           child: Icon(Icons.drag_indicator, color: context.colors.textSecondary),
         ),
         title: Text(
-          place?.name ?? '(Địa điểm không còn tồn tại)',
+          place?.name ?? l10n.placeNoLongerExists,
           style: Theme.of(context).textTheme.titleSmall,
         ),
         subtitle: place != null
@@ -222,7 +226,7 @@ class _ItineraryItemTile extends StatelessWidget {
         trailing: IconButton(
           icon: const Icon(Icons.delete_outline, color: AppColors.error),
           onPressed: onRemove,
-          tooltip: 'Xoá khỏi lịch trình',
+          tooltip: l10n.removeFromItineraryTooltip,
         ),
         onTap: place != null ? () => context.push('/place/${place!.id}') : null,
       ),

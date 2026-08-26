@@ -50,6 +50,10 @@ dependencies:
   cached_network_image: ^3.4.1
   shimmer: ^3.0.0
   flutter_svg: ^2.0.10+1
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.19.0
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +80,10 @@ dependency_overrides:
 
 # The following section is specific to Flutter packages.
 flutter:
+
+  # Sinh `AppLocalizations` từ các file .arb trong lib/l10n (xem l10n.yaml) —
+  # bật đa ngôn ngữ Việt/Anh cho toàn app.
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

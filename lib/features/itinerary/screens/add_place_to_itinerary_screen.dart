@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_network_image.dart';
 import '../../../core/widgets/skeleton_loaders.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../home/models/place.dart';
 import '../../home/providers/places_providers.dart';
 import '../../home/widgets/place_image_placeholder.dart';
@@ -41,7 +42,7 @@ class _AddPlaceToItineraryScreenState extends ConsumerState<AddPlaceToItineraryS
           );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Đã thêm "${place.name}" vào Ngày ${widget.dayIndex + 1}')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.placeAddedToDay(place.name, widget.dayIndex + 1))),
         );
         context.pop();
       }
@@ -54,9 +55,10 @@ class _AddPlaceToItineraryScreenState extends ConsumerState<AddPlaceToItineraryS
   Widget build(BuildContext context) {
     final placesAsync = ref.watch(placesProvider);
     final query = _query.trim().toLowerCase();
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Thêm địa điểm · Ngày ${widget.dayIndex + 1}')),
+      appBar: AppBar(title: Text(l10n.addPlaceToDayTitle(widget.dayIndex + 1))),
       body: Column(
         children: [
           Padding(
@@ -65,7 +67,7 @@ class _AddPlaceToItineraryScreenState extends ConsumerState<AddPlaceToItineraryS
               controller: _searchController,
               onChanged: (value) => setState(() => _query = value),
               decoration: InputDecoration(
-                hintText: 'Tìm địa điểm...',
+                hintText: l10n.searchPlacesHint,
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: context.colors.surface,
@@ -79,7 +81,7 @@ class _AddPlaceToItineraryScreenState extends ConsumerState<AddPlaceToItineraryS
           Expanded(
             child: placesAsync.when(
               loading: () => const SkeletonList(),
-              error: (error, _) => Center(child: Text('Lỗi tải địa điểm: $error')),
+              error: (error, _) => Center(child: Text(l10n.placesLoadError(error))),
               data: (places) {
                 final filtered = query.isEmpty
                     ? places
@@ -87,7 +89,7 @@ class _AddPlaceToItineraryScreenState extends ConsumerState<AddPlaceToItineraryS
                 if (filtered.isEmpty) {
                   return Center(
                     child: Text(
-                      'Không tìm thấy địa điểm phù hợp',
+                      l10n.noMatchingPlacesFound,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
                     ),
                   );

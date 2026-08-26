@@ -8,6 +8,7 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/fade_slide_in.dart';
 import '../../../core/widgets/pressable_scale.dart';
 import '../../../core/widgets/skeleton_loaders.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/chat_repository.dart';
 import '../providers/chat_providers.dart';
 import '../widgets/chat_message_bubble.dart';
@@ -58,9 +59,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           .sendMessage(text: text, priorMessages: priorMessages);
     } on FirebaseFunctionsException catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(e.message ?? 'Đã có lỗi khi gọi trợ lý AI.'),
+              content: Text(e.message ?? l10n.chatFunctionErrorFallback),
               backgroundColor: AppColors.error),
         );
       }
@@ -68,7 +70,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text('Đã có lỗi: $e'), backgroundColor: AppColors.error),
+              content: Text(AppLocalizations.of(context)!.chatGenericError(e)),
+              backgroundColor: AppColors.error),
         );
       }
     } finally {
@@ -83,6 +86,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget build(BuildContext context) {
     final messagesAsync = ref.watch(chatMessagesProvider);
     final isWaiting = ref.watch(isChatWaitingForReplyProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     ref.listen(chatMessagesProvider, (previous, next) {
       if ((next.valueOrNull?.length ?? 0) !=
@@ -92,7 +96,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Trợ lý du lịch AI')),
+      appBar: AppBar(title: Text(l10n.appTitle)),
       body: DecorativeBackground(
         child: Column(
           children: [
@@ -100,7 +104,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               child: messagesAsync.when(
                 loading: () => const SkeletonList(itemCount: 4),
                 error: (error, _) =>
-                    Center(child: Text('Lỗi tải hội thoại: $error')),
+                    Center(child: Text(l10n.chatLoadError(error))),
                 data: (messages) {
                   if (messages.isEmpty && !isWaiting) {
                     return const _WelcomeState();
@@ -133,8 +137,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         maxLines: 4,
                         textInputAction: TextInputAction.send,
                         onSubmitted: (_) => _send(),
-                        decoration: const InputDecoration(
-                            hintText: 'Hỏi về địa điểm, lịch trình...'),
+                        decoration:
+                            InputDecoration(hintText: l10n.chatInputHint),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.sm),
@@ -163,11 +167,12 @@ class _WelcomeState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const EmptyState(
+    final l10n = AppLocalizations.of(context)!;
+    return EmptyState(
       icon: Icons.smart_toy_outlined,
       illustrationAsset: 'assets/illustrations/empty_chat.svg',
-      title: 'Trợ lý du lịch AI',
-      message: 'Hỏi mình về địa điểm, lên lịch trình hay mẹo du lịch nhé!',
+      title: l10n.appTitle,
+      message: l10n.chatWelcomeMessage,
     );
   }
 }

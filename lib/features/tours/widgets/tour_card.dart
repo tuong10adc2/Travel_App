@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_network_image.dart';
+import '../../../l10n/app_localizations.dart';
 import '../models/tour.dart';
 
 class TourCard extends StatelessWidget {
@@ -17,14 +18,15 @@ class TourCard extends StatelessWidget {
     [Color(0xFF1A6B5C), Color(0xFF3EAE8C)],
   ];
 
-  String get _priceLabel {
-    if (tour.price <= 0) return 'Liên hệ';
+  String _priceLabel(AppLocalizations l10n) {
+    if (tour.price <= 0) return l10n.contactForPrice;
     final s = tour.price.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => '.');
     return '${s}đ'; // ignore: unnecessary_brace_in_string_interps -- tránh nhập nhằng với ký tự "đ" liền sau
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = _gradients[tour.name.hashCode.abs() % _gradients.length];
 
     return Card(
@@ -79,16 +81,16 @@ class TourCard extends StatelessWidget {
                       children: [
                         Icon(Icons.calendar_month_outlined, size: 14, color: context.colors.textSecondary),
                         const SizedBox(width: 4),
-                        Text('${tour.durationDays} ngày', style: Theme.of(context).textTheme.bodySmall),
+                        Text(l10n.dayCount(tour.durationDays), style: Theme.of(context).textTheme.bodySmall),
                         const SizedBox(width: AppSpacing.sm),
                         Icon(Icons.place_outlined, size: 14, color: context.colors.textSecondary),
                         const SizedBox(width: 4),
-                        Text('${tour.placeIds.length} điểm', style: Theme.of(context).textTheme.bodySmall),
+                        Text(l10n.placeCountLabel(tour.placeIds.length), style: Theme.of(context).textTheme.bodySmall),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                      _priceLabel,
+                      _priceLabel(l10n),
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(color: AppColors.primary),
                     ),
                   ],
