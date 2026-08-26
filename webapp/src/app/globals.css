@@ -2,8 +2,10 @@
 
 :root {
   /* Bảng màu theo đúng theme app Flutter (lib/core/theme/app_theme.dart):
-     primary #0E7C66, secondary #F2A93B, error #D64545. */
-  --background: #f7f7f5;
+     primary #0E7C66, secondary #F2A93B, error #D64545. Nền/surface dùng tông
+     be/kem ấm thay vì trắng tinh + xám lạnh — đồng bộ với bản Flutter đã đổi
+     (trắng tinh trên diện rộng nhìn "trơ", be nhạt giúp card nổi khối hơn). */
+  --background: #f5f1e7;
   --foreground: #1c1c1e;
 
   --brand-50: #eaf6f3;
@@ -19,9 +21,9 @@
   --accent-500: #f2a93b;
   --accent-600: #d99120;
 
-  --surface: #ffffff;
-  --surface-muted: #f1f1ef;
-  --border: #e4e4e0;
+  --surface: #fffcf5;
+  --surface-muted: #efe8d9;
+  --border: #e9e2d0;
   --muted-foreground: #6b6b6f;
 
   --success-50: #ecfdf5;

@@ -23,6 +23,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/contexts/toast-context";
 import { RequireAuth } from "@/components/require-auth";
 import { PlaceImage } from "@/components/ui/place-image";
+import { PatternOverlay } from "@/components/ui/pattern-overlay";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 import { cn } from "@/lib/cn";
@@ -181,7 +182,9 @@ function ChatInner() {
   }
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-3xl flex-col px-4 sm:px-6">
+    <div className="relative flex h-[calc(100vh-4rem)] flex-col overflow-hidden">
+      <PatternOverlay />
+      <div className="relative mx-auto flex w-full max-w-3xl flex-1 flex-col overflow-hidden px-4 sm:px-6">
       <div className="flex items-center gap-2 border-b border-border py-4">
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white">
           <Bot className="h-5 w-5" />
@@ -284,6 +287,7 @@ function ChatInner() {
           <Send className="h-4 w-4" />
         </Button>
       </form>
+      </div>
 
       {planModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
