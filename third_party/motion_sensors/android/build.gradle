@@ -15,7 +15,11 @@ rootProject.allprojects {
 
 android {
     namespace 'finaldev.motion_sensors'
-    compileSdkVersion 28
+    // Bản vendor gốc ghim compileSdkVersion 28 — quá cũ, thiếu resource
+    // android:attr/lStar (thêm ở API 31) mà 1 dependency Material khác merge
+    // vào, khiến `flutter build apk --release` lỗi ở bước verifyReleaseResources.
+    // Nâng lên khớp compileSdk của app (flutter.compileSdkVersion, hiện = 34).
+    compileSdkVersion 34
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
