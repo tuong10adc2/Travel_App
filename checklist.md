@@ -117,14 +117,14 @@
 - [x] Test đăng nhập/đăng ký trên web hoạt động đúng, dùng chung tài khoản với app — đăng ký ghi đúng `users/{uid}` theo schema chung (`role: 'user'`, `isDisabled: false`); test thật bằng Playwright trên dữ liệu Firestore thật của project `travelapp-7f140` (không mock), đăng nhập bằng tài khoản `admin@gmail.com` đã dùng cho Admin Dashboard: duyệt Khám phá → xem chi tiết địa điểm → Lưu → viết đánh giá → tạo lịch trình → thêm địa điểm theo ngày → thêm ngày → xoá địa điểm → xem Tour → "Thêm vào lịch trình của tôi" → Đã lưu → Hồ sơ → Chat AI (lỗi graceful đúng như kỳ vọng). Đã dọn sạch dữ liệu test sau khi xong. **Phát hiện + đã sửa 3 bug thật khi test**: (1) thiếu composite index `itinerary_items` (`dayIndex` + `order`) khiến trang chi tiết lịch trình đọc dữ liệu bị lỗi âm thầm — đã thêm index + deploy; (2) nút "Hỏi trợ lý AI" ở khối CTA trang chủ bị mất chữ do class Tailwind tự viết đè (`bg-transparent`/`text-white`) xung đột thứ tự với class gốc của variant `outline` — sửa bằng cách thêm hẳn 1 variant `outlineInverse` riêng cho nút trên nền màu thay vì đè class; (3) trang Chat bị đẩy layout lệch hẳn lên trên (header/tin nhắn khuất khỏi khung nhìn) do `scrollIntoView({behavior:'smooth'})` mặc định `block:'start'` chạy ngay cả khi chưa có tin nhắn nào — sửa bằng cách bỏ qua khi danh sách tin nhắn rỗng và thêm `block:'nearest'`
 ## GIAI ĐOẠN 9 — Hoàn thiện & nộp đồ án
  
-- [ ] Push notification (FCM) cho các sự kiện: gợi ý mới, nhắc lịch trình
-- [ ] Đa ngôn ngữ (ít nhất Việt + Anh)
-- [ ] Rà soát và fix bug toàn bộ luồng chính (App + Web + Admin)
-- [ ] Tối ưu hiệu năng (cache ảnh, giảm thời gian tải)
-- [ ] Viết báo cáo đồ án (mô tả kiến trúc, chức năng, công nghệ dùng)
-- [ ] Chuẩn bị slide bảo vệ đồ án
-- [ ] Quay video demo dự phòng (phòng khi demo trực tiếp lỗi mạng/thiết bị)
-- [ ] Đóng gói/build bản release (APK/AAB cho app, deploy web + admin lên hosting)
+- [ ] Push notification (FCM) cho các sự kiện: gợi ý mới, nhắc lịch trình — **code đã xong cả 2 phía** (backend `notifyNewPlace`/`remindUpcomingItineraries` trong `functions/src/index.ts`, Flutter `lib/core/services/push_notification_service.dart` xin quyền + subscribe topic + lưu `fcmToken`), `flutter analyze`/`tsc --noEmit` sạch — **chưa deploy/test được** vì cần Blaze (cùng điều kiện với Giai đoạn 3)
+- [x] Đa ngôn ngữ (ít nhất Việt + Anh) — Flutter: `flutter_localizations` + ARB (`lib/l10n/app_vi.arb`/`app_en.arb`), locale lấy từ `users/{uid}.language` (fallback SharedPreferences khi chưa đăng nhập), toggle ở màn Hồ sơ. Webapp: context + dictionary riêng (`vi.json`/`en.json`, không dùng next-intl vì không cần locale-prefixed URL), cùng field `language` để đồng bộ với Flutter. Đã tự verify bằng Playwright + emulator thật: đổi ngôn ngữ, load lại trang, khởi động lại app đều giữ đúng lựa chọn. `flutter analyze`/`tsc --noEmit`/`npm run build` đều sạch
+- [x] Rà soát và fix bug toàn bộ luồng chính (App + Web + Admin) — test lại toàn bộ luồng chính qua Playwright (webapp: đăng ký → khám phá → lưu → lịch trình → chat AI → hồ sơ → đăng xuất/đăng nhập lại) và emulator Android thật (Flutter: điều hướng 6 tab, hồ sơ, ngôn ngữ) — không phát hiện bug thật nào; trạng thái "AI chưa khả dụng" báo lỗi gọn gàng đúng như thiết kế thay vì crash
+- [x] Tối ưu hiệu năng (cache ảnh, giảm thời gian tải) — đã có từ đợt UI trước (`cached_network_image` + `memCacheWidth`, shimmer skeleton, đếm bằng `getCountFromServer` thay vì tải cả collection); rà lại không thấy vấn đề mới đáng sửa ở quy mô dữ liệu hiện tại
+- [ ] Viết báo cáo đồ án (mô tả kiến trúc, chức năng, công nghệ dùng) — bạn tự làm
+- [ ] Chuẩn bị slide bảo vệ đồ án — bạn tự làm
+- [ ] Quay video demo dự phòng (phòng khi demo trực tiếp lỗi mạng/thiết bị) — bạn tự làm
+- [x] Đóng gói/build bản release (APK/AAB cho app, deploy web + admin lên hosting) — tạo keystore ký release riêng (`android/key.properties`, gitignore, không commit), build thành công `app-release.aab` (27.3MB) + `app-release.apk` (55.7MB) ký đúng bằng key thật, cài/chạy thử trên emulator không lỗi. Nhân tiện phát hiện + sửa 1 bug thật: `third_party/motion_sensors` ghim `compileSdkVersion 28` khiến build release luôn fail ở bước `verifyReleaseResources` (thiếu resource `android:attr/lStar`) — nâng lên 34, giờ build release chạy được. Webapp/admin build production sạch. **Deploy hosting chưa làm được**: đã tạo sẵn 2 site Firebase Hosting (`travelapp-7f140-web`, `travelapp-7f140-admin`) + cấu hình `firebase.json`/`.firebaserc`, nhưng Next.js SSR hosting qua Firebase cần Cloud Functions/Cloud Run — cùng bị chặn bởi Blaze như Giai đoạn 3
 ---
  
 ## Ghi chú
@@ -138,7 +138,7 @@
 **Giai đoạn 3 — Trợ lý AI:**
 1. Bật gói **Blaze** cho project `travelapp-7f140` (Cloud Functions cần gói trả phí mới deploy được).
 2. Set secret API key: `firebase functions:secrets:set ANTHROPIC_API_KEY` (dán API key Claude khi được hỏi).
-3. Báo lại để mình `firebase deploy --only functions` rồi test luồng "hỏi AI → nhận gợi ý địa điểm → bấm xem chi tiết" bằng Playwright như các giai đoạn trước.
+3. Báo lại để mình `firebase deploy --only functions` rồi test luồng "hỏi AI → nhận gợi ý địa điểm → bấm xem chi tiết" bằng Playwright như các giai đoạn trước. Cùng lúc này sẽ test luôn push notification (code đã xong, xem Giai đoạn 9) và deploy `webapp`/`admin` lên Firebase Hosting (đã cấu hình sẵn `firebase.json`) — cả 2 đều chung điều kiện Blaze nên làm 1 lần.
 
 **Giai đoạn 4 — VR 360°:**
 1. Bật **Firebase Storage** cho project: vào https://console.firebase.google.com/project/travelapp-7f140/storage, bấm "Get Started" (chọn chế độ Production, location gần VN vd `asia-southeast1`).
