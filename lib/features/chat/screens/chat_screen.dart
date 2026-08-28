@@ -1,4 +1,3 @@
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -57,12 +56,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       await ref
           .read(chatRepositoryProvider)
           .sendMessage(text: text, priorMessages: priorMessages);
-    } on FirebaseFunctionsException catch (e) {
+    } on StateError catch (e) {
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(e.message ?? l10n.chatFunctionErrorFallback),
+              content: Text(e.message.isNotEmpty
+                  ? e.message
+                  : l10n.chatFunctionErrorFallback),
               backgroundColor: AppColors.error),
         );
       }

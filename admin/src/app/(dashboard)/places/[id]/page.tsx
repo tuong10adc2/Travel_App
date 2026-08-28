@@ -16,6 +16,10 @@ import {
 } from "@/components/places/place-form";
 import type { Place } from "@/lib/types";
 
+// Domain webapp (Vercel) — nơi host /api/notify-new-place thay cho Cloud Function
+// notifyNewPlace cũ (chặn bởi Blaze). Xem migration-vercel-ai.md.
+const WEBAPP_API_BASE_URL = "https://travel-app-6rww.vercel.app";
+
 export default function EditPlacePage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -44,6 +48,7 @@ export default function EditPlacePage() {
   }, [params.id]);
 
   async function handleSubmit(values: PlaceFormValues) {
+    const becameActive = !place?.isActive && values.isActive;
     await updateDoc(doc(db, "places", params.id), {
       name: values.name.trim(),
       description: values.description.trim(),
@@ -67,6 +72,14 @@ export default function EditPlacePage() {
       id: params.id,
       label: values.name,
     });
+    if (becameActive && user) {
+      const idToken = await user.getIdToken();
+      fetch(`${WEBAPP_API_BASE_URL}/api/notify-new-place`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({ placeId: params.id, placeName: values.name }),
+      }).catch(() => {});
+    }
     toast.success("Đã lưu thay đổi.");
     router.push("/places");
   }

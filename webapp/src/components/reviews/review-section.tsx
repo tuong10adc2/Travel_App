@@ -127,6 +127,8 @@ export function ReviewSection({
         await updateDoc(doc(db, "reviews", docId), {
           rating,
           comment: comment.trim(),
+          // Reset để /api/moderate-review (Vercel Cron) quét lại nội dung vừa sửa.
+          aiModeration: null,
           updatedAt: serverTimestamp(),
         });
       } else {
@@ -138,6 +140,9 @@ export function ReviewSection({
           comment: comment.trim(),
           images: [],
           status: "pending",
+          // Ghi tường minh null (không bỏ qua field) để where('aiModeration', '==', null)
+          // trong /api/moderate-review match được — Firestore không match field vắng mặt.
+          aiModeration: null,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         });

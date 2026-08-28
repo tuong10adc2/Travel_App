@@ -16,9 +16,8 @@ import {
   Timestamp,
   writeBatch,
 } from "firebase/firestore";
-import { httpsCallable } from "firebase/functions";
 import { Bot, Loader2, Map as MapIcon, Send, Sparkles, Star, X } from "lucide-react";
-import { db, functions } from "@/lib/firebase";
+import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
 import { useTranslations } from "@/contexts/language-context";
 import { useToast } from "@/contexts/toast-context";
@@ -146,19 +145,25 @@ function ChatInner() {
       });
 
       const history = messages.slice(-20).map((m) => ({ role: m.role, content: m.content }));
-      const call = httpsCallable<{ message: string; history: typeof history }, ChatResponse>(
-        functions,
-        "chatWithAssistant"
-      );
-      const result = await call({ message: text, history });
-      const itineraryPlan = result.data.itineraryPlan ?? [];
+      const idToken = await user.getIdToken();
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({ message: text, history }),
+      });
+      const data = (await res.json()) as ChatResponse & { error?: string };
+      if (!res.ok) {
+        throw new Error(data.error ?? "chat_failed");
+      }
+
+      const itineraryPlan = data.itineraryPlan ?? [];
       const planPlaceIds = itineraryPlan.flatMap((d) => d.placeIds);
-      const places = await resolvePlaces([...result.data.suggestedPlaceIds, ...planPlaceIds]);
+      const places = await resolvePlaces([...data.suggestedPlaceIds, ...planPlaceIds]);
 
       await setDoc(doc(messagesRef), {
         role: "assistant",
-        content: result.data.reply,
-        placeCards: result.data.suggestedPlaceIds
+        content: data.reply,
+        placeCards: data.suggestedPlaceIds
           .filter((id) => places[id])
           .map((id) => ({
             placeId: id,
@@ -169,13 +174,8 @@ function ChatInner() {
         itineraryPlan,
         createdAt: serverTimestamp(),
       });
-    } catch (err) {
-      const code = (err as { code?: string })?.code ?? "";
-      if (code === "functions/not-found" || code === "functions/internal" || code === "functions/unavailable") {
-        toast.error(t("chat.toastUnavailable"));
-      } else {
-        toast.error(t("chat.toastSendFailed"));
-      }
+    } catch {
+      toast.error(t("chat.toastUnavailable"));
     } finally {
       setSending(false);
     }

@@ -45,6 +45,10 @@ class ReviewRepository {
       'comment': comment,
       'images': <String>[],
       'status': status,
+      // Luôn reset về null khi tạo mới hoặc sửa — để route /api/moderate-review (Vercel Cron)
+      // quét đúng bằng where('aiModeration', '==', null); Firestore không match được field
+      // hoàn toàn vắng mặt, nên phải ghi tường minh null thay vì bỏ qua field.
+      'aiModeration': null,
       'createdAt': existing.exists ? existing.data()!['createdAt'] : FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });

@@ -38,6 +38,10 @@ import { toMillis } from "@/lib/timestamp";
 import type { Place } from "@/lib/types";
 
 const PAGE_SIZE = 20;
+
+// Domain webapp (Vercel) — nơi host /api/notify-new-place thay cho Cloud Function
+// notifyNewPlace cũ (chặn bởi Blaze). Xem migration-vercel-ai.md.
+const WEBAPP_API_BASE_URL = "https://travel-app-6rww.vercel.app";
 type SortField = "name" | "ratingAvg" | "createdAt";
 type SortDir = "asc" | "desc";
 
@@ -171,8 +175,20 @@ export default function PlacesPage() {
 
   async function toggleField(p: Place, field: "isActive" | "isFeatured") {
     setBusyId(p.id);
+    const becameActive = field === "isActive" && !p.isActive;
     try {
       await updateDoc(doc(db, "places", p.id), { [field]: !p[field] });
+      // notifyNewPlace vốn là Firestore trigger (Cloud Function, chặn bởi Blaze) — giờ gọi
+      // trực tiếp từ đây ngay sau khi bật isActive thay vì chờ trigger. Không throw nếu lỗi,
+      // vì việc chính (cập nhật địa điểm) đã thành công.
+      if (becameActive && user) {
+        const idToken = await user.getIdToken();
+        fetch(`${WEBAPP_API_BASE_URL}/api/notify-new-place`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+          body: JSON.stringify({ placeId: p.id, placeName: p.name }),
+        }).catch(() => {});
+      }
     } catch {
       toast.error("Không thể cập nhật, kiểm tra lại quyền truy cập.");
     } finally {
