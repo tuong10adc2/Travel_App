@@ -1,20 +1,21 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 import '../../../core/providers/firebase_providers.dart';
 import '../models/chat_message.dart';
 
-final firebaseFunctionsProvider = Provider<FirebaseFunctions>((ref) {
-  return FirebaseFunctions.instance;
-});
+/// Domain webapp (Vercel) — nơi host `/api/chat` thay cho Cloud Function
+/// `chatWithAssistant` cũ (chặn bởi Blaze). Xem `migration-vercel-ai.md`.
+const _chatApiBaseUrl = 'https://travel-app-6rww.vercel.app';
 
 final chatRepositoryProvider = Provider<ChatRepository>((ref) {
   return ChatRepository(
     firestore: ref.watch(firestoreProvider),
     firebaseAuth: ref.watch(firebaseAuthProvider),
-    functions: ref.watch(firebaseFunctionsProvider),
   );
 });
 
@@ -28,14 +29,11 @@ class ChatRepository {
   ChatRepository({
     required FirebaseFirestore firestore,
     required FirebaseAuth firebaseAuth,
-    required FirebaseFunctions functions,
   })  : _firestore = firestore,
-        _firebaseAuth = firebaseAuth,
-        _functions = functions;
+        _firebaseAuth = firebaseAuth;
 
   final FirebaseFirestore _firestore;
   final FirebaseAuth _firebaseAuth;
-  final FirebaseFunctions _functions;
 
   CollectionReference<Map<String, dynamic>> _messages(String uid) => _firestore
       .collection('users')
@@ -82,22 +80,30 @@ class ChatRepository {
         .map((m) => {'role': m.role, 'content': m.content})
         .toList();
 
-    final callable = _functions.httpsCallable(
-      'chatWithAssistant',
-      options: HttpsCallableOptions(timeout: const Duration(seconds: 60)),
-    );
-    final result = await callable.call<Map<String, dynamic>>({
-      'message': trimmed,
-      'history': history,
-    });
+    final idToken = await user.getIdToken();
+    final response = await http
+        .post(
+          Uri.parse('$_chatApiBaseUrl/api/chat'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $idToken',
+          },
+          body: jsonEncode({'message': trimmed, 'history': history}),
+        )
+        .timeout(const Duration(seconds: 60));
 
-    final reply = (result.data['reply'] as String?) ?? '';
-    final suggestedPlaceIds = List<String>.from(result.data['suggestedPlaceIds'] as List? ?? const []);
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    if (response.statusCode != 200) {
+      throw StateError((data['error'] as String?) ?? 'Đã có lỗi khi gọi trợ lý AI.');
+    }
+
+    final reply = (data['reply'] as String?) ?? '';
+    final suggestedPlaceIds = List<String>.from(data['suggestedPlaceIds'] as List? ?? const []);
 
     // itineraryPlan trả về dạng [{dayIndex, placeIds}, ...] (kết quả tool plan_itinerary,
     // đã gom theo khu vực địa lý + sắp thứ tự ở server) — chuyển thành List<List<String>>
     // theo đúng thứ tự dayIndex để lưu gọn vào Firestore.
-    final rawPlan = result.data['itineraryPlan'] as List? ?? const [];
+    final rawPlan = data['itineraryPlan'] as List? ?? const [];
     final itineraryPlan = rawPlan
         .map((day) => List<String>.from((day as Map)['placeIds'] as List? ?? const []))
         .toList();

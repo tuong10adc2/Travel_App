@@ -9,6 +9,10 @@ import { logAction } from "@/lib/audit-log";
 import { PageHeader } from "@/components/layout/page-header";
 import { PlaceForm, type PlaceFormValues } from "@/components/places/place-form";
 
+// Domain webapp (Vercel) — nơi host /api/notify-new-place thay cho Cloud Function
+// notifyNewPlace cũ (chặn bởi Blaze). Xem migration-vercel-ai.md.
+const WEBAPP_API_BASE_URL = "https://travel-app-6rww.vercel.app";
+
 export default function NewPlacePage() {
   const router = useRouter();
   const { user } = useAuth();
@@ -39,6 +43,14 @@ export default function NewPlacePage() {
       updatedAt: serverTimestamp(),
     });
     await logAction(user, "tạo địa điểm", { type: "place", id: docRef.id, label: values.name });
+    if (values.isActive && user) {
+      const idToken = await user.getIdToken();
+      fetch(`${WEBAPP_API_BASE_URL}/api/notify-new-place`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({ placeId: docRef.id, placeName: values.name }),
+      }).catch(() => {});
+    }
     toast.success("Đã tạo địa điểm mới.");
     router.push("/places");
   }

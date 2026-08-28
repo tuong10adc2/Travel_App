@@ -1,0 +1,6 @@
+{
+  "crons": [
+    { "path": "/api/moderate-review", "schedule": "*/5 * * * *" },
+    { "path": "/api/remind-itineraries", "schedule": "0 8 * * *" }
+  ]
+}
