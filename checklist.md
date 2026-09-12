@@ -156,7 +156,25 @@
 - [ ] Viết báo cáo đồ án (mô tả kiến trúc, chức năng, công nghệ dùng) — bạn tự làm
 - [ ] Chuẩn bị slide bảo vệ đồ án — bạn tự làm
 - [ ] Quay video demo dự phòng (phòng khi demo trực tiếp lỗi mạng/thiết bị) — bạn tự làm
-- [x] Đóng gói/build bản release (APK/AAB cho app, deploy web + admin lên hosting) — tạo keystore ký release riêng (`android/key.properties`, gitignore, không commit), build thành công `app-release.aab` (27.3MB) + `app-release.apk` (55.7MB) ký đúng bằng key thật, cài/chạy thử trên emulator không lỗi. Nhân tiện phát hiện + sửa 1 bug thật: `third_party/motion_sensors` ghim `compileSdkVersion 28` khiến build release luôn fail ở bước `verifyReleaseResources` (thiếu resource `android:attr/lStar`) — nâng lên 34, giờ build release chạy được. Webapp/admin build production sạch. **Deploy hosting chưa làm được**: đã tạo sẵn 2 site Firebase Hosting (`travelapp-7f140-web`, `travelapp-7f140-admin`) + cấu hình `firebase.json`/`.firebaserc`, nhưng Next.js SSR hosting qua Firebase cần Cloud Functions/Cloud Run — cùng bị chặn bởi Blaze như Giai đoạn 3
+- [x] Đóng gói/build bản release (APK/AAB cho app, deploy web + admin lên hosting) — tạo keystore ký release riêng (`android/key.properties`, gitignore, không commit), build thành công `app-release.aab` (27.3MB) + `app-release.apk` (55.7MB) ký đúng bằng key thật, cài/chạy thử trên emulator không lỗi. Nhân tiện phát hiện + sửa 1 bug thật: `third_party/motion_sensors` ghim `compileSdkVersion 28` khiến build release luôn fail ở bước `verifyReleaseResources` (thiếu resource `android:attr/lStar`) — nâng lên 34, giờ build release chạy được. Webapp/admin build production sạch.
+
+> **Cập nhật 2026-09-12 — Deploy hosting: ĐÃ XONG, nhưng đổi hướng khỏi Firebase Hosting**: 2 site
+> Firebase Hosting (`travelapp-7f140-web`, `travelapp-7f140-admin`) tạo từ trước vẫn chưa dùng được vì
+> Next.js SSR qua Firebase Hosting cần Cloud Functions/Cloud Run — cùng bị chặn bởi Blaze như Giai đoạn
+> 3, không có dấu hiệu sẽ tự hết. Thay vào đó, deploy cả webapp lẫn admin lên **Vercel** (giống hướng đã
+> dùng cho AI ở Giai đoạn 3) — 2 project Vercel riêng biệt cùng team, cùng trỏ về 1 Firebase project
+> `travelapp-7f140`:
+> - **Webapp**: `https://travel-app-6rww.vercel.app` (đã deploy từ Giai đoạn 3).
+> - **Admin**: `https://admin-mocha-six-89.vercel.app` — project Vercel mới tên `admin`, deploy trực
+>   tiếp từ thư mục `admin/` (không cần `.vercelignore` allowlist như webapp vì đây là project gốc từ
+>   `admin/`, không phải monorepo con), set đủ 7 biến `NEXT_PUBLIC_FIREBASE_*` (copy từ `admin/.env.local`,
+>   riêng `NEXT_PUBLIC_FIREBASE_API_KEY` phải thêm bằng `--no-sensitive --value` vì CLI mặc định coi tên
+>   có "API_KEY" là nhạy cảm và hỏi xác nhận thêm — không phải lỗi thật).
+> - Cả 2 domain Vercel đã thêm vào **Authorized domains** của Firebase Auth (bắt buộc để
+>   `signInWithPopup` Google hoạt động — thiếu bước này gây lỗi `auth/unauthorized-domain`, đúng bug đã
+>   gặp và sửa cho webapp trước khi làm admin).
+> - Firebase Hosting cho `travelapp-7f140-web`/`travelapp-7f140-admin` giữ nguyên chưa xoá, không dùng
+>   tới, có thể dọn sau nếu muốn — không ảnh hưởng gì vì chưa từng deploy được nội dung nào lên đó.
 ---
  
 ## Ghi chú
