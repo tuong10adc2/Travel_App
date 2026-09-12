@@ -101,12 +101,11 @@ class ChatRepository {
     final suggestedPlaceIds = List<String>.from(data['suggestedPlaceIds'] as List? ?? const []);
 
     // itineraryPlan trả về dạng [{dayIndex, placeIds}, ...] (kết quả tool plan_itinerary,
-    // đã gom theo khu vực địa lý + sắp thứ tự ở server) — chuyển thành List<List<String>>
-    // theo đúng thứ tự dayIndex để lưu gọn vào Firestore.
-    final rawPlan = data['itineraryPlan'] as List? ?? const [];
-    final itineraryPlan = rawPlan
-        .map((day) => List<String>.from((day as Map)['placeIds'] as List? ?? const []))
-        .toList();
+    // đã gom theo khu vực địa lý + sắp thứ tự ở server) — lưu nguyên dạng gốc, KHÔNG rút gọn
+    // thành List<List<String>>, để khớp đúng format webapp cũng đang lưu vào cùng collection
+    // `chat_history` (2 client dùng chung 1 backend/schema). `ChatMessage.fromDoc` khi đọc lại
+    // tự nhận diện đúng dạng map này.
+    final itineraryPlan = data['itineraryPlan'] as List? ?? const [];
 
     await messagesRef.add({
       'role': 'assistant',

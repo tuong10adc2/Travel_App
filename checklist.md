@@ -234,6 +234,19 @@
 >   rộng (đang xem trên chính điện thoại thật) khung tự ẩn, app vẫn full-bleed bình thường qua media
 >   query. Đã build/test lại toàn bộ luồng (đăng nhập, trang chủ, chi tiết địa điểm, bản đồ) bên trong
 >   khung mới, không phát sinh lỗi tương tác/cuộn.
+
+> **Cập nhật 2026-09-12 (3) — Sửa bug thật: lỗi tải lịch sử chat "TypeError...List<dynamic>?"**:
+> phát hiện khi người dùng test thật trên bản Flutter Web. **Nguyên nhân gốc**: Flutter và Webapp cùng
+> ghi vào 1 collection Firestore dùng chung (`chat_history`) nhưng lưu field `itineraryPlan` theo
+> **2 định dạng khác nhau** — Webapp lưu nguyên dạng API trả về `[{dayIndex, placeIds}, ...]` (mảng
+> object), còn `chat_repository.dart` (Flutter) tự rút gọn thành `[[id1, id2], ...]` (mảng mảng chuỗi)
+> trước khi lưu. Khi Flutter tải lại 1 tin nhắn itinerary do **webapp** tạo ra (hoặc ngược lại), code ép
+> kiểu thẳng `as List` gặp Map thì crash. **Sửa tận gốc** thay vì chỉ vá chỗ đọc: bỏ hẳn bước rút gọn ở
+> `chat_repository.dart`, Flutter giờ cũng lưu nguyên dạng `[{dayIndex, placeIds}]` giống Webapp — đồng
+> bộ format giữa 2 client đúng theo kiến trúc "1 backend nhiều client" của dự án. `ChatMessage.fromDoc`
+> (`chat_message.dart`) cũng được sửa để chấp nhận cả 2 dạng khi đọc (phòng dữ liệu cũ còn sót lại từ
+> trước khi sửa). Đã build lại Flutter Web + Android debug APK, `flutter analyze` sạch, deploy lại
+> production.
 ---
  
 ## Ghi chú
