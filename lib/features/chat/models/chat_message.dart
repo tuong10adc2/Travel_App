@@ -29,8 +29,18 @@ class ChatMessage {
       role: (data['role'] as String?) ?? 'assistant',
       content: (data['content'] as String?) ?? '',
       placeSuggestionIds: List<String>.from(data['placeSuggestionIds'] as List? ?? const []),
-      itineraryPlan: rawPlan.map((day) => List<String>.from(day as List? ?? const [])).toList(),
+      itineraryPlan: rawPlan.map(_dayPlaceIds).toList(),
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
     );
+  }
+
+  /// Chấp nhận cả 2 dạng: `[id1, id2]` (dạng hiện tại ghi vào Firestore) và
+  /// `{dayIndex, placeIds: [id1, id2]}` (dạng cũ, còn sót lại trong lịch sử
+  /// chat đã lưu trước khi đổi cách ghi) — tránh lỗi ép kiểu khi tải lại các
+  /// hội thoại cũ.
+  static List<String> _dayPlaceIds(dynamic day) {
+    if (day is List) return List<String>.from(day);
+    if (day is Map) return List<String>.from(day['placeIds'] as List? ?? const []);
+    return const [];
   }
 }
