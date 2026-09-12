@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Map,
+  Smartphone,
   User as UserIcon,
   LogOut,
   ChevronDown,
@@ -16,6 +17,11 @@ import { useAuth } from "@/contexts/auth-context";
 import { useTranslations } from "@/contexts/language-context";
 import { cn } from "@/lib/cn";
 import { ThemeToggle } from "@/components/theme-toggle";
+
+// Domain Flutter Web (Vercel) — bản "app" đầy đủ, khác bản desktop (webapp
+// Next.js này). Đăng nhập không dùng chung phiên (mỗi domain lưu session
+// Firebase Auth riêng theo origin), người dùng cần đăng nhập lại khi chuyển.
+const APP_VERSION_URL = "https://web-nu-woad-82.vercel.app";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -61,6 +67,13 @@ export function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
+          <a
+            href={APP_VERSION_URL}
+            title={t("common.switchToAppVersion")}
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-surface-muted hover:text-foreground"
+          >
+            <Smartphone className="h-4 w-4" />
+          </a>
           <ThemeToggle />
           {user ? (
             <div className="relative">
@@ -133,6 +146,12 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+            <a
+              href={APP_VERSION_URL}
+              className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-surface-muted"
+            >
+              <Smartphone className="h-4 w-4" /> {t("common.switchToAppVersion")}
+            </a>
             {user ? (
               <>
                 <Link

@@ -2,6 +2,7 @@
   "common": {
     "login": "Đăng nhập",
     "logout": "Đăng xuất",
+    "switchToAppVersion": "Bản ứng dụng",
     "loading": "Đang tải...",
     "phone": "Số điện thoại",
     "save": "Lưu",
