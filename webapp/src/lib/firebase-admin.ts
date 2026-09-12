@@ -18,11 +18,20 @@ function getAdminApp(): App {
     );
   }
 
-  const serviceAccount = JSON.parse(raw) as {
-    project_id: string;
-    client_email: string;
-    private_key: string;
-  };
+  let serviceAccount: { project_id: string; client_email: string; private_key: string };
+  try {
+    serviceAccount = JSON.parse(raw);
+  } catch (error) {
+    console.error(
+      "getAdminApp: FIREBASE_SERVICE_ACCOUNT_KEY khong phai JSON hop le. length=",
+      raw.length,
+      "first20=",
+      JSON.stringify(raw.slice(0, 20)),
+      "last20=",
+      JSON.stringify(raw.slice(-20))
+    );
+    throw error;
+  }
 
   return initializeApp({
     credential: cert({
@@ -67,7 +76,8 @@ export async function verifyRequestAuth(request: Request): Promise<string> {
   try {
     const decoded = await adminAuth.verifyIdToken(token);
     return decoded.uid;
-  } catch {
+  } catch (error) {
+    console.error("verifyRequestAuth: verifyIdToken that bai", error);
     throw new UnauthorizedError("Token không hợp lệ hoặc đã hết hạn.");
   }
 }
