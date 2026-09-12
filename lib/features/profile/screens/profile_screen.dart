@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/date_format.dart';
@@ -13,6 +15,10 @@ import '../../auth/data/auth_repository.dart';
 import '../../itinerary/providers/itinerary_providers.dart';
 import '../../saved/providers/saved_providers.dart';
 import '../providers/profile_providers.dart';
+
+// Domain webapp (Vercel) — bản desktop đầy đủ, dùng cho nút chuyển đổi
+// desktop/app chỉ hiện khi chạy Flutter Web (kIsWeb).
+const _desktopWebappUrl = 'https://travel-app-6rww.vercel.app';
 
 const _preferenceTags = [
   'Lịch sử',
@@ -328,6 +334,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   currentLanguage: currentLanguage,
                   onSelect: (language) => _setLanguage(data, language),
                 ),
+                if (kIsWeb) ...[
+                  const SizedBox(height: AppSpacing.lg),
+                  OutlinedButton.icon(
+                    onPressed: () => launchUrl(Uri.parse(_desktopWebappUrl),
+                        webOnlyWindowName: '_self'),
+                    icon: const Icon(Icons.desktop_windows_outlined),
+                    label: Text(l10n.switchToDesktopVersion),
+                  ),
+                ],
                 const SizedBox(height: AppSpacing.lg),
                 OutlinedButton.icon(
                   onPressed: () => ref.read(authRepositoryProvider).signOut(),

@@ -137,6 +137,12 @@ abstract class AppLocalizations {
   /// **'Hồ sơ'**
   String get navProfile;
 
+  /// No description provided for @switchToDesktopVersion.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chuyển sang bản desktop'**
+  String get switchToDesktopVersion;
+
   /// No description provided for @login.
   ///
   /// In vi, this message translates to:

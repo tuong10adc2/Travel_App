@@ -30,6 +30,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get navProfile => 'Hồ sơ';
 
   @override
+  String get switchToDesktopVersion => 'Chuyển sang bản desktop';
+
+  @override
   String get login => 'Đăng nhập';
 
   @override

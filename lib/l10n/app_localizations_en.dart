@@ -30,6 +30,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navProfile => 'Profile';
 
   @override
+  String get switchToDesktopVersion => 'Switch to desktop version';
+
+  @override
   String get login => 'Log in';
 
   @override

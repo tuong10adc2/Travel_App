@@ -2,6 +2,7 @@
   "common": {
     "login": "Log in",
     "logout": "Log out",
+    "switchToAppVersion": "App version",
     "loading": "Loading...",
     "phone": "Phone number",
     "save": "Save",
