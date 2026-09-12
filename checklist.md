@@ -247,6 +247,23 @@
 > (`chat_message.dart`) cũng được sửa để chấp nhận cả 2 dạng khi đọc (phòng dữ liệu cũ còn sót lại từ
 > trước khi sửa). Đã build lại Flutter Web + Android debug APK, `flutter analyze` sạch, deploy lại
 > production.
+
+> **Cập nhật 2026-09-12 (4) — Bug hạ tầng: domain Flutter Web bị 404 lặp lại nhiều lần**: sau vài lần
+> deploy lại để sửa các bug ở trên, domain `web-nu-woad-82.vercel.app` liên tục quay về lỗi 404 dù
+> deploy CLI báo thành công — ban đầu tưởng là lỗi gán alias ngẫu nhiên phía Vercel, deploy lại là hết,
+> nhưng **tái diễn nhiều lần**. **Nguyên nhân thật**: project Vercel "web" (và cả "admin") được CLI tự
+> động **kết nối sẵn với GitHub repo** ngay lúc tạo project lần đầu (`vercel --yes` chạy trong thư mục
+> đó tự nhận diện + connect repo hiện tại). Mỗi lần `git push` sau đó (vd. lúc commit các bug fix ở
+> trên), Vercel's GitHub integration **tự động trigger 1 deployment mới** cho các project này — build
+> thẳng từ mã nguồn trong repo Git, mà `build/web` (nội dung Flutter Web thật) không nằm trong Git (bị
+> `.gitignore`, chỉ tồn tại cục bộ), nên bản tự-động đó rỗng/lỗi → 404 → **đè lên** bản mình vừa
+> `vercel --prod` từ `build/web` bằng CLI. Hai project "web" và "admin" đều gặp rủi ro này (không phải
+> "travel-app-6rww"/webapp — project đó dùng chính mã nguồn Next.js trong repo nên build từ Git vẫn ra
+> đúng nội dung, không xung đột). **Đã sửa triệt để**: `vercel git disconnect` cho cả 2 project "web"
+> và "admin" — từ nay `git push` sẽ không tự trigger deploy nữa, chỉ deploy khi chủ động chạy CLI. **Ghi
+> nhớ khi làm việc tiếp**: sau khi sửa code Flutter và `git push`, luôn phải tự chạy lại
+> `flutter build web --release --pwa-strategy=none && cd build/web && vercel --prod` — deploy KHÔNG
+> còn tự động theo git nữa (đây là chủ đích, tránh đúng bug này lặp lại), không phải quên sót.
 ---
  
 ## Ghi chú
