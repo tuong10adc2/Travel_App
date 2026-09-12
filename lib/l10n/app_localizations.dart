@@ -545,6 +545,18 @@ abstract class AppLocalizations {
   /// **'Giới thiệu'**
   String get introductionHeading;
 
+  /// No description provided for @highlightsHeading.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đặc điểm nổi bật'**
+  String get highlightsHeading;
+
+  /// No description provided for @foodToTryHeading.
+  ///
+  /// In vi, this message translates to:
+  /// **'Món ăn nên thử'**
+  String get foodToTryHeading;
+
   /// No description provided for @reviewsHeading.
   ///
   /// In vi, this message translates to:

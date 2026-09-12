@@ -59,6 +59,8 @@ export default function EditPlacePage() {
       openingHours: values.openingHours,
       ticketPrice: values.ticketPrice,
       visitDurationMinutes: values.visitDurationMinutes,
+      highlights: values.highlights,
+      foodToTry: values.foodToTry,
       location:
         values.latitude != null && values.longitude != null
           ? new GeoPoint(values.latitude, values.longitude)

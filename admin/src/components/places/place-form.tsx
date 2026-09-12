@@ -24,6 +24,8 @@ export interface PlaceFormValues {
   longitude?: number;
   isFeatured: boolean;
   isActive: boolean;
+  highlights: string[];
+  foodToTry: string[];
 }
 
 const EMPTY: PlaceFormValues = {
@@ -38,6 +40,8 @@ const EMPTY: PlaceFormValues = {
   visitDurationMinutes: 60,
   isFeatured: false,
   isActive: true,
+  highlights: [],
+  foodToTry: [],
 };
 
 export function placeToFormValues(p: Place): PlaceFormValues {
@@ -55,6 +59,8 @@ export function placeToFormValues(p: Place): PlaceFormValues {
     longitude: p.location?.longitude,
     isFeatured: p.isFeatured ?? false,
     isActive: p.isActive ?? true,
+    highlights: p.highlights ?? [],
+    foodToTry: p.foodToTry ?? [],
   };
 }
 
@@ -71,6 +77,8 @@ export function PlaceForm({
   const [values, setValues] = useState<PlaceFormValues>(initial ?? EMPTY);
   const [tagInput, setTagInput] = useState("");
   const [imagesText, setImagesText] = useState((initial?.images ?? []).join("\n"));
+  const [highlightsText, setHighlightsText] = useState((initial?.highlights ?? []).join("\n"));
+  const [foodToTryText, setFoodToTryText] = useState((initial?.foodToTry ?? []).join("\n"));
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -105,7 +113,15 @@ export function PlaceForm({
         .split("\n")
         .map((s) => s.trim())
         .filter(Boolean);
-      await onSubmit({ ...values, images });
+      const highlights = highlightsText
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const foodToTry = foodToTryText
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      await onSubmit({ ...values, images, highlights, foodToTry });
     } catch (err) {
       setError((err as Error)?.message || "Có lỗi xảy ra, vui lòng thử lại.");
     } finally {
@@ -192,6 +208,30 @@ export function PlaceForm({
                 Thêm
               </Button>
             </div>
+          </Field>
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Đặc điểm nổi bật & Ẩm thực</CardTitle>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <Field label="Đặc điểm nổi bật" hint="Mỗi dòng 1 điểm đặc biệt, hiển thị dạng danh sách trên app/web">
+            <Textarea
+              rows={4}
+              value={highlightsText}
+              onChange={(e) => setHighlightsText(e.target.value)}
+              placeholder={"Vịnh có hơn 1.600 hòn đảo đá vôi\nĐược UNESCO công nhận Di sản Thiên nhiên Thế giới"}
+            />
+          </Field>
+          <Field label="Món ăn nên thử" hint="Mỗi dòng 1 món, nên ghi kèm mô tả ngắn">
+            <Textarea
+              rows={4}
+              value={foodToTryText}
+              onChange={(e) => setFoodToTryText(e.target.value)}
+              placeholder={"Chả mực Hạ Long - đặc sản làm từ mực tươi giã tay\nSá sùng nướng"}
+            />
           </Field>
         </CardBody>
       </Card>

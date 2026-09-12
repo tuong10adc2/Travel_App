@@ -129,6 +129,8 @@
     "placeholders": { "count": { "type": "Object" } }
   },
   "introductionHeading": "Giới thiệu",
+  "highlightsHeading": "Đặc điểm nổi bật",
+  "foodToTryHeading": "Món ăn nên thử",
   "reviewsHeading": "Đánh giá ({count})",
   "@reviewsHeading": {
     "placeholders": { "count": { "type": "Object" } }

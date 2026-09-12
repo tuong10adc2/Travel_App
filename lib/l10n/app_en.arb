@@ -87,6 +87,8 @@
   "placeNotFound": "Place not found.",
   "reviewCountParen": "({count} reviews)",
   "introductionHeading": "About",
+  "highlightsHeading": "Highlights",
+  "foodToTryHeading": "Food to try",
   "reviewsHeading": "Reviews ({count})",
   "noReviewsForPlace": "No reviews yet for this place.",
   "visitDurationUnknown": "Visit duration not specified",

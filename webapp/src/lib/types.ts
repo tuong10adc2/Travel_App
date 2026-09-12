@@ -34,6 +34,8 @@ export interface Place {
   visitDurationMinutes: number;
   isFeatured: boolean;
   isActive: boolean;
+  highlights?: string[];
+  foodToTry?: string[];
   createdBy?: string;
   createdAt?: unknown;
   updatedAt?: unknown;
