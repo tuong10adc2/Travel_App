@@ -19,7 +19,6 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Trợ lý du lịch AI - App Flutter">
-  <meta name="google-signin-client_id" content="591974579800-7gi7ascujl8v1cs9pn0h8njnaf34dkl0.apps.googleusercontent.com">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -32,8 +31,75 @@
 
   <title>TngGuide</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    /* Khung điện thoại quanh app Flutter khi xem trên trình duyệt desktop —
+       app này thiết kế cho mobile (Android), hiển thị full-bleed trên màn
+       hình rộng sẽ trông sai kích thước. Trên màn hình hẹp (điện thoại thật)
+       thì khung tự ẩn, app vẫn full-bleed như bình thường. */
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      background: radial-gradient(circle at 50% 0%, #1f3d33 0%, #0b1f19 60%, #05100c 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    #phone-frame {
+      position: relative;
+      width: 390px;
+      height: 844px;
+      max-width: 100vw;
+      max-height: 100vh;
+      background: #000;
+      border-radius: 44px;
+      padding: 14px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), 0 0 0 2px rgba(255, 255, 255, 0.06) inset;
+    }
+    #flutter-host {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 32px;
+      overflow: hidden;
+      background: #fff;
+    }
+    #phone-notch {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 26px;
+      background: #000;
+      border-radius: 0 0 16px 16px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    /* Dưới 480px coi như đang xem trên chính điện thoại thật — bỏ khung,
+       app chiếm toàn màn hình như mọi trang web mobile bình thường. */
+    @media (max-width: 480px), (max-height: 700px) {
+      body { background: #fff; }
+      #phone-frame {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+      }
+      #flutter-host { border-radius: 0; }
+      #phone-notch { display: none; }
+    }
+  </style>
 </head>
 <body>
+  <div id="phone-frame">
+    <div id="phone-notch"></div>
+    <div id="flutter-host"></div>
+  </div>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
