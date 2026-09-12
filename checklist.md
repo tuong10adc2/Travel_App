@@ -188,6 +188,27 @@
 >   gặp và sửa cho webapp trước khi làm admin).
 > - Firebase Hosting cho `travelapp-7f140-web`/`travelapp-7f140-admin` giữ nguyên chưa xoá, không dùng
 >   tới, có thể dọn sau nếu muốn — không ảnh hưởng gì vì chưa từng deploy được nội dung nào lên đó.
+
+> **Cập nhật 2026-09-12 — Deploy thêm bản Flutter Web + nút chuyển đổi desktop/app**: app Flutter giờ
+> có thêm 1 bản chạy trên web, deploy riêng biệt song song với webapp Next.js.
+> - **Domain**: `https://web-nu-woad-82.vercel.app` — project Vercel mới tên `web`, deploy static
+>   (không phải framework Next.js) từ thư mục build `build/web` sau khi chạy
+>   `flutter build web --release --pwa-strategy=none`. **Bắt buộc phải có `--pwa-strategy=none`** —
+>   thiếu cờ này bản release bị **trắng trang hoàn toàn, không lỗi rõ ràng** do service worker mặc định
+>   của Flutter Web bị race condition lúc tải `main.dart.js` (chỉ xảy ra ở `--release`, không xảy ra ở
+>   `--debug`/`--profile`, nên rất dễ bỏ sót nếu chỉ test bằng `flutter run`). Cách deploy lại khi có
+>   code mới: `flutter build web --release --pwa-strategy=none` rồi `cd build/web && vercel --prod`.
+> - **3 bug thật phát hiện khi làm** (xem chi tiết trong commit): (1) `webview_flutter` (dùng cho bản
+>   đồ) không có bản cho web → crash toàn app khi vào Chi tiết địa điểm — sửa bằng conditional export:
+>   `place_map_view_mobile.dart` (webview_flutter) cho Android/iOS, `place_map_view_web.dart`
+>   (`HtmlElementView` + iframe) cho web; (2) `coverImage`/`images` của 18 địa điểm lưu đường dẫn tương
+>   đối (`/images/places/...`) chỉ đúng trên domain webapp — **đã ảnh hưởng cả app Flutter Android thật
+>   từ trước**, không chỉ web — đã sửa thành URL tuyệt đối trong Firestore; (3) service worker nói trên.
+> - **Nút chuyển đổi 2 chiều**: webapp (icon điện thoại trên navbar) ↔ Flutter Web (nút "Chuyển sang
+>   bản desktop" ở màn Hồ sơ, chỉ hiện khi `kIsWeb`). **Lưu ý**: 2 domain khác nhau nên phiên đăng nhập
+>   không dùng chung — người dùng cần đăng nhập lại khi chuyển qua lại giữa 2 bản.
+> - Thêm CORS header (`Access-Control-Allow-Origin: *`) cho `/images/*` trên webapp — cần thiết để
+>   Flutter Web (renderer CanvasKit) vẽ được ảnh cross-origin lên canvas (khác `<img>` thường không cần).
 ---
  
 ## Ghi chú
