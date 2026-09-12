@@ -11,7 +11,6 @@ import {
   MapPin,
   Star,
   Ticket,
-  View,
 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { formatOpeningHours } from "@/lib/opening-hours";
@@ -119,7 +118,6 @@ export default function PlaceDetailPage() {
                   {place.tags?.map((t) => (
                     <Badge key={t} tone="brand">{t}</Badge>
                   ))}
-                  {place.has360 && <Badge tone="accent">VR 360°</Badge>}
                 </div>
                 <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{place.name}</h1>
                 <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -171,13 +169,6 @@ export default function PlaceDetailPage() {
         </div>
 
         <div className="sticky top-24 h-fit space-y-3 rounded-2xl border border-border bg-surface p-5">
-          {place.has360 && (
-            <Link href={`/places/${place.id}/vr360`} className="block">
-              <Button className="w-full" size="lg">
-                <View className="h-4.5 w-4.5" /> {t("placeDetail.experienceVr360")}
-              </Button>
-            </Link>
-          )}
           <AddToItineraryButton placeId={place.id} placeName={place.name} className="w-full" />
           <Link href="/chat" className="block">
             <Button variant="ghost" className="w-full">

@@ -31,7 +31,6 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link href="/chat" className="hover:text-brand-700">{t("footer.aiChat")}</Link></li>
               <li><span>{t("footer.smartGuide")}</span></li>
-              <li><span>{t("footer.preview360")}</span></li>
             </ul>
           </div>
           <div>

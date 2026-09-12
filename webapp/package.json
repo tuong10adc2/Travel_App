@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.122.0",
-    "@photo-sphere-viewer/core": "^5.15.1",
-    "@photo-sphere-viewer/markers-plugin": "^5.15.1",
     "clsx": "^2.1.1",
     "firebase": "^12.17.1",
     "firebase-admin": "^13.5.0",

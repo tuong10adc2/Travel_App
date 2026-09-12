@@ -101,9 +101,7 @@
   "weekdaySun": "Sunday",
 
   "placeNotFound": "Place not found.",
-  "vr360Badge": "360° VR",
   "reviewCountParen": "({count} reviews)",
-  "experienceVr360Button": "Try the 360° experience",
   "introductionHeading": "About",
   "reviewsHeading": "Reviews ({count})",
   "noReviewsForPlace": "No reviews yet for this place.",
@@ -140,17 +138,6 @@
   "addToMyItinerary": "Add to my itinerary",
   "noReviewsForTour": "No reviews yet for this tour.",
   "reviewsLoadError": "Failed to load reviews: {error}",
-
-  "vr360FallbackTitle": "VR 360°",
-  "gyroMobileOnlyMessage": "Sensor-based rotation is only supported on a real mobile device.",
-  "gyroOffTooltip": "Turn off sensor rotation",
-  "gyroOnTooltip": "Turn on sensor rotation",
-  "media360LoadError": "Failed to load 360° data: {error}",
-  "no360ForPlace": "No 360° images for this place yet.",
-  "viewOtherHotspotTooltip": "View another viewpoint",
-  "loading360Message": "Loading 360° image...",
-  "rotateHint360": "Swipe or tilt your device to look around in 360°",
-  "viewpointLabel": "Viewpoint {number}",
 
   "updateProfileFailedMessage": "Update failed, please try again.",
   "profileLoadError": "Failed to load profile: {error}",

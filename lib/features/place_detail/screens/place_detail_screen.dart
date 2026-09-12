@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/tag_labels.dart';
@@ -118,22 +117,6 @@ class _PlaceDetailContentState extends ConsumerState<_PlaceDetailContent> {
                       child: Text(place.name,
                           style: Theme.of(context).textTheme.headlineSmall),
                     ),
-                    if (place.has360)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.sm, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(AppRadius.sm),
-                        ),
-                        child: Text(
-                          l10n.vr360Badge,
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelSmall
-                              ?.copyWith(color: Colors.white),
-                        ),
-                      ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.xs),
@@ -171,23 +154,6 @@ class _PlaceDetailContentState extends ConsumerState<_PlaceDetailContent> {
                     text: _priceLabel(l10n, place.ticketPrice)),
                 if (place.openingHours.isNotEmpty)
                   _OpeningHours(openingHours: place.openingHours),
-                if (place.has360) ...[
-                  const SizedBox(height: AppSpacing.sm),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () => context.push('/place/${place.id}/vr360'),
-                      icon: const Icon(Icons.threed_rotation),
-                      label: Text(l10n.experienceVr360Button),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        side: const BorderSide(color: AppColors.primary),
-                        padding:
-                            const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                      ),
-                    ),
-                  ),
-                ],
                 const SizedBox(height: AppSpacing.lg),
                 Text(l10n.introductionHeading,
                     style: Theme.of(context).textTheme.titleMedium),

@@ -44,7 +44,6 @@
     "aiFeaturesHeading": "Tính năng AI",
     "aiChat": "Hỏi đáp trợ lý AI",
     "smartGuide": "Dẫn đường thông minh",
-    "preview360": "Xem trước 360°",
     "accountHeading": "Tài khoản",
     "profile": "Hồ sơ",
     "copyright": "© {year} TngGuide. Trợ lý du lịch thông minh khám phá Việt Nam."
@@ -59,15 +58,12 @@
     "askAi": "Hỏi trợ lý AI",
     "viewSuggestedTours": "Xem tour gợi ý",
     "statPlaces": "Địa điểm & di tích",
-    "stat360": "Trải nghiệm VR 360°",
     "statTours": "Tour gợi ý sẵn",
     "statAi": "Đồng hành cùng AI",
     "featuresTitle": "Tương lai của hành trình khám phá",
     "featuresSubtitle": "Công nghệ tinh tế hoà quyện cùng am hiểu bản địa.",
     "feature1Title": "Trợ lý AI hỏi đáp",
     "feature1Desc": "Hỏi về lịch sử, văn hoá, ẩm thực hay địa điểm ẩn — AI gợi ý đúng nơi phù hợp sở thích của bạn.",
-    "feature2Title": "Trải nghiệm VR 360°",
-    "feature2Desc": "Xem trước không gian thực tế tại từng địa điểm trước khi đặt chân tới, xoay 360° mượt mà.",
     "feature3Title": "Lịch trình thông minh",
     "feature3Desc": "Tạo lịch trình theo ngày, thêm/sắp xếp điểm đến tự do, biến tour gợi ý thành hành trình của riêng bạn.",
     "feature4Title": "Đa ngôn ngữ",
@@ -95,12 +91,7 @@
     "visitDuration": "{hours} giờ tham quan",
     "free": "Miễn phí",
     "openingHours": "Giờ mở cửa",
-    "experienceVr360": "Trải nghiệm VR 360°",
     "askAiAboutPlace": "Hỏi trợ lý AI về địa điểm này"
-  },
-  "vr360": {
-    "back": "Quay lại",
-    "empty": "Địa điểm này chưa có ảnh 360°."
   },
   "tours": {
     "title": "Tour gợi ý",

@@ -2,11 +2,11 @@
 
 **AI-powered travel assistant** — Flutter mobile app, Next.js web app, Next.js admin dashboard, and a Firebase backend, all sharing one data model and one AI layer.
 
-> Trợ lý du lịch AI: gợi ý địa điểm, lên lịch trình và trả lời câu hỏi du lịch qua chat, xem trước điểm đến bằng ảnh 360°.
+> Trợ lý du lịch AI: gợi ý địa điểm, lên lịch trình và trả lời câu hỏi du lịch qua chat.
 
 ## Overview
 
-TravelAI helps users discover destinations, chat with an AI assistant for recommendations, plan multi-day itineraries, and preview places in 360° VR — across three clients backed by a single Firebase project.
+TravelAI helps users discover destinations, chat with an AI assistant for recommendations, and plan multi-day itineraries — across three clients backed by a single Firebase project.
 
 | Client | Audience | Stack |
 |---|---|---|
@@ -33,7 +33,6 @@ See [`docs/ai-improvement-roadmap.md`](docs/ai-improvement-roadmap.md) for the n
 - Explore destinations with search and tag filtering
 - Place details: ratings, opening hours, reviews, ticket info
 - AI chat assistant with place-suggestion and itinerary cards inline in the conversation
-- 360° VR place previews with gyroscope support and multi-viewpoint hotspots
 - Reviews with star ratings and AI-assisted moderation
 - Saved places / favorites
 - Admin dashboard: place/review management, content approval queue
@@ -95,11 +94,11 @@ GOOGLE_PLACES_API_KEY=... ANTHROPIC_API_KEY=... npm run import
 ## Project structure
 
 ```
-lib/            Flutter app (feature-first: auth, chat, home, itinerary, place_detail, review, saved, vr360, ...)
+lib/            Flutter app (feature-first: auth, chat, home, itinerary, place_detail, review, saved, ...)
 webapp/         Next.js public web app
 admin/          Next.js admin dashboard
 functions/      Firebase Cloud Functions (TypeScript) — chat assistant, moderation, itinerary planner
-scripts/        Data pipelines (place import, VR360 asset seeding)
+scripts/        Data pipelines (place import)
 docs/           Data model, AI roadmap, planning docs
 ```
 

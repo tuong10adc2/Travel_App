@@ -34,21 +34,9 @@ export interface Place {
   visitDurationMinutes: number;
   isFeatured: boolean;
   isActive: boolean;
-  has360: boolean;
   createdBy?: string;
   createdAt?: unknown;
   updatedAt?: unknown;
-}
-
-export interface Media360 {
-  id: string;
-  placeId: string;
-  type: "image" | "video";
-  url: string;
-  title: string;
-  order: number;
-  hotspots?: { targetMediaId: string; yaw: number; pitch: number; label: string }[];
-  createdAt?: unknown;
 }
 
 export interface Tour {

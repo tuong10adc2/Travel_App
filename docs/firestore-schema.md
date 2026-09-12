@@ -41,21 +41,8 @@ Sub-collection: `users/{uid}/chat_history/{sessionId}` (xem bên dưới).
 | visitDurationMinutes | number | |
 | isFeatured | bool | hiển thị trang chủ |
 | isActive | bool | admin duyệt/ẩn |
-| has360 | bool | denormalize, true nếu có `media_360` |
 | createdBy | string (uid) | |
 | createdAt / updatedAt | timestamp | |
-
-## `media_360/{mediaId}`
-
-| Field | Type | Ghi chú |
-|---|---|---|
-| placeId | string | ref tới `places` |
-| type | string | `image` \| `video` |
-| url | string | ảnh equirectangular 2:1, Storage URL |
-| title | string | tên điểm nhìn |
-| order | number | thứ tự hiển thị |
-| hotspots | array\<map\> | optional: `{ targetMediaId, yaw, pitch, label }` |
-| createdAt | timestamp | |
 
 ## `tours/{tourId}`
 

@@ -17,7 +17,6 @@ import '../../features/profile/screens/profile_screen.dart';
 import '../../features/saved/screens/saved_places_screen.dart';
 import '../../features/tours/screens/tour_detail_screen.dart';
 import '../../features/tours/screens/tour_list_screen.dart';
-import '../../features/vr360/screens/vr360_viewer_screen.dart';
 import 'fade_scale_page.dart';
 import 'main_shell.dart';
 
@@ -103,16 +102,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => fadeScalePage(
           key: state.pageKey,
           child: PlaceDetailScreen(placeId: state.pathParameters['id']!),
-        ),
-      ),
-      GoRoute(
-        path: '/place/:id/vr360',
-        pageBuilder: (context, state) => fadeScalePage(
-          key: state.pageKey,
-          child: Vr360ViewerScreen(
-            placeId: state.pathParameters['id']!,
-            initialMediaId: state.uri.queryParameters['mediaId'],
-          ),
         ),
       ),
       GoRoute(

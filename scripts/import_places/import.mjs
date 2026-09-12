@@ -9,7 +9,7 @@
 // Cần trước khi chạy:
 //   1. Biến môi trường GOOGLE_PLACES_API_KEY (bật "Places API" trong Google Cloud Console)
 //      và ANTHROPIC_API_KEY.
-//   2. Giống các script seed trước (seed_vr360, seed places/tours Giai đoạn 2/6): tạm nới
+//   2. Giống các script seed trước (seed places/tours Giai đoạn 2/6): tạm nới
 //      firestore.rules cho phép user đã đăng nhập tạo `places`
 //      (`allow create: if isSignedIn()`), deploy, chạy xong thì trả rule gốc
 //      (`isContentEditor()`-only) và deploy lại.
@@ -221,7 +221,6 @@ async function main() {
         visitDurationMinutes: enrichment.visitDurationMinutes,
         isFeatured: false,
         isActive: false, // NHÁP — chờ admin duyệt qua tab "Chờ duyệt"
-        has360: false,
         createdBy: uid,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),

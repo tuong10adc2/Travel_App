@@ -629,23 +629,11 @@ abstract class AppLocalizations {
   /// **'Không tìm thấy địa điểm.'**
   String get placeNotFound;
 
-  /// No description provided for @vr360Badge.
-  ///
-  /// In vi, this message translates to:
-  /// **'360° VR'**
-  String get vr360Badge;
-
   /// No description provided for @reviewCountParen.
   ///
   /// In vi, this message translates to:
   /// **'({count} đánh giá)'**
   String reviewCountParen(Object count);
-
-  /// No description provided for @experienceVr360Button.
-  ///
-  /// In vi, this message translates to:
-  /// **'Trải nghiệm ngay 360°'**
-  String get experienceVr360Button;
 
   /// No description provided for @introductionHeading.
   ///
@@ -844,66 +832,6 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Lỗi tải đánh giá: {error}'**
   String reviewsLoadError(Object error);
-
-  /// No description provided for @vr360FallbackTitle.
-  ///
-  /// In vi, this message translates to:
-  /// **'VR 360°'**
-  String get vr360FallbackTitle;
-
-  /// No description provided for @gyroMobileOnlyMessage.
-  ///
-  /// In vi, this message translates to:
-  /// **'Xoay theo cảm biến chỉ hỗ trợ trên thiết bị di động thật.'**
-  String get gyroMobileOnlyMessage;
-
-  /// No description provided for @gyroOffTooltip.
-  ///
-  /// In vi, this message translates to:
-  /// **'Tắt xoay theo cảm biến'**
-  String get gyroOffTooltip;
-
-  /// No description provided for @gyroOnTooltip.
-  ///
-  /// In vi, this message translates to:
-  /// **'Bật xoay theo cảm biến'**
-  String get gyroOnTooltip;
-
-  /// No description provided for @media360LoadError.
-  ///
-  /// In vi, this message translates to:
-  /// **'Lỗi tải dữ liệu 360°: {error}'**
-  String media360LoadError(Object error);
-
-  /// No description provided for @no360ForPlace.
-  ///
-  /// In vi, this message translates to:
-  /// **'Chưa có ảnh 360° cho địa điểm này.'**
-  String get no360ForPlace;
-
-  /// No description provided for @viewOtherHotspotTooltip.
-  ///
-  /// In vi, this message translates to:
-  /// **'Xem điểm nhìn khác'**
-  String get viewOtherHotspotTooltip;
-
-  /// No description provided for @loading360Message.
-  ///
-  /// In vi, this message translates to:
-  /// **'Đang tải ảnh 360°...'**
-  String get loading360Message;
-
-  /// No description provided for @rotateHint360.
-  ///
-  /// In vi, this message translates to:
-  /// **'Vuốt hoặc nghiêng thiết bị để xoay 360°'**
-  String get rotateHint360;
-
-  /// No description provided for @viewpointLabel.
-  ///
-  /// In vi, this message translates to:
-  /// **'Điểm nhìn {number}'**
-  String viewpointLabel(Object number);
 
   /// No description provided for @updateProfileFailedMessage.
   ///

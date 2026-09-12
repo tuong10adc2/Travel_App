@@ -306,15 +306,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get placeNotFound => 'Place not found.';
 
   @override
-  String get vr360Badge => '360° VR';
-
-  @override
   String reviewCountParen(Object count) {
     return '($count reviews)';
   }
-
-  @override
-  String get experienceVr360Button => 'Try the 360° experience';
 
   @override
   String get introductionHeading => 'About';
@@ -431,40 +425,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String reviewsLoadError(Object error) {
     return 'Failed to load reviews: $error';
-  }
-
-  @override
-  String get vr360FallbackTitle => 'VR 360°';
-
-  @override
-  String get gyroMobileOnlyMessage => 'Sensor-based rotation is only supported on a real mobile device.';
-
-  @override
-  String get gyroOffTooltip => 'Turn off sensor rotation';
-
-  @override
-  String get gyroOnTooltip => 'Turn on sensor rotation';
-
-  @override
-  String media360LoadError(Object error) {
-    return 'Failed to load 360° data: $error';
-  }
-
-  @override
-  String get no360ForPlace => 'No 360° images for this place yet.';
-
-  @override
-  String get viewOtherHotspotTooltip => 'View another viewpoint';
-
-  @override
-  String get loading360Message => 'Loading 360° image...';
-
-  @override
-  String get rotateHint360 => 'Swipe or tilt your device to look around in 360°';
-
-  @override
-  String viewpointLabel(Object number) {
-    return 'Viewpoint $number';
   }
 
   @override

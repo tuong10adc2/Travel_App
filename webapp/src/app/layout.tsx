@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "TngGuide — Trợ lý du lịch thông minh Việt Nam",
   description:
-    "Trợ lý du lịch số riêng bạn — mang đến tri thức bản địa, gợi ý AI và trải nghiệm VR 360° tới mọi miền đất nước.",
+    "Trợ lý du lịch số riêng bạn — mang đến tri thức bản địa, gợi ý AI và dẫn đường thông minh tới mọi miền đất nước.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
