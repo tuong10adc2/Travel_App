@@ -66,9 +66,70 @@ Nguyên tắc trả lời:
 - Khi người dùng muốn LẬP LỊCH TRÌNH cụ thể nhiều ngày (vd "lên lịch 3 ngày ở Sa Pa"), PHẢI gọi tool plan_itinerary thay vì suggest_places — chỉ cần chọn đúng địa điểm phù hợp, KHÔNG tự sắp xếp thứ tự hay đoán khoảng cách, server sẽ tính bằng toạ độ thật rồi trả lại cho bạn để bạn diễn giải bằng lời.
 - Chỉ được gợi ý địa điểm có trong danh sách bên dưới. Không bịa thêm địa điểm, giá vé, hay thông tin không có trong danh sách.
 - Không phải câu hỏi nào cũng cần gợi ý địa điểm — chỉ gọi tool khi người dùng thực sự đang tìm địa điểm để đi.
+- Nếu có phần "Thông tin cá nhân hoá" bên dưới VÀ câu hỏi của người dùng chung chung, không nêu rõ loại địa điểm (vd "gợi ý cho tôi 1 chỗ hay ho", "đi đâu bây giờ"), thì BẮT BUỘC chọn (các) địa điểm có tag trùng với sở thích/lịch sử nêu trong phần đó — không được chọn địa điểm khác chỉ vì nổi tiếng/điểm đánh giá cao hơn. Chỉ bỏ qua quy tắc này khi không có địa điểm nào trong danh sách khớp tag đó, hoặc khi người dùng đã nói rõ muốn loại địa điểm khác.
 
 Danh sách địa điểm hiện có (id | tên | tags | mô tả ngắn):
 ${placesList || "(hiện chưa có địa điểm nào trong hệ thống)"}`;
+}
+
+/**
+ * Cá nhân hoá (roadmap mục 4): đọc sở thích khai báo (users.preferences) + tín hiệu hành vi
+ * (tag của địa điểm đã lưu, tag của địa điểm được đánh giá cao) để chèn thêm 1 đoạn ngắn vào
+ * system prompt — KHÔNG đưa vào block có cache_control vì nội dung khác nhau theo từng user,
+ * đặt ở block riêng sau block địa điểm (ổn định, dùng chung) để không phá cache prefix.
+ */
+async function buildPersonalizationNote(
+  uid: string,
+  placeTagsById: Map<string, { name: string; tags: string[] }>
+): Promise<string | null> {
+  const [userSnap, savedSnap, reviewsSnap] = await Promise.all([
+    adminDb.collection("users").doc(uid).get(),
+    adminDb.collection("saved_places").where("userId", "==", uid).get(),
+    adminDb.collection("reviews").where("userId", "==", uid).where("rating", ">=", 4).get(),
+  ]);
+
+  const declaredPreferences: string[] = Array.isArray(userSnap.data()?.preferences)
+    ? userSnap.data()!.preferences
+    : [];
+
+  const tagCounts = new Map<string, number>();
+  for (const tag of declaredPreferences) {
+    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 2); // sở thích khai báo trực tiếp có trọng số cao hơn
+  }
+
+  const likedPlaceNames: string[] = [];
+  for (const doc of savedSnap.docs) {
+    const placeId = doc.data().placeId as string | undefined;
+    if (!placeId) continue;
+    for (const tag of placeTagsById.get(placeId)?.tags ?? []) {
+      tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+    }
+  }
+  for (const doc of reviewsSnap.docs) {
+    const data = doc.data();
+    if (data.targetType !== "place") continue;
+    const placeId = data.targetId as string | undefined;
+    if (!placeId) continue;
+    const entry = placeTagsById.get(placeId);
+    if (entry) {
+      likedPlaceNames.push(entry.name);
+      for (const tag of entry.tags) tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+    }
+  }
+
+  if (tagCounts.size === 0 && likedPlaceNames.length === 0) return null;
+
+  const topTags = [...tagCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([tag]) => tag);
+
+  const parts: string[] = [];
+  if (topTags.length > 0) parts.push(`Người dùng có xu hướng thích: ${topTags.join(", ")}.`);
+  if (likedPlaceNames.length > 0) {
+    parts.push(`Đã từng đánh giá cao: ${[...new Set(likedPlaceNames)].slice(0, 3).join(", ")}.`);
+  }
+  return parts.length > 0 ? `Thông tin cá nhân hoá:\n${parts.join(" ")}` : null;
 }
 
 interface ChatTurn {
@@ -96,7 +157,6 @@ export async function POST(request: Request) {
     }
     throw error;
   }
-  void uid;
 
   const body = (await request.json().catch(() => null)) as { message?: string; history?: unknown } | null;
   const message = body?.message?.trim();
@@ -115,14 +175,17 @@ export async function POST(request: Request) {
     const placesSnap = await adminDb.collection("places").where("isActive", "==", true).get();
     const validPlaceIds = new Set(placesSnap.docs.map((doc) => doc.id));
     const placesLocationById = new Map<string, GeoPoint>();
+    const placeTagsById = new Map<string, { name: string; tags: string[] }>();
     const placesList = placesSnap.docs
       .map((doc) => {
         const d = doc.data();
-        const tags = Array.isArray(d.tags) ? d.tags.join(", ") : "";
+        const tagsArr: string[] = Array.isArray(d.tags) ? d.tags : [];
+        const tags = tagsArr.join(", ");
         const location = d.location as { latitude?: number; longitude?: number } | undefined;
         if (location && typeof location.latitude === "number" && typeof location.longitude === "number") {
           placesLocationById.set(doc.id, { id: doc.id, lat: location.latitude, lng: location.longitude });
         }
+        placeTagsById.set(doc.id, { name: d.name ?? "", tags: tagsArr });
         return `- ${doc.id} | ${d.name ?? ""} | ${tags} | ${d.description ?? ""}`;
       })
       .join("\n");
@@ -136,6 +199,15 @@ export async function POST(request: Request) {
         cache_control: { type: "ephemeral" },
       },
     ];
+
+    // Cá nhân hoá — block riêng KHÔNG cache (khác nhau theo từng user), đặt sau block địa điểm
+    // đã cache để không phá cache prefix dùng chung. Lỗi ở đây không được chặn luồng chat chính.
+    try {
+      const note = await buildPersonalizationNote(uid, placeTagsById);
+      if (note) systemBlocks.push({ type: "text", text: note });
+    } catch (error) {
+      console.error("api/chat: loi khi tinh ca nhan hoa (bo qua, khong chan chat)", error);
+    }
 
     const conversation: Anthropic.MessageParam[] = [
       ...history.map((turn) => ({

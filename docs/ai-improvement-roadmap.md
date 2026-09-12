@@ -59,7 +59,7 @@ sản phẩm chat AI thật (ChatGPT, Claude.ai) đều stream theo token. Đã 
 5. Xử lý tool-use trong lúc stream: cần buffer tool_use block riêng, chỉ stream phần text — phức tạp
    hơn stream thuần vì đang có agent loop 2 vòng (`MAX_TOOL_ROUND_TRIPS`).
 
-**Giá trị CV**: Thể hiện hiểu về giao thức streaming LLM thực tế (SSE, xử lý tool-use xen kẽ streaming
+**Giá trị CV**: Thể hiện hiểu về giao thức streaming LLM thực tế (SSE, xử lý tool-use xen kẽ streaming   
 text) — khác với việc chỉ gọi API dạng request/response đơn giản. Đây là chi tiết hay bị hỏi sâu khi
 phỏng vấn về "đã từng build production chat app chưa".
 
@@ -99,9 +99,18 @@ không đụng vào code chạy production.
 
 ---
 
-## 4. Cá nhân hoá dựa trên preference & lịch sử tương tác
+## 4. Cá nhân hoá dựa trên preference & lịch sử tương tác — ĐÃ LÀM
 
-**Mục đích**: Field `users.preferences` đã có sẵn trong schema với ghi chú "dùng cho AI gợi ý"
+**Trạng thái**: Đã cài đặt trong `webapp/src/app/api/chat/route.ts` (`buildPersonalizationNote`) —
+đọc `users/{uid}.preferences` (trọng số 2) + tag của `saved_places` (trọng số 1) + tag của địa điểm
+được review ≥4 sao (trọng số 1), lấy top 3 tag, chèn thành block system prompt riêng KHÔNG cache
+(đặt sau block địa điểm đã cache để không phá cache prefix). System prompt được sửa để BẮT BUỘC ưu
+tiên tag khớp sở thích khi câu hỏi chung chung (bản đầu chỉ "khuyến khích" — test thực tế cho thấy
+model vẫn chọn địa điểm nổi tiếng/rating cao hơn thay vì theo sở thích, phải đổi thành chỉ thị bắt
+buộc mới có hiệu quả). Đã test qua Playwright: user khai báo thích "Biển đảo" → hỏi chung chung
+"gợi ý 1 chỗ hay ho" → AI trả lời "Bạn thích biển đảo nên mình gợi ý..." và gợi ý Nha Trang.
+
+**Mục đích (gốc)**: Field `users.preferences` đã có sẵn trong schema với ghi chú "dùng cho AI gợi ý"
 (`docs/firestore-schema.md:17`) nhưng chưa được đọc/dùng ở đâu cả. Chat hiện trả lời giống nhau cho mọi
 người dùng, không tận dụng lịch sử đã lưu (địa điểm đã save, đã review, rating đã cho).
 
