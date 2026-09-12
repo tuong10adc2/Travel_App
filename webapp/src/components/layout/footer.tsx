@@ -37,7 +37,6 @@ export function Footer() {
             <p className="mb-3 text-sm font-semibold text-foreground">{t("footer.accountHeading")}</p>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link href="/login" className="hover:text-brand-700">{t("common.login")}</Link></li>
-              <li><Link href="/register" className="hover:text-brand-700">{t("common.register")}</Link></li>
               <li><Link href="/profile" className="hover:text-brand-700">{t("footer.profile")}</Link></li>
             </ul>
           </div>

@@ -14,6 +14,8 @@ class Place {
   final bool isFeatured;
   final List<String> images;
   final Map<String, String> openingHours;
+  final double? latitude;
+  final double? longitude;
 
   Place({
     required this.id,
@@ -29,10 +31,13 @@ class Place {
     required this.isFeatured,
     required this.images,
     required this.openingHours,
+    this.latitude,
+    this.longitude,
   });
 
   factory Place.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
+    final location = data['location'];
     return Place(
       id: doc.id,
       name: (data['name'] as String?) ?? '',
@@ -47,6 +52,8 @@ class Place {
       isFeatured: (data['isFeatured'] as bool?) ?? false,
       images: List<String>.from(data['images'] as List? ?? const []),
       openingHours: Map<String, String>.from(data['openingHours'] as Map? ?? const {}),
+      latitude: location is GeoPoint ? location.latitude : null,
+      longitude: location is GeoPoint ? location.longitude : null,
     );
   }
 }

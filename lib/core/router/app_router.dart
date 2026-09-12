@@ -2,9 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/data/auth_repository.dart';
-import '../../features/auth/screens/forgot_password_screen.dart';
 import '../../features/auth/screens/login_screen.dart';
-import '../../features/auth/screens/register_screen.dart';
 import '../../features/auth/screens/splash_screen.dart';
 import '../../features/chat/screens/chat_screen.dart';
 import '../../features/home/screens/home_screen.dart';
@@ -20,7 +18,7 @@ import '../../features/tours/screens/tour_list_screen.dart';
 import 'fade_scale_page.dart';
 import 'main_shell.dart';
 
-const _authRoutes = ['/login', '/register', '/forgot-password'];
+const _authRoutes = ['/login'];
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateChangesProvider);
@@ -52,16 +50,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/login',
         pageBuilder: (context, state) =>
             fadeScalePage(key: state.pageKey, child: const LoginScreen()),
-      ),
-      GoRoute(
-        path: '/register',
-        pageBuilder: (context, state) =>
-            fadeScalePage(key: state.pageKey, child: const RegisterScreen()),
-      ),
-      GoRoute(
-        path: '/forgot-password',
-        pageBuilder: (context, state) => fadeScalePage(
-            key: state.pageKey, child: const ForgotPasswordScreen()),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>

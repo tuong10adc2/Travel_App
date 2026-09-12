@@ -36,48 +36,6 @@ class AuthRepository {
 
   User? get currentUser => _firebaseAuth.currentUser;
 
-  Future<User> signUpWithEmail({
-    required String email,
-    required String password,
-    required String displayName,
-  }) async {
-    try {
-      final credential = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      final user = credential.user!;
-      await user.updateDisplayName(displayName);
-      await _createUserDocument(user, displayName: displayName);
-      return user;
-    } on FirebaseAuthException catch (e) {
-      throw AuthException.fromFirebase(e);
-    }
-  }
-
-  Future<User> signInWithEmail({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      final credential = await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      return credential.user!;
-    } on FirebaseAuthException catch (e) {
-      throw AuthException.fromFirebase(e);
-    }
-  }
-
-  Future<void> sendPasswordResetEmail(String email) async {
-    try {
-      await _firebaseAuth.sendPasswordResetEmail(email: email);
-    } on FirebaseAuthException catch (e) {
-      throw AuthException.fromFirebase(e);
-    }
-  }
-
   /// Trả về `null` nếu người dùng huỷ chọn tài khoản Google.
   Future<User?> signInWithGoogle() async {
     try {

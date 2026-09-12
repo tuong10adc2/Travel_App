@@ -1,86 +1,56 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { Compass } from "lucide-react";
 import { auth } from "@/lib/firebase";
+import { ensureUserDoc } from "@/lib/ensure-user-doc";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/input";
 import { useTranslations } from "@/contexts/language-context";
 
 function firebaseAuthErrorMessage(code: string, t: (key: string) => string) {
   switch (code) {
-    case "auth/invalid-email":
-      return t("login.errorInvalidEmail");
-    case "auth/invalid-credential":
-    case "auth/wrong-password":
-    case "auth/user-not-found":
-      return t("login.errorWrongCredential");
     case "auth/too-many-requests":
       return t("login.errorTooManyRequests");
+    case "auth/popup-closed-by-user":
+    case "auth/cancelled-popup-request":
+      return null;
     default:
       return t("login.errorDefault");
   }
 }
 
-function LoginForm() {
+function GoogleSignInButton() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations();
   const redirect = searchParams.get("redirect") || "/";
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleClick() {
     setError(null);
     setSubmitting(true);
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      const credential = await signInWithPopup(auth, new GoogleAuthProvider());
+      await ensureUserDoc(credential.user);
       router.replace(redirect);
     } catch (err) {
-      setError(firebaseAuthErrorMessage((err as { code?: string })?.code ?? "", t));
+      const message = firebaseAuthErrorMessage((err as { code?: string })?.code ?? "", t);
+      if (message) setError(message);
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <Field label={t("common.email")}>
-        <Input
-          type="email"
-          required
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder={t("common.emailPlaceholder")}
-        />
-      </Field>
-      <Field label={t("common.password")}>
-        <Input
-          type="password"
-          required
-          autoComplete="current-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder={t("common.passwordPlaceholder")}
-        />
-      </Field>
-      <div className="text-right">
-        <Link href="/forgot-password" className="text-sm font-medium text-brand-700 hover:underline">
-          {t("login.forgotPassword")}
-        </Link>
-      </div>
+    <div className="space-y-4">
       {error && <p className="rounded-lg bg-danger-50 px-3 py-2 text-sm text-danger-600">{error}</p>}
-      <Button type="submit" className="w-full" size="lg" loading={submitting}>
-        {t("common.login")}
+      <Button type="button" className="w-full" size="lg" loading={submitting} onClick={handleClick}>
+        {t("login.withGoogle")}
       </Button>
-    </form>
+    </div>
   );
 }
 
@@ -100,15 +70,9 @@ export default function LoginPage() {
         </div>
         <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
           <Suspense fallback={null}>
-            <LoginForm />
+            <GoogleSignInButton />
           </Suspense>
         </div>
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          {t("login.noAccount")}{" "}
-          <Link href="/register" className="font-medium text-brand-700 hover:underline">
-            {t("common.registerNow")}
-          </Link>
-        </p>
       </div>
     </div>
   );

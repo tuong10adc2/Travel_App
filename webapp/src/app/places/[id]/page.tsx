@@ -161,6 +161,22 @@ export default function PlaceDetailPage() {
                 </dl>
               </div>
             )}
+
+            {place.location && (
+              <div className="mt-6">
+                <h3 className="mb-3 flex items-center gap-2 font-semibold text-foreground">
+                  <MapPin className="h-4 w-4" /> {t("placeDetail.mapHeading")}
+                </h3>
+                <div className="overflow-hidden rounded-2xl border border-border">
+                  <iframe
+                    title={`Bản đồ ${place.name}`}
+                    className="h-64 w-full"
+                    loading="lazy"
+                    src={`https://maps.google.com/maps?q=${place.location.latitude},${place.location.longitude}&z=15&output=embed`}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="mt-10">

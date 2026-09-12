@@ -33,7 +33,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get login => 'Đăng nhập';
 
   @override
-  String get register => 'Đăng ký';
+  String get loginSubtitle => 'Đăng nhập bằng tài khoản Google để bắt đầu khám phá';
 
   @override
   String get emailLabel => 'Email';
@@ -42,19 +42,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get emailInvalidError => 'Vui lòng nhập email hợp lệ';
 
   @override
-  String get passwordLabel => 'Mật khẩu';
-
-  @override
-  String get passwordTooShortError => 'Mật khẩu cần ít nhất 6 ký tự';
-
-  @override
-  String get forgotPasswordLink => 'Quên mật khẩu?';
-
-  @override
   String get loginWithGoogle => 'Đăng nhập với Google';
-
-  @override
-  String get noAccountRegisterNow => 'Chưa có tài khoản? Đăng ký ngay';
 
   @override
   String get fullNameLabel => 'Họ tên';
@@ -63,43 +51,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get fullNameRequiredError => 'Vui lòng nhập họ tên';
 
   @override
-  String get confirmPasswordLabel => 'Xác nhận mật khẩu';
-
-  @override
-  String get confirmPasswordMismatchError => 'Mật khẩu xác nhận không khớp';
-
-  @override
-  String get haveAccountLoginNow => 'Đã có tài khoản? Đăng nhập';
-
-  @override
-  String get forgotPasswordTitle => 'Quên mật khẩu';
-
-  @override
-  String get forgotPasswordInstructions => 'Nhập email đã đăng ký, chúng tôi sẽ gửi liên kết đặt lại mật khẩu.';
-
-  @override
-  String get sendResetEmailButton => 'Gửi email khôi phục';
-
-  @override
-  String get resetEmailSentMessage => 'Đã gửi email khôi phục mật khẩu, vui lòng kiểm tra hộp thư.';
-
-  @override
-  String get authErrorInvalidEmail => 'Email không hợp lệ.';
-
-  @override
   String get authErrorUserDisabled => 'Tài khoản này đã bị khoá.';
-
-  @override
-  String get authErrorUserNotFound => 'Không tìm thấy tài khoản với email này.';
-
-  @override
-  String get authErrorWrongPassword => 'Email hoặc mật khẩu không đúng.';
-
-  @override
-  String get authErrorEmailInUse => 'Email này đã được đăng ký.';
-
-  @override
-  String get authErrorWeakPassword => 'Mật khẩu quá yếu, cần ít nhất 6 ký tự.';
 
   @override
   String get authErrorOperationNotAllowed => 'Phương thức đăng nhập này chưa được bật.';
