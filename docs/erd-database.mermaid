@@ -4,7 +4,6 @@ erDiagram
     USERS ||--o{ REVIEWS : "viet"
     USERS ||--o{ CHAT_HISTORY : "co"
 
-    PLACES ||--o{ MEDIA_360 : "co anh/video 360"
     PLACES ||--o{ REVIEWS : "duoc danh gia"
     PLACES ||--o{ SAVED_PLACES : "duoc luu"
     PLACES ||--o{ ITINERARY_ITEMS : "xuat hien trong"
@@ -41,21 +40,9 @@ erDiagram
         number visitDurationMinutes
         bool isFeatured
         bool isActive
-        bool has360
         string createdBy FK
         timestamp createdAt
         timestamp updatedAt
-    }
-
-    MEDIA_360 {
-        string id PK
-        string placeId FK
-        string type "image | video"
-        string url
-        string title
-        number order
-        array hotspots
-        timestamp createdAt
     }
 
     TOURS {

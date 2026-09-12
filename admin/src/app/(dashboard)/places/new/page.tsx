@@ -37,7 +37,6 @@ export default function NewPlacePage() {
       ratingCount: 0,
       isFeatured: values.isFeatured,
       isActive: values.isActive,
-      has360: false,
       createdBy: user?.uid ?? "",
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),

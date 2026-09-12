@@ -13,7 +13,7 @@ import {
   onSnapshot,
   Timestamp,
 } from "firebase/firestore";
-import { Users, MapPin, Package, Star, ImagePlay, ArrowRight, TrendingUp } from "lucide-react";
+import { Users, MapPin, Package, Star, ArrowRight, TrendingUp } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/auth-context";
 import { PageHeader } from "@/components/layout/page-header";
@@ -61,7 +61,6 @@ interface Counts {
   disabledUsers?: number;
   places?: number;
   activePlaces?: number;
-  placesWith360?: number;
   tours?: number;
   pendingReviews?: number;
 }
@@ -104,10 +103,6 @@ export default function DashboardPage() {
             query(collection(db, "places"), where("isActive", "==", true))
           );
           next.activePlaces = activeSnap.data().count;
-          const with360Snap = await getCountFromServer(
-            query(collection(db, "places"), where("has360", "==", true))
-          );
-          next.placesWith360 = with360Snap.data().count;
           const toursSnap = await getCountFromServer(collection(db, "tours"));
           next.tours = toursSnap.data().count;
         }
@@ -211,13 +206,6 @@ export default function DashboardPage() {
               tone="success"
             />
             <StatCard
-              label="Địa điểm có VR 360°"
-              value={counts.placesWith360 ?? 0}
-              icon={ImagePlay}
-              loading={loading}
-              tone="brand"
-            />
-            <StatCard
               label="Tour gợi ý"
               value={counts.tours ?? 0}
               icon={Package}
@@ -272,7 +260,7 @@ export default function DashboardPage() {
                 href="/places"
                 className="flex items-center justify-between rounded-lg border border-border px-3 py-2.5 text-sm hover:bg-surface-muted"
               >
-                <span>Quản lý địa điểm & gắn ảnh 360°</span>
+                <span>Quản lý địa điểm</span>
                 <ArrowRight className="h-4 w-4 text-muted-foreground" />
               </Link>
               {can.moderateReviews && (

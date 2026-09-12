@@ -22,7 +22,7 @@ interface AuthContextValue {
   role: UserRole | null;
   can: {
     manageUsers: boolean; // admin, support
-    manageContent: boolean; // admin, content_editor (places, tours, media360, featured)
+    manageContent: boolean; // admin, content_editor (places, tours, featured)
     moderateReviews: boolean; // admin, support
     manageRoles: boolean; // admin only
   };

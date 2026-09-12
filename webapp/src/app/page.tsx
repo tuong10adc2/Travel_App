@@ -18,7 +18,6 @@ import {
   Sparkles,
   Compass,
   MessageCircle,
-  View,
   CalendarRange,
   Languages,
   ArrowRight,
@@ -36,7 +35,6 @@ export default function HomePage() {
 
   const FEATURES = [
     { icon: MessageCircle, title: t("home.feature1Title"), desc: t("home.feature1Desc") },
-    { icon: View, title: t("home.feature2Title"), desc: t("home.feature2Desc") },
     { icon: CalendarRange, title: t("home.feature3Title"), desc: t("home.feature3Desc") },
     { icon: Languages, title: t("home.feature4Title"), desc: t("home.feature4Desc") },
   ];
@@ -44,7 +42,7 @@ export default function HomePage() {
   const [search, setSearch] = useState("");
   const [featured, setFeatured] = useState<Place[]>([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
-  const [stats, setStats] = useState({ places: 0, with360: 0, tours: 0 });
+  const [stats, setStats] = useState({ places: 0, tours: 0 });
 
   useEffect(() => {
     const q = query(
@@ -68,16 +66,12 @@ export default function HomePage() {
   useEffect(() => {
     async function loadStats() {
       try {
-        const [placesSnap, with360Snap, toursSnap] = await Promise.all([
+        const [placesSnap, toursSnap] = await Promise.all([
           getCountFromServer(query(collection(db, "places"), where("isActive", "==", true))),
-          getCountFromServer(
-            query(collection(db, "places"), where("isActive", "==", true), where("has360", "==", true))
-          ),
           getCountFromServer(query(collection(db, "tours"), where("isActive", "==", true))),
         ]);
         setStats({
           places: placesSnap.data().count,
-          with360: with360Snap.data().count,
           tours: toursSnap.data().count,
         });
       } catch {
@@ -151,10 +145,9 @@ export default function HomePage() {
 
       {/* Stats */}
       <section className="border-b border-border bg-surface">
-        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-6 px-4 py-10 sm:px-6 md:grid-cols-4 lg:px-8">
+        <div className="mx-auto grid max-w-5xl grid-cols-3 gap-6 px-4 py-10 sm:px-6 lg:px-8">
           {[
             { value: `${stats.places}+`, label: t("home.statPlaces") },
-            { value: `${stats.with360}`, label: t("home.stat360") },
             { value: `${stats.tours}+`, label: t("home.statTours") },
             { value: "24/7", label: t("home.statAi") },
           ].map((s, i) => (
@@ -176,7 +169,7 @@ export default function HomePage() {
             {t("home.featuresSubtitle")}
           </p>
         </Reveal>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           {FEATURES.map((f, i) => (
             <Reveal key={f.title} delay={i * 90}>
               <div className="group h-full rounded-2xl border border-border bg-surface p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/5">

@@ -300,15 +300,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get placeNotFound => 'Không tìm thấy địa điểm.';
 
   @override
-  String get vr360Badge => '360° VR';
-
-  @override
   String reviewCountParen(Object count) {
     return '($count đánh giá)';
   }
-
-  @override
-  String get experienceVr360Button => 'Trải nghiệm ngay 360°';
 
   @override
   String get introductionHeading => 'Giới thiệu';
@@ -425,40 +419,6 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String reviewsLoadError(Object error) {
     return 'Lỗi tải đánh giá: $error';
-  }
-
-  @override
-  String get vr360FallbackTitle => 'VR 360°';
-
-  @override
-  String get gyroMobileOnlyMessage => 'Xoay theo cảm biến chỉ hỗ trợ trên thiết bị di động thật.';
-
-  @override
-  String get gyroOffTooltip => 'Tắt xoay theo cảm biến';
-
-  @override
-  String get gyroOnTooltip => 'Bật xoay theo cảm biến';
-
-  @override
-  String media360LoadError(Object error) {
-    return 'Lỗi tải dữ liệu 360°: $error';
-  }
-
-  @override
-  String get no360ForPlace => 'Chưa có ảnh 360° cho địa điểm này.';
-
-  @override
-  String get viewOtherHotspotTooltip => 'Xem điểm nhìn khác';
-
-  @override
-  String get loading360Message => 'Đang tải ảnh 360°...';
-
-  @override
-  String get rotateHint360 => 'Vuốt hoặc nghiêng thiết bị để xoay 360°';
-
-  @override
-  String viewpointLabel(Object number) {
-    return 'Điểm nhìn $number';
   }
 
   @override

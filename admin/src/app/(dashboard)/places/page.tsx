@@ -12,7 +12,6 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import {
-  Aperture,
   ChevronDown,
   ChevronUp,
   MapPin,
@@ -340,7 +339,6 @@ export default function PlacesPage() {
                         {p.isActive ? "Hoạt động" : "Đã ẩn"}
                       </Badge>
                       {p.isFeatured && <Badge tone="brand">Nổi bật</Badge>}
-                      {p.has360 && <Badge tone="warning">360°</Badge>}
                     </div>
                   </td>
                   <td className="px-5 py-3">
@@ -356,11 +354,6 @@ export default function PlacesPage() {
                           >
                             <Star className="h-3.5 w-3.5" />
                           </Button>
-                          <Link href={`/places/${p.id}/media360`}>
-                            <Button variant="outline" size="sm" title="Ảnh 360°">
-                              <Aperture className="h-3.5 w-3.5" />
-                            </Button>
-                          </Link>
                           <Link href={`/places/${p.id}`}>
                             <Button variant="outline" size="sm" title="Sửa">
                               <Pencil className="h-3.5 w-3.5" />

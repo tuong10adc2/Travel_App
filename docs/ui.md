@@ -19,9 +19,6 @@
   cache ảnh, fade-in 250ms khi tải xong, icon lỗi khi ảnh hỏng — thay cho `Image.network` trần (không
   cache, không placeholder, mạng chậm ra khoảng trắng). Áp dụng ở `place_card.dart`, `tour_card.dart`,
   `place_detail_screen.dart`, `tour_detail_screen.dart`, `add_place_to_itinerary_screen.dart`.
-- **Không đổi** `vr360_viewer_screen.dart` — package `panorama` yêu cầu type `Image` cụ thể (đọc thẳng
-  `.image` để dựng texture 360°), không nhận widget chung chung như `AppNetworkImage`; màn này đã có
-  cơ chế loading riêng (`precacheImage` + skeleton) từ trước nên giữ nguyên.
 - **Không đổi** `profile_screen.dart`'s `CircleAvatar.backgroundImage` — nhận `ImageProvider`, không
   nhận widget.
 
@@ -41,8 +38,7 @@
   có 4 ô số liệu tĩnh.
 - `admin/src/contexts/confirm-context.tsx`: `ConfirmProvider` + `useConfirm()` — modal xác nhận đồng bộ
   style với app thay cho `confirm()` gốc của trình duyệt (đã phá vỡ giao diện custom mỗi lần xoá địa
-  điểm/tour/đánh giá/điểm nhìn 360°). Áp dụng ở `places/page.tsx`, `reviews/page.tsx`, `tours/page.tsx`,
-  `places/[id]/media360/page.tsx`.
+  điểm/tour/đánh giá). Áp dụng ở `places/page.tsx`, `reviews/page.tsx`, `tours/page.tsx`.
 
 Đã verify: `flutter analyze` sạch, `flutter build web` build được; admin `tsc --noEmit`, `npm run lint`,
 `npm run build` đều sạch.
@@ -65,9 +61,8 @@
   hướng dẫn "Preventing Flash Before Hydration" của chính Next.js phiên bản đang dùng).
 - Quét toàn bộ 2 project thay `bg-white`/`bg-slate-*` dùng làm **nền chrome trung tính** (card, input,
   dropdown, modal, skeleton) sang `bg-surface`/`bg-surface-muted`. **Giữ nguyên** `text-white`/`bg-white/
-  NN` khi nó nằm trong section màu thương hiệu cố định (hero gradient, banner CTA, badge nổi trên ảnh),
-  `bg-black/NN` (lớp phủ cho dễ đọc chữ trên ảnh), và toàn bộ `vr360/page.tsx` (trình xem VR nền đen cố
-  ý, không phải chrome trang) — những màu này đúng ở cả 2 theme nên không cần đổi.
+  NN` khi nó nằm trong section màu thương hiệu cố định (hero gradient, banner CTA, badge nổi trên ảnh)
+  và `bg-black/NN` (lớp phủ cho dễ đọc chữ trên ảnh) — những màu này đúng ở cả 2 theme nên không cần đổi.
 - `admin/src/components/ui/activity-chart.tsx`: đổi màu series từ hex cứng sang `var(--brand-600)`/
   `var(--warning-600)` để chart tự đổi màu theo theme luôn, không cần logic JS phát hiện dark mode.
 

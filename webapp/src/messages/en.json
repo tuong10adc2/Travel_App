@@ -44,7 +44,6 @@
     "aiFeaturesHeading": "AI features",
     "aiChat": "Ask the AI assistant",
     "smartGuide": "Smart guidance",
-    "preview360": "360° preview",
     "accountHeading": "Account",
     "profile": "Profile",
     "copyright": "© {year} TngGuide. Your smart travel assistant for exploring Vietnam."
@@ -59,15 +58,12 @@
     "askAi": "Ask the AI assistant",
     "viewSuggestedTours": "View suggested tours",
     "statPlaces": "Places & landmarks",
-    "stat360": "360° VR experiences",
     "statTours": "Ready-made tours",
     "statAi": "AI by your side",
     "featuresTitle": "The future of exploring",
     "featuresSubtitle": "Refined technology blended with local know-how.",
     "feature1Title": "AI Q&A assistant",
     "feature1Desc": "Ask about history, culture, food, or hidden gems — the AI suggests places matched to your taste.",
-    "feature2Title": "360° VR experience",
-    "feature2Desc": "Preview the real space of each place before you arrive, with smooth 360° rotation.",
     "feature3Title": "Smart itineraries",
     "feature3Desc": "Build day-by-day plans, freely add and reorder stops, and turn suggested tours into your own journey.",
     "feature4Title": "Multilingual",
@@ -95,12 +91,7 @@
     "visitDuration": "{hours}h visit",
     "free": "Free",
     "openingHours": "Opening hours",
-    "experienceVr360": "Experience 360° VR",
     "askAiAboutPlace": "Ask the AI about this place"
-  },
-  "vr360": {
-    "back": "Back",
-    "empty": "This place doesn't have 360° photos yet."
   },
   "tours": {
     "title": "Suggested tours",

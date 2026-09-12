@@ -7,10 +7,10 @@
 > API Routes, miễn phí, không cần thẻ) — **giữ nguyên toàn bộ Firestore/Firebase Auth/schema/rules
 > hiện có**, vì các phần đó không cần Blaze và đang chạy tốt, không đụng vào.
 >
-> **Không giải quyết được bằng cách này**: Firebase Storage (VR 360°, Giai đoạn 4) nhiều khả năng
-> cũng yêu cầu Blaze để tạo bucket mới — đây là vấn đề riêng, chưa nằm trong phạm vi file này. Nếu
-> muốn né luôn cả phần đó, sẽ cần thêm 1 bước di chuyển Storage sang dịch vụ khác (Supabase Storage /
-> Cloudflare R2) — bàn sau nếu cần.
+> **Cập nhật 2026-09-12**: Firebase Storage (từng cần cho VR 360°, Giai đoạn 4) cũng không bật được
+> vì cùng nguyên nhân Blaze — nhưng khác với AI, không có hướng né tương đương (Vercel không thay
+> được chỗ lưu file lớn của Firebase). Thay vì di chuyển Storage sang dịch vụ khác, chủ đồ án quyết
+> định bỏ hẳn tính năng VR 360° khỏi đồ án — xem `checklist.md` Giai đoạn 4.
 
 ## Việc BẠN cần làm trước (chặn bước deploy cuối)
 

@@ -140,12 +140,10 @@
   "weekdaySun": "Chủ nhật",
 
   "placeNotFound": "Không tìm thấy địa điểm.",
-  "vr360Badge": "360° VR",
   "reviewCountParen": "({count} đánh giá)",
   "@reviewCountParen": {
     "placeholders": { "count": { "type": "Object" } }
   },
-  "experienceVr360Button": "Trải nghiệm ngay 360°",
   "introductionHeading": "Giới thiệu",
   "reviewsHeading": "Đánh giá ({count})",
   "@reviewsHeading": {
@@ -208,23 +206,6 @@
   "reviewsLoadError": "Lỗi tải đánh giá: {error}",
   "@reviewsLoadError": {
     "placeholders": { "error": { "type": "Object" } }
-  },
-
-  "vr360FallbackTitle": "VR 360°",
-  "gyroMobileOnlyMessage": "Xoay theo cảm biến chỉ hỗ trợ trên thiết bị di động thật.",
-  "gyroOffTooltip": "Tắt xoay theo cảm biến",
-  "gyroOnTooltip": "Bật xoay theo cảm biến",
-  "media360LoadError": "Lỗi tải dữ liệu 360°: {error}",
-  "@media360LoadError": {
-    "placeholders": { "error": { "type": "Object" } }
-  },
-  "no360ForPlace": "Chưa có ảnh 360° cho địa điểm này.",
-  "viewOtherHotspotTooltip": "Xem điểm nhìn khác",
-  "loading360Message": "Đang tải ảnh 360°...",
-  "rotateHint360": "Vuốt hoặc nghiêng thiết bị để xoay 360°",
-  "viewpointLabel": "Điểm nhìn {number}",
-  "@viewpointLabel": {
-    "placeholders": { "number": { "type": "Object" } }
   },
 
   "updateProfileFailedMessage": "Cập nhật thất bại, vui lòng thử lại.",

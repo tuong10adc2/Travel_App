@@ -12,7 +12,6 @@ class Place {
   final int ticketPrice;
   final int visitDurationMinutes;
   final bool isFeatured;
-  final bool has360;
   final List<String> images;
   final Map<String, String> openingHours;
 
@@ -28,7 +27,6 @@ class Place {
     required this.ticketPrice,
     required this.visitDurationMinutes,
     required this.isFeatured,
-    required this.has360,
     required this.images,
     required this.openingHours,
   });
@@ -47,7 +45,6 @@ class Place {
       ticketPrice: ((data['ticketPrice'] as num?) ?? 0).toInt(),
       visitDurationMinutes: ((data['visitDurationMinutes'] as num?) ?? 0).toInt(),
       isFeatured: (data['isFeatured'] as bool?) ?? false,
-      has360: (data['has360'] as bool?) ?? false,
       images: List<String>.from(data['images'] as List? ?? const []),
       openingHours: Map<String, String>.from(data['openingHours'] as Map? ?? const {}),
     );

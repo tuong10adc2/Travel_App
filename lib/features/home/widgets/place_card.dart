@@ -68,25 +68,6 @@ class PlaceCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                if (place.has360)
-                  Positioned(
-                    top: AppSpacing.sm,
-                    right: AppSpacing.sm,
-                    child: _Badge(
-                      color: AppColors.primary,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.threed_rotation, size: 12, color: Colors.white),
-                          const SizedBox(width: 2),
-                          Text(
-                            l10n.vr360Badge,
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.white, fontSize: 10),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
               ],
             ),
           ),

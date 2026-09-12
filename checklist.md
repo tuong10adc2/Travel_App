@@ -10,7 +10,7 @@
  
 - [x] Tạo tài khoản/project Firebase mới (Firebase Console)
 - [x] Tạo Flutter project (`flutter create`)
-- [x] Setup cấu trúc thư mục theo feature (`lib/features/...`, `lib/core/...`) — đã có sẵn khung cho auth, home, chat, itinerary, place_detail, profile, review, saved, settings, vr360
+- [x] Setup cấu trúc thư mục theo feature (`lib/features/...`, `lib/core/...`) — đã có sẵn khung cho auth, home, chat, itinerary, place_detail, profile, review, saved, settings
 - [x] Cài `flutterfire_cli`, chạy `flutterfire configure` để sinh `firebase_options.dart` — project `travelapp-7f140`, đã cấu hình android + ios + web
 - [x] Cài package chính: `firebase_core`, `firebase_auth`, `cloud_firestore`, `firebase_storage`, `go_router`, state management (Riverpod hoặc Bloc) — đã thêm vào `pubspec.yaml` (kèm `google_sign_in`, `flutter_dotenv`)
 - [x] Setup theme (màu, font, spacing dùng chung) — `lib/core/theme/app_theme.dart`
@@ -20,7 +20,7 @@
 > Đã làm thêm (chưa thuộc giai đoạn 0 nhưng dựng khung sẵn): `app_router.dart` (go_router) với 2 route `/` (Splash) và `/home`, `SplashScreen` và `HomeScreen` mới là UI placeholder tĩnh, chưa có logic/dữ liệu thật.
 ## GIAI ĐOẠN 1 — Database & Auth
  
-- [x] Từ file ERD, thiết kế collection Firestore: `users`, `places`, `media_360`, `tours`, `itineraries` (với sub-collection `itinerary_items`), `reviews`, `saved_places`, `chat_history` — xem `docs/erd-database.mermaid` và `docs/firestore-schema.md`
+- [x] Từ file ERD, thiết kế collection Firestore: `users`, `places`, `tours`, `itineraries` (với sub-collection `itinerary_items`), `reviews`, `saved_places`, `chat_history` — xem `docs/erd-database.mermaid` và `docs/firestore-schema.md`
 - [x] Viết Firestore Security Rules cơ bản cho từng collection (đọc/ghi theo `request.auth.uid`, role admin) — `firestore.rules` (đã validate compile thành công), index đề xuất tại `firestore.indexes.json`
 - [x] Setup Firebase Authentication (Email/password) — code: `lib/features/auth/data/auth_repository.dart` (+ `firebase_providers.dart`, `auth_exception.dart`); provider Email/Password đã bật trên Firebase Console (xác nhận bằng screenshot)
 - [x] Setup đăng nhập Google (OAuth) qua Firebase Auth (Android — dự án chỉ target Android, bỏ iOS/Web) — code `AuthRepository.signInWithGoogle()` đã xong; provider Google đã bật trên Console; đã tạo debug keystore + đăng ký SHA-1 debug (`CB:6C:C8:49:84:4B:85:C6:CC:98:86:CA:BC:81:BA:46:23:C4:61:5F`) qua `firebase apps:android:sha:create`, tải lại `android/app/google-services.json` (đã có `oauth_client`)
@@ -48,8 +48,17 @@
 - [x] Màn hình Chat (UI hội thoại) — `chat_screen.dart`: bong bóng chat trái/phải, ô nhập + nút gửi, chỉ báo "đang gõ" khi chờ AI trả lời, tự cuộn xuống tin mới, empty state khi chưa có hội thoại; nối tab "Trợ lý" trên bottom nav (trước đó "đang phát triển")
 - [x] AI trả về gợi ý địa điểm dạng card (không chỉ text thuần) — dùng **tool use** của Claude: tool `suggest_places(placeIds: string[])`, model tự quyết định gọi khi muốn giới thiệu địa điểm cụ thể thay vì liệt kê tên suông trong văn bản; server lọc lại `placeIds` theo đúng danh sách địa điểm thật (chặn model "bịa" id) rồi trả về client; `chat_message_bubble.dart` render `suggestedPlaceIds` thành dải `PlaceCard` cuộn ngang ngay dưới tin nhắn, bấm vào điều hướng sang `/place/:id` (tái dùng nguyên `PlaceCard` + `placesByIdProvider` đã có từ Giai đoạn 5/6, không thêm code hiển thị mới)
 - [x] Test: hỏi AI về địa điểm → nhận gợi ý → bấm vào xem chi tiết — **Blaze không bật được** (Google từ chối thanh toán nhiều ngân hàng khác nhau, lỗi hồ sơ chứ không phải thẻ) nên đã chuyển toàn bộ logic từ Cloud Function sang Next.js API Route trong `webapp/` (deploy Vercel, miễn phí, không cần Blaze) — xem `migration-vercel-ai.md`. Đã test thật đầu-cuối trên cả webapp và app Flutter thật: hỏi AI → nhận gợi ý địa điểm dạng card → hiển thị đúng dữ liệu thật. `functions/` gốc vẫn giữ nguyên không xoá, phòng khi Blaze bật được thì quay lại dùng.
-## GIAI ĐOẠN 4 — VR 360°
- 
+## GIAI ĐOẠN 4 — VR 360° (ĐÃ BỎ KHỎI ĐỒ ÁN — 2026-09-12)
+
+> **Quyết định**: Sau khi Firebase Storage không bật được (cùng nguyên nhân Blaze bị chặn như Giai
+> đoạn 3, không có hướng né tương đương như Vercel cho Cloud Functions), chủ đồ án quyết định bỏ hẳn
+> tính năng VR 360° thay vì tiếp tục tìm giải pháp thay thế (vd Cloudflare R2/Supabase Storage). Toàn
+> bộ code liên quan đã được gỡ khỏi 3 client (Flutter: `lib/features/vr360/`, package `panorama` +
+> `motion_sensors`; Web: `/places/[id]/vr360`, `@photo-sphere-viewer/*`; Admin:
+> `places/[id]/media360`), field `has360`/collection `media_360`, rule Firestore/Storage liên quan, và
+> script seed `scripts/seed_vr360/`. Các mục bên dưới giữ nguyên làm hồ sơ những gì đã từng làm được
+> trước khi gỡ (đóng góp cho phần "quá trình phát triển" của báo cáo đồ án nếu cần).
+
 - [x] Chuẩn bị ảnh 360° (equirectangular, tỷ lệ 2:1) cho 3-5 địa điểm demo — chưa có ảnh thật nên **tạo ảnh placeholder equirectangular bằng script** (`scripts/seed_vr360/generate_images.py`, Python + Pillow: gradient trời/đất seamless trái-phải + tên địa điểm), cùng triết lý với `PlaceImagePlaceholder` ở Giai đoạn 2 (placeholder rõ ràng, thay bằng ảnh 360° thật sau). 6 ảnh cho 5 địa điểm: Vịnh Hạ Long (2 điểm nhìn: "Trên biển" + "Đỉnh núi", để test hotspot), Hội An, Đà Lạt, Sa Pa, Phú Quốc — nằm ở `scripts/seed_vr360/images/`
 - [ ] Upload ảnh lên Firebase Storage, tạo document trong collection `media_360` — **chưa làm được**: Firebase Storage chưa từng bật ở Console cho project `travelapp-7f140` (bấm "Get Started" tại https://console.firebase.google.com/project/travelapp-7f140/storage), giống hệt tình huống Blaze ở Giai đoạn 3. Đã chuẩn bị sẵn toàn bộ để chạy ngay khi bạn bật: `storage.rules` (đọc công khai `media_360/**`, ghi giới hạn `admin`/`content_editor` qua `firestore.get()` cross-service rule) + đã thêm `"storage"` vào `firebase.json`; script seed `scripts/seed_vr360/seed.mjs` (Node, `npm install` đã chạy sẵn trong thư mục đó) tự tạo tài khoản test tạm, upload 6 ảnh, tạo đúng 6 doc `media_360`, gắn hotspot 2 chiều cho Hạ Long, bật `has360=true` cho 5 địa điểm. **Cần làm khi seed**: tạm nới `allow create, update, delete` của `places`/`media_360` trong `firestore.rules` thành `isContentEditor() || isSignedIn()`, `firebase deploy --only firestore:rules,storage`, chạy `node scripts/seed_vr360/seed.mjs`, rồi trả `firestore.rules` về bản gốc và deploy lại (đúng quy trình đã dùng ở Giai đoạn 2/6 khi seed `places`/`tours`)
 - [x] Cài package `panorama` (0.4.1, dùng `flutter_cube` + `motion_sensors`) — **phát hiện + sửa bug thật khi build**: `motion_sensors` 0.1.0 (bản pub.dev mới nhất, đã bỏ hoang ~5 năm) khai báo cứng Kotlin Gradle plugin 1.3.50 trong `android/build.gradle`, không tương thích AGP hiện tại của project → `flutter build apk` fail ngay với lỗi "The Android Gradle plugin supports only Kotlin Gradle plugin version 1.5.20 and higher". Sửa bằng cách vendor lại 1 bản local ở `third_party/motion_sensors` (chỉ sửa `android/build.gradle` sang cú pháp `plugins {}` hiện đại, dùng chung Kotlin version với root project thay vì tự khai buildscript riêng; giữ nguyên code Dart/plugin logic), trỏ qua `dependency_overrides` trong `pubspec.yaml`. Đã build sạch cả `flutter build apk --debug` lẫn `flutter build web`; loại `third_party/**` khỏi `flutter analyze` qua `analysis_options.yaml`
@@ -58,7 +67,7 @@
 - [x] Thêm loading/skeleton khi ảnh đang tải — `precacheImage()` + `_LoadingSkeleton` (nền tối + spinner + text) hiện trong lúc tải, tránh khung hình trắng/đen giật cục khi `Panorama` nạp texture
 - [x] Nối nút "Trải nghiệm ngay" từ màn Chi tiết địa điểm → mở VR viewer với dữ liệu thật — nút `OutlinedButton` "Trải nghiệm ngay 360°" chỉ hiện khi `place.has360 == true`, điều hướng `/place/:id/vr360` (`Vr360ViewerScreen` đọc trực tiếp từ `media360ForPlaceProvider`, không có mock)
 - [x] (Tuỳ chọn) Thêm hotspot liên kết nhiều điểm nhìn trong cùng địa điểm — field `hotspots` (`targetMediaId`, `yaw`, `pitch`, `label`) trên `media_360` render thành icon `Icons.explore` nổi trong không gian 360° (dùng `Panorama.hotspots`), bấm vào chuyển sang điểm nhìn khác cùng địa điểm; kèm dải `ChoiceChip` chọn nhanh điểm nhìn ở dưới màn hình khi địa điểm có >1 điểm nhìn
-- [ ] Test trên thiết bị thật (Android + iOS nếu có) — **chưa test được đầu-cuối** (cần dữ liệu thật từ bước Storage ở trên trước): đã xác nhận `flutter analyze` sạch, `flutter build web` và `flutter build apk --debug` đều build thành công (APK cài được, `dependency_overrides` hoạt động đúng). Do chưa seed được `media_360`, chưa tự bấm thử luồng "vào địa điểm có ảnh 360° → bấm Trải nghiệm ngay → xoay tay/nghiêng máy → bấm hotspot đổi điểm nhìn" trên app thật — sẽ nhờ chạy lại kiểu Playwright/emulator giống các giai đoạn trước ngay sau khi seed xong.
+- [x] ~~Test trên thiết bị thật~~ — không còn áp dụng, tính năng đã bị bỏ trước khi test được đầu-cuối (xem ghi chú quyết định ở đầu giai đoạn)
 ## GIAI ĐOẠN 5 — Lịch trình & tương tác
  
 - [x] Màn tạo lịch trình mới (chọn ngày bắt đầu, đặt tên) — `lib/features/itinerary/screens/create_itinerary_screen.dart`, form tên + `showDatePicker` chọn ngày bắt đầu; `ItineraryRepository.createItinerary()` tạo doc `itineraries/{id}` với `endDate` mặc định = `startDate` (lịch trình 1 ngày), tự điều hướng sang màn chi tiết sau khi tạo
@@ -91,11 +100,11 @@
 - [x] Setup Auth riêng cho admin — **không dùng Admin SDK/service account** (tránh phải quản lý key nhạy cảm cho 1 đồ án): đăng nhập bằng Firebase Auth client SDK (email/password, dùng chung tài khoản với app), `contexts/auth-context.tsx` đọc field `role` trong `users/{uid}` qua `onSnapshot`, tính quyền theo role (`admin` / `content_editor` / `support`) rồi gate route ở `(dashboard)/layout.tsx`. Bảo mật thật nằm ở `firestore.rules` (role-based), không phải ở lớp guard này. Đã mở rộng rule `users` cho phép `support` khoá/mở tài khoản (`isDisabled`) nhưng không đổi được `role` — khớp đúng phân quyền "Super Admin / Content Editor / Support" trong kế hoạch ban đầu; đã deploy
 - [x] Trang quản lý người dùng — `(dashboard)/users/page.tsx`: tìm theo tên/email, đổi quyền (chỉ admin), khoá/mở tài khoản (admin + support), link nhanh sang "Xem đánh giá" của từng user (lọc `reviews` theo `userId`)
 - [x] Trang CRUD địa điểm/tour — `place-form.tsx`/`tour-form.tsx` dùng chung cho tạo/sửa: tag, giờ mở cửa theo từng ngày, giá vé, thời gian tham quan, toạ độ, ảnh bìa (upload Storage hoặc dán URL trực tiếp — dán URL luôn hoạt động kể cả khi Storage chưa bật), thư viện ảnh; danh sách có bật/tắt nổi bật/hoạt động, xoá có xác nhận
-- [x] Trang upload & gắn ảnh 360° — `places/[id]/media360/page.tsx`: thêm điểm nhìn (ảnh 360° qua upload hoặc URL), chỉnh hotspot liên kết giữa các điểm nhìn cùng địa điểm (chọn điểm đích + yaw/pitch), tự đồng bộ `has360` trên `places` theo số điểm nhìn còn lại
+- [x] ~~Trang upload & gắn ảnh 360°~~ — `places/[id]/media360/page.tsx` đã bị xoá cùng lúc gỡ VR 360° khỏi đồ án (xem Giai đoạn 4)
 - [x] Trang duyệt/ẩn/xoá đánh giá — `reviews/page.tsx`: tab Chờ duyệt/Đã duyệt/Đã ẩn/Tất cả, join tên người đánh giá + tên địa điểm/tour, hỗ trợ lọc theo `?userId=` từ trang Người dùng
 - [x] Trang chọn nội dung nổi bật — gộp vào trang Địa điểm (nút bật/tắt "Nổi bật" ngay trong danh sách) thay vì làm trang riêng, vì hệ thống hiện chưa có collection banner/tin tức trong ERD nên không có gì khác để quản lý ở mục này
-- [x] Trang thống kê cơ bản — `(dashboard)/page.tsx`: số người dùng, địa điểm đang hoạt động/tổng, địa điểm có VR 360°, số tour, số đánh giá chờ duyệt (dùng `getCountFromServer`, không tốn đọc toàn bộ document); thêm trang **Nhật ký thao tác** (`audit-log`, admin-only) ghi lại các hành động quản trị (tạo/sửa/xoá địa điểm-tour, khoá/mở tài khoản, duyệt/ẩn đánh giá) vào collection mới `audit_logs` (đã thêm rule + deploy)
-- [x] Test luồng: đăng nhập admin → thêm địa điểm mới → kiểm tra hiện trên app — build/lint sạch, sau đó test thật bằng Playwright trên dữ liệu Firestore thật của project (`travelapp-7f140`), không mock: đăng nhập → tất cả trang điều hướng đúng theo role → tạo địa điểm mới → hiện ngay trong danh sách (đã xoá dọn sau test) → duyệt 1 đánh giá thật → ghi đúng vào Nhật ký thao tác → thêm ảnh 360° + hotspot cho "Vịnh Hạ Long". Không còn lỗi console. **Phát hiện + đã sửa 1 bug thật khi test**: trang ảnh 360° ghi được vào Firestore nhưng danh sách không hiển thị lại do thiếu composite index (`media_360`: `placeId` + `order`) và lỗi `onSnapshot` bị nuốt âm thầm không báo — đã thêm index (đã deploy) và sửa để lỗi hiện toast + `console.error` rõ ràng thay vì im lặng, áp dụng luôn cho các trang danh sách khác (Địa điểm/Tour/Đánh giá/Nhật ký). **Lưu ý**: "Trang CRUD địa điểm/tour" upload ảnh qua Storage sẽ báo lỗi nhẹ nhàng (gợi ý dán URL thay thế) cho tới khi Firebase Storage được bật (xem việc cần làm Giai đoạn 4); chưa test tay trên trình duyệt thật ngoài Playwright headless.
+- [x] Trang thống kê cơ bản — `(dashboard)/page.tsx`: số người dùng, địa điểm đang hoạt động/tổng, số tour, số đánh giá chờ duyệt (dùng `getCountFromServer`, không tốn đọc toàn bộ document); thêm trang **Nhật ký thao tác** (`audit-log`, admin-only) ghi lại các hành động quản trị (tạo/sửa/xoá địa điểm-tour, khoá/mở tài khoản, duyệt/ẩn đánh giá) vào collection mới `audit_logs` (đã thêm rule + deploy)
+- [x] Test luồng: đăng nhập admin → thêm địa điểm mới → kiểm tra hiện trên app — build/lint sạch, sau đó test thật bằng Playwright trên dữ liệu Firestore thật của project (`travelapp-7f140`), không mock: đăng nhập → tất cả trang điều hướng đúng theo role → tạo địa điểm mới → hiện ngay trong danh sách (đã xoá dọn sau test) → duyệt 1 đánh giá thật → ghi đúng vào Nhật ký thao tác. Không còn lỗi console. **Lưu ý**: "Trang CRUD địa điểm/tour" upload ảnh qua Storage sẽ báo lỗi nhẹ nhàng (gợi ý dán URL thay thế) vì Firebase Storage chưa từng bật cho project; chưa test tay trên trình duyệt thật ngoài Playwright headless.
 ## GIAI ĐOẠN 8 — Web (Next.js)
 
 > `webapp/` (tách biệt hoàn toàn với `web/` — đó là thư mục nền tảng Web của Flutter, không đụng tới).
@@ -104,13 +113,13 @@
 > bố cục hero/stat/card tham khảo layout ảnh mẫu "VietGuide AI" người dùng gửi. Tối ưu cho desktop
 > (container rộng, grid nhiều cột, sidebar sticky ở trang chi tiết) nhưng vẫn responsive xuống mobile.
 
-- [x] Tạo project Next.js cho Web người dùng — `webapp/`, đăng ký thêm 1 Firebase Web App riêng "TravelAI Web"; cài `@photo-sphere-viewer/core` + `markers-plugin` cho VR 360°
-- [x] Landing page giới thiệu — hero gradient + ô tìm kiếm, dải thống kê **lấy số thật từ Firestore** (`getCountFromServer`, không hardcode), khối tính năng (AI/VR/Lịch trình/Đa ngôn ngữ), địa điểm nổi bật, CTA cuối trang
+- [x] Tạo project Next.js cho Web người dùng — `webapp/`, đăng ký thêm 1 Firebase Web App riêng "TravelAI Web"
+- [x] Landing page giới thiệu — hero gradient + ô tìm kiếm, dải thống kê **lấy số thật từ Firestore** (`getCountFromServer`, không hardcode), khối tính năng (AI/Lịch trình/Đa ngôn ngữ), địa điểm nổi bật, CTA cuối trang
 - [x] Trang Khám phá — `/explore`: tìm theo tên/địa chỉ + lọc tag, grid 4 cột ở desktop, đọc trực tiếp Firestore `places` (không qua API riêng, đúng kiến trúc "1 backend nhiều client")
-- [x] Trang Chi tiết địa điểm — `/places/[id]`: gallery ảnh, giờ mở cửa (rút gọn "Cả tuần" nếu giống nhau, giống logic app Flutter), nút Lưu (tim), nút "Thêm vào lịch trình" (chọn lịch trình + ngày có sẵn), khối đánh giá (viết/sửa đánh giá của mình + danh sách đã duyệt), CTA "Trải nghiệm VR 360°" khi `has360`
+- [x] Trang Chi tiết địa điểm — `/places/[id]`: gallery ảnh, giờ mở cửa (rút gọn "Cả tuần" nếu giống nhau, giống logic app Flutter), nút Lưu (tim), nút "Thêm vào lịch trình" (chọn lịch trình + ngày có sẵn), khối đánh giá (viết/sửa đánh giá của mình + danh sách đã duyệt)
 - [x] Trang Tour — `/tours` (list) + `/tours/[id]` (chi tiết, danh sách địa điểm, đánh giá, nút "Thêm vào lịch trình của tôi" tự tạo lịch trình mới + chia đều địa điểm theo số ngày, giống hệt logic `createItineraryFromTour` bên Flutter)
 - [x] Trang Chat AI — `/chat`: giao diện hội thoại, lưu lịch sử vào đúng path `users/{uid}/chat_history/default/messages` (khớp schema Flutter dùng chung), gợi ý địa điểm dạng card khi AI trả tool `suggest_places`. **Chưa gọi được thật** vì Cloud Functions vẫn chờ bạn bật Blaze (xem việc cần làm Giai đoạn 3) — đã xử lý graceful: bắt lỗi và hiện toast thông báo trợ lý chưa khả dụng thay vì crash
-- [x] Trang VR 360° — `/places/[id]/vr360`: dùng `@photo-sphere-viewer/core`, hotspot từ Admin (yaw/pitch/targetMediaId) chuyển thành marker bấm được để nhảy giữa các điểm nhìn cùng địa điểm, dải chip chọn nhanh điểm nhìn khi có nhiều hơn 1
+- [x] ~~Trang VR 360°~~ — `/places/[id]/vr360` đã bị xoá cùng lúc gỡ VR 360° khỏi đồ án (xem Giai đoạn 4)
 - [x] Trang Lịch trình — `/itineraries` (danh sách + xoá) , `/itineraries/new` (tạo), `/itineraries/[id]` (thêm địa điểm theo ngày qua modal tìm kiếm, xoá, **kéo-thả sắp xếp lại thứ tự trong ngày** bằng HTML5 drag-and-drop, "+ Thêm ngày" nới `endDate`)
 - [x] Trang Đã lưu (`/saved`) và Hồ sơ cá nhân (`/profile`: sửa họ tên/số điện thoại/ngôn ngữ, đăng xuất) — làm thêm ngoài checklist gốc vì đây là chức năng "đầy đủ" của app cần có trên web
 - [x] Responsive kiểm tra trên mobile/tablet/desktop — Tailwind responsive classes (`sm:`/`lg:`) xuyên suốt, navbar có menu mobile riêng; **mới kiểm tra kỹ ở viewport desktop (1400px)** qua Playwright, chưa test tay trên thiết bị mobile/tablet thật
@@ -130,15 +139,16 @@
 ## Ghi chú
 - Sau mỗi giai đoạn: **commit Git riêng**, đặt tên rõ ràng (vd: `feat: hoan thanh giai doan 2 - trang chu`)
 - Sau mỗi giai đoạn: **commit Git riêng**, đặt tên rõ ràng (vd: `feat: hoan thanh giai doan 2 - trang chu`)
-- Nếu thiếu thời gian: có thể bỏ Giai đoạn 4 (VR 360°) và phần Push notification ở Giai đoạn 9 để rút gọn — vẫn đủ chức năng cốt lõi cho 1 đồ án hoàn chỉnh
+- Giai đoạn 4 (VR 360°) đã được bỏ khỏi đồ án (2026-09-12, xem ghi chú ở đầu giai đoạn) — không cần thời gian dự phòng cho mục này nữa
 - Luôn tự chạy thử app thật sau khi vibe code xong mỗi mục, không chỉ tin AI báo "xong"
 
-## Việc cần tự làm (Giai đoạn 4) — làm xong báo lại để mình tiếp tục
+## Việc cần tự làm
 
 **Giai đoạn 3 — Trợ lý AI: ĐÃ XONG**, không cần Blaze nữa — xem `migration-vercel-ai.md` (đã chuyển
 sang Vercel, đã test thật đầu-cuối trên webapp + app Flutter, kèm push notification + kiểm duyệt
-review bằng AI).
+review bằng AI, và cá nhân hoá gợi ý theo sở thích/lịch sử người dùng).
 
-**Giai đoạn 4 — VR 360°:** (vẫn cần Firebase Storage, không liên quan tới phần AI đã chuyển đi)
-1. Bật **Firebase Storage** cho project: vào https://console.firebase.google.com/project/travelapp-7f140/storage, bấm "Get Started" (chọn chế độ Production, location gần VN vd `asia-southeast1`).
-2. Báo lại để mình: deploy `storage.rules` + tạm nới `firestore.rules`, chạy `scripts/seed_vr360/seed.mjs` để upload 6 ảnh 360° demo + tạo dữ liệu `media_360`, rồi khôi phục `firestore.rules` về bản gốc và test luồng "vào địa điểm có 360° → Trải nghiệm ngay → xoay/gyroscope → đổi điểm nhìn qua hotspot".
+**Giai đoạn 4 — VR 360°: ĐÃ BỎ KHỎI ĐỒ ÁN** (2026-09-12) — không còn việc gì cần làm ở mục này, xem
+ghi chú quyết định ở đầu Giai đoạn 4.
+
+Không còn việc nào đang chờ bạn làm.

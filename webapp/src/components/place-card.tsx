@@ -21,11 +21,6 @@ export function PlaceCard({ place }: { place: Place }) {
           tags={place.tags}
           className="h-full w-full transition-transform duration-300 group-hover:scale-105"
         />
-        {place.has360 && (
-          <Badge tone="brand" className="absolute left-3 top-3 bg-white/90">
-            360°
-          </Badge>
-        )}
         {place.isFeatured && (
           <Badge tone="accent" className="absolute right-3 top-3 bg-white/90">
             {t("common.featured")}

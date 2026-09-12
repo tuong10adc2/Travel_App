@@ -7,11 +7,14 @@
 
 ## Việc BẠN cần làm trước (chặn cả Ngày 1)
 
-Không có bước này thì AI chat + VR 360 không test end-to-end được:
+Không có bước này thì AI chat không test end-to-end được:
 
 - [ ] Bật gói **Blaze** cho project `travelapp-7f140` + set secret `firebase functions:secrets:set ANTHROPIC_API_KEY`
-- [ ] Bật **Firebase Storage** (Console → Storage → Get Started, chọn `asia-southeast1`)
 - [ ] (Nếu làm push notification) Bật **Cloud Messaging** trên Firebase Console, chuẩn bị icon app cho notification
+
+> Cập nhật 2026-09-12: Blaze không bật được (lỗi thanh toán phía Google) nên phần AI/push notification
+> đã chuyển hẳn sang Vercel — xem `migration-vercel-ai.md`, không còn chặn bởi mục Blaze ở trên nữa.
+> VR 360° (từng chặn bởi Firebase Storage) đã bị bỏ khỏi đồ án — xem `checklist.md` Giai đoạn 4.
 
 Báo lại ngay khi xong 1 trong 2 mục để mình chạy tiếp phần phụ thuộc, không cần chờ đủ cả 2.
 
@@ -24,10 +27,8 @@ Báo lại ngay khi xong 1 trong 2 mục để mình chạy tiếp phần phụ 
 - [ ] Test thật luồng "hỏi AI → nhận gợi ý địa điểm → bấm xem chi tiết" (Playwright, cả app + web)
 - [ ] Fix bug phát sinh nếu có (log lỗi Cloud Function qua `firebase functions:log`)
 
-### 1.2 Hoàn tất Giai đoạn 4 (VR 360°) đang dang dở
-- [ ] Deploy `storage.rules`, chạy `scripts/seed_vr360/seed.mjs`, khôi phục `firestore.rules` gốc
-- [ ] Test thật trên thiết bị/emulator: xoay tay, gyroscope, đổi điểm nhìn qua hotspot
-- [ ] Fix bug phát sinh nếu có
+### 1.2 Giai đoạn 4 (VR 360°) — ĐÃ BỎ KHỎI ĐỒ ÁN (2026-09-12)
+Không còn áp dụng — xem ghi chú quyết định ở `checklist.md` Giai đoạn 4.
 
 ### 1.3 Pipeline nhập địa điểm tự động (Hướng AI #1)
 > Mục tiêu: từ 8 địa điểm hiện tại lên vài chục, không gõ tay từng field.

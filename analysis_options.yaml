@@ -11,9 +11,6 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   exclude:
-    # Bản vendor local của `motion_sensors` (xem pubspec.yaml dependency_overrides) —
-    # chỉ patch android/build.gradle, không cần lint code Dart của package này.
-    - third_party/**
     # File sinh tự động bởi `flutter gen-l10n` (xem l10n.yaml) — không lint code
     # mình không viết tay, và bị regenerate lại mỗi lần build.
     - lib/l10n/app_localizations*.dart
