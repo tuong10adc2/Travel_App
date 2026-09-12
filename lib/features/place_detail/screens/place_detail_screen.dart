@@ -15,6 +15,7 @@ import '../../review/widgets/review_list_item.dart';
 import '../../review/widgets/star_rating.dart';
 import '../../saved/widgets/save_toggle_button.dart';
 import '../providers/place_detail_providers.dart';
+import '../widgets/place_map_view.dart';
 
 const _weekdayOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -154,6 +155,11 @@ class _PlaceDetailContentState extends ConsumerState<_PlaceDetailContent> {
                     text: _priceLabel(l10n, place.ticketPrice)),
                 if (place.openingHours.isNotEmpty)
                   _OpeningHours(openingHours: place.openingHours),
+                if (place.latitude != null && place.longitude != null) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  PlaceMapView(
+                      latitude: place.latitude!, longitude: place.longitude!),
+                ],
                 const SizedBox(height: AppSpacing.lg),
                 Text(l10n.introductionHeading,
                     style: Theme.of(context).textTheme.titleMedium),

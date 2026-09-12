@@ -33,7 +33,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get login => 'Log in';
 
   @override
-  String get register => 'Sign up';
+  String get loginSubtitle => 'Sign in with your Google account to start exploring';
 
   @override
   String get emailLabel => 'Email';
@@ -42,19 +42,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emailInvalidError => 'Please enter a valid email';
 
   @override
-  String get passwordLabel => 'Password';
-
-  @override
-  String get passwordTooShortError => 'Password must be at least 6 characters';
-
-  @override
-  String get forgotPasswordLink => 'Forgot password?';
-
-  @override
   String get loginWithGoogle => 'Sign in with Google';
-
-  @override
-  String get noAccountRegisterNow => 'Don\'t have an account? Sign up now';
 
   @override
   String get fullNameLabel => 'Full name';
@@ -63,43 +51,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fullNameRequiredError => 'Please enter your full name';
 
   @override
-  String get confirmPasswordLabel => 'Confirm password';
-
-  @override
-  String get confirmPasswordMismatchError => 'Passwords do not match';
-
-  @override
-  String get haveAccountLoginNow => 'Already have an account? Log in';
-
-  @override
-  String get forgotPasswordTitle => 'Forgot password';
-
-  @override
-  String get forgotPasswordInstructions => 'Enter your registered email and we\'ll send you a password reset link.';
-
-  @override
-  String get sendResetEmailButton => 'Send reset email';
-
-  @override
-  String get resetEmailSentMessage => 'Password reset email sent, please check your inbox.';
-
-  @override
-  String get authErrorInvalidEmail => 'Invalid email.';
-
-  @override
   String get authErrorUserDisabled => 'This account has been disabled.';
-
-  @override
-  String get authErrorUserNotFound => 'No account found with this email.';
-
-  @override
-  String get authErrorWrongPassword => 'Incorrect email or password.';
-
-  @override
-  String get authErrorEmailInUse => 'This email is already registered.';
-
-  @override
-  String get authErrorWeakPassword => 'Password is too weak, it must be at least 6 characters.';
 
   @override
   String get authErrorOperationNotAllowed => 'This sign-in method is not enabled.';

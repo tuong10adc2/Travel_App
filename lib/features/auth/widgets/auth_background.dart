@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Nền ảnh du lịch dùng chung cho các màn auth (Login/Register/Forgot password),
-/// phủ gradient tối để chữ/form phía trên luôn đọc được rõ.
+/// Nền ảnh du lịch dùng cho màn đăng nhập, phủ gradient tối để chữ/form phía
+/// trên luôn đọc được rõ.
 class AuthBackground extends StatelessWidget {
   const AuthBackground({super.key, required this.child});
 

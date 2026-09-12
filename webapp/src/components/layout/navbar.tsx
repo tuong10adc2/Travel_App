@@ -101,18 +101,11 @@ export function Navbar() {
               )}
             </div>
           ) : (
-            <>
-              <Link href="/login">
-                <span className="rounded-lg px-3.5 py-2 text-sm font-medium text-foreground hover:bg-surface-muted">
-                  {t("common.login")}
-                </span>
-              </Link>
-              <Link href="/register">
-                <span className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">
-                  {t("common.register")}
-                </span>
-              </Link>
-            </>
+            <Link href="/login">
+              <span className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">
+                {t("common.login")}
+              </span>
+            </Link>
           )}
         </div>
 
@@ -157,18 +150,11 @@ export function Navbar() {
                 </button>
               </>
             ) : (
-              <div className="mt-2 flex gap-2">
-                <Link href="/login" className="flex-1">
-                  <span className="flex h-10 items-center justify-center rounded-lg border border-border text-sm font-medium">
-                    {t("common.login")}
-                  </span>
-                </Link>
-                <Link href="/register" className="flex-1">
-                  <span className="flex h-10 items-center justify-center rounded-lg bg-brand-600 text-sm font-medium text-white">
-                    {t("common.register")}
-                  </span>
-                </Link>
-              </div>
+              <Link href="/login" className="mt-2 block">
+                <span className="flex h-10 items-center justify-center rounded-lg bg-brand-600 text-sm font-medium text-white">
+                  {t("common.login")}
+                </span>
+              </Link>
             )}
           </nav>
         </div>

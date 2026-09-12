@@ -1,13 +1,8 @@
 {
   "common": {
     "login": "Đăng nhập",
-    "register": "Đăng ký",
-    "registerNow": "Đăng ký ngay",
     "logout": "Đăng xuất",
     "loading": "Đang tải...",
-    "email": "Email",
-    "password": "Mật khẩu",
-    "name": "Họ tên",
     "phone": "Số điện thoại",
     "save": "Lưu",
     "cancel": "Huỷ",
@@ -17,9 +12,6 @@
     "startDate": "Ngày bắt đầu",
     "day": "Ngày {n}",
     "tryAgainLater": "Vui lòng thử lại sau.",
-    "backToLogin": "Quay lại đăng nhập",
-    "emailPlaceholder": "ban@email.com",
-    "passwordPlaceholder": "••••••••",
     "account": "Tài khoản",
     "featured": "Nổi bật",
     "durationHours": "{h}h",
@@ -91,6 +83,7 @@
     "visitDuration": "{hours} giờ tham quan",
     "free": "Miễn phí",
     "openingHours": "Giờ mở cửa",
+    "mapHeading": "Vị trí trên bản đồ",
     "askAiAboutPlace": "Hỏi trợ lý AI về địa điểm này"
   },
   "tours": {
@@ -183,35 +176,10 @@
   },
   "login": {
     "title": "Chào mừng trở lại",
-    "subtitle": "Đăng nhập để tiếp tục hành trình",
-    "forgotPassword": "Quên mật khẩu?",
-    "noAccount": "Chưa có tài khoản?",
-    "errorInvalidEmail": "Email không hợp lệ.",
-    "errorWrongCredential": "Email hoặc mật khẩu không đúng.",
+    "subtitle": "Đăng nhập bằng tài khoản Google để tiếp tục hành trình",
+    "withGoogle": "Đăng nhập với Google",
     "errorTooManyRequests": "Bạn đã thử sai quá nhiều lần, vui lòng thử lại sau.",
     "errorDefault": "Đăng nhập thất bại. Vui lòng thử lại."
-  },
-  "register": {
-    "title": "Tạo tài khoản",
-    "subtitle": "Bắt đầu hành trình khám phá của bạn",
-    "namePlaceholder": "Nguyễn Văn A",
-    "passwordHint": "Tối thiểu 6 ký tự",
-    "confirmPassword": "Xác nhận mật khẩu",
-    "haveAccount": "Đã có tài khoản?",
-    "errorPasswordMismatch": "Mật khẩu xác nhận không khớp.",
-    "errorEmailInUse": "Email này đã được đăng ký.",
-    "errorInvalidEmail": "Email không hợp lệ.",
-    "errorWeakPassword": "Mật khẩu quá yếu, cần ít nhất 6 ký tự.",
-    "errorDefault": "Đăng ký thất bại. Vui lòng thử lại."
-  },
-  "forgotPassword": {
-    "title": "Quên mật khẩu",
-    "subtitle": "Nhập email để nhận liên kết đặt lại mật khẩu",
-    "sentMessagePrefix": "Đã gửi email đặt lại mật khẩu tới",
-    "sentMessageSuffix": "Kiểm tra hộp thư của bạn.",
-    "sendLink": "Gửi liên kết đặt lại",
-    "error": "Không thể gửi email đặt lại mật khẩu. Kiểm tra lại địa chỉ email.",
-    "backToLogin": "Quay lại đăng nhập"
   },
   "reviews": {
     "heading": "Đánh giá",

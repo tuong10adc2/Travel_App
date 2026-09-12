@@ -143,11 +143,11 @@ abstract class AppLocalizations {
   /// **'Đăng nhập'**
   String get login;
 
-  /// No description provided for @register.
+  /// No description provided for @loginSubtitle.
   ///
   /// In vi, this message translates to:
-  /// **'Đăng ký'**
-  String get register;
+  /// **'Đăng nhập bằng tài khoản Google để bắt đầu khám phá'**
+  String get loginSubtitle;
 
   /// No description provided for @emailLabel.
   ///
@@ -161,35 +161,11 @@ abstract class AppLocalizations {
   /// **'Vui lòng nhập email hợp lệ'**
   String get emailInvalidError;
 
-  /// No description provided for @passwordLabel.
-  ///
-  /// In vi, this message translates to:
-  /// **'Mật khẩu'**
-  String get passwordLabel;
-
-  /// No description provided for @passwordTooShortError.
-  ///
-  /// In vi, this message translates to:
-  /// **'Mật khẩu cần ít nhất 6 ký tự'**
-  String get passwordTooShortError;
-
-  /// No description provided for @forgotPasswordLink.
-  ///
-  /// In vi, this message translates to:
-  /// **'Quên mật khẩu?'**
-  String get forgotPasswordLink;
-
   /// No description provided for @loginWithGoogle.
   ///
   /// In vi, this message translates to:
   /// **'Đăng nhập với Google'**
   String get loginWithGoogle;
-
-  /// No description provided for @noAccountRegisterNow.
-  ///
-  /// In vi, this message translates to:
-  /// **'Chưa có tài khoản? Đăng ký ngay'**
-  String get noAccountRegisterNow;
 
   /// No description provided for @fullNameLabel.
   ///
@@ -203,83 +179,11 @@ abstract class AppLocalizations {
   /// **'Vui lòng nhập họ tên'**
   String get fullNameRequiredError;
 
-  /// No description provided for @confirmPasswordLabel.
-  ///
-  /// In vi, this message translates to:
-  /// **'Xác nhận mật khẩu'**
-  String get confirmPasswordLabel;
-
-  /// No description provided for @confirmPasswordMismatchError.
-  ///
-  /// In vi, this message translates to:
-  /// **'Mật khẩu xác nhận không khớp'**
-  String get confirmPasswordMismatchError;
-
-  /// No description provided for @haveAccountLoginNow.
-  ///
-  /// In vi, this message translates to:
-  /// **'Đã có tài khoản? Đăng nhập'**
-  String get haveAccountLoginNow;
-
-  /// No description provided for @forgotPasswordTitle.
-  ///
-  /// In vi, this message translates to:
-  /// **'Quên mật khẩu'**
-  String get forgotPasswordTitle;
-
-  /// No description provided for @forgotPasswordInstructions.
-  ///
-  /// In vi, this message translates to:
-  /// **'Nhập email đã đăng ký, chúng tôi sẽ gửi liên kết đặt lại mật khẩu.'**
-  String get forgotPasswordInstructions;
-
-  /// No description provided for @sendResetEmailButton.
-  ///
-  /// In vi, this message translates to:
-  /// **'Gửi email khôi phục'**
-  String get sendResetEmailButton;
-
-  /// No description provided for @resetEmailSentMessage.
-  ///
-  /// In vi, this message translates to:
-  /// **'Đã gửi email khôi phục mật khẩu, vui lòng kiểm tra hộp thư.'**
-  String get resetEmailSentMessage;
-
-  /// No description provided for @authErrorInvalidEmail.
-  ///
-  /// In vi, this message translates to:
-  /// **'Email không hợp lệ.'**
-  String get authErrorInvalidEmail;
-
   /// No description provided for @authErrorUserDisabled.
   ///
   /// In vi, this message translates to:
   /// **'Tài khoản này đã bị khoá.'**
   String get authErrorUserDisabled;
-
-  /// No description provided for @authErrorUserNotFound.
-  ///
-  /// In vi, this message translates to:
-  /// **'Không tìm thấy tài khoản với email này.'**
-  String get authErrorUserNotFound;
-
-  /// No description provided for @authErrorWrongPassword.
-  ///
-  /// In vi, this message translates to:
-  /// **'Email hoặc mật khẩu không đúng.'**
-  String get authErrorWrongPassword;
-
-  /// No description provided for @authErrorEmailInUse.
-  ///
-  /// In vi, this message translates to:
-  /// **'Email này đã được đăng ký.'**
-  String get authErrorEmailInUse;
-
-  /// No description provided for @authErrorWeakPassword.
-  ///
-  /// In vi, this message translates to:
-  /// **'Mật khẩu quá yếu, cần ít nhất 6 ký tự.'**
-  String get authErrorWeakPassword;
 
   /// No description provided for @authErrorOperationNotAllowed.
   ///

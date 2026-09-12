@@ -1,13 +1,8 @@
 {
   "common": {
     "login": "Log in",
-    "register": "Sign up",
-    "registerNow": "Sign up now",
     "logout": "Log out",
     "loading": "Loading...",
-    "email": "Email",
-    "password": "Password",
-    "name": "Full name",
     "phone": "Phone number",
     "save": "Save",
     "cancel": "Cancel",
@@ -17,9 +12,6 @@
     "startDate": "Start date",
     "day": "Day {n}",
     "tryAgainLater": "Please try again later.",
-    "backToLogin": "Back to login",
-    "emailPlaceholder": "you@email.com",
-    "passwordPlaceholder": "••••••••",
     "account": "Account",
     "featured": "Featured",
     "durationHours": "{h}h",
@@ -91,6 +83,7 @@
     "visitDuration": "{hours}h visit",
     "free": "Free",
     "openingHours": "Opening hours",
+    "mapHeading": "Location on the map",
     "askAiAboutPlace": "Ask the AI about this place"
   },
   "tours": {
@@ -183,35 +176,10 @@
   },
   "login": {
     "title": "Welcome back",
-    "subtitle": "Log in to continue your journey",
-    "forgotPassword": "Forgot password?",
-    "noAccount": "Don't have an account?",
-    "errorInvalidEmail": "Invalid email address.",
-    "errorWrongCredential": "Incorrect email or password.",
+    "subtitle": "Sign in with your Google account to continue your journey",
+    "withGoogle": "Sign in with Google",
     "errorTooManyRequests": "Too many failed attempts, please try again later.",
     "errorDefault": "Login failed. Please try again."
-  },
-  "register": {
-    "title": "Create an account",
-    "subtitle": "Start your exploration journey",
-    "namePlaceholder": "Jane Doe",
-    "passwordHint": "At least 6 characters",
-    "confirmPassword": "Confirm password",
-    "haveAccount": "Already have an account?",
-    "errorPasswordMismatch": "Passwords do not match.",
-    "errorEmailInUse": "This email is already registered.",
-    "errorInvalidEmail": "Invalid email address.",
-    "errorWeakPassword": "Password is too weak, needs at least 6 characters.",
-    "errorDefault": "Registration failed. Please try again."
-  },
-  "forgotPassword": {
-    "title": "Forgot password",
-    "subtitle": "Enter your email to receive a password reset link",
-    "sentMessagePrefix": "A password reset email has been sent to",
-    "sentMessageSuffix": "Check your inbox.",
-    "sendLink": "Send reset link",
-    "error": "Could not send the password reset email. Please check the email address.",
-    "backToLogin": "Back to login"
   },
   "reviews": {
     "heading": "Reviews",
