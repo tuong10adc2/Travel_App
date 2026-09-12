@@ -9,8 +9,10 @@ import {
   Clock,
   Loader2,
   MapPin,
+  Sparkles,
   Star,
   Ticket,
+  Utensils,
 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { formatOpeningHours } from "@/lib/opening-hours";
@@ -145,6 +147,36 @@ export default function PlaceDetailPage() {
             </div>
 
             <p className="mt-6 whitespace-pre-line leading-relaxed text-foreground">{place.description}</p>
+
+            {place.highlights && place.highlights.length > 0 && (
+              <div className="mt-6 rounded-2xl border border-border bg-surface p-5">
+                <h3 className="mb-3 flex items-center gap-2 font-semibold text-foreground">
+                  <Sparkles className="h-4 w-4" /> {t("placeDetail.highlightsHeading")}
+                </h3>
+                <ul className="space-y-1.5 text-sm text-foreground">
+                  {place.highlights.map((item, i) => (
+                    <li key={i} className="flex gap-2">
+                      <span className="text-brand-600">•</span> {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {place.foodToTry && place.foodToTry.length > 0 && (
+              <div className="mt-6 rounded-2xl border border-border bg-surface p-5">
+                <h3 className="mb-3 flex items-center gap-2 font-semibold text-foreground">
+                  <Utensils className="h-4 w-4" /> {t("placeDetail.foodToTryHeading")}
+                </h3>
+                <ul className="space-y-1.5 text-sm text-foreground">
+                  {place.foodToTry.map((item, i) => (
+                    <li key={i} className="flex gap-2">
+                      <span className="text-brand-600">•</span> {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {hours.length > 0 && (
               <div className="mt-6 rounded-2xl border border-border bg-surface p-5">

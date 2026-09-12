@@ -41,6 +41,8 @@ Sub-collection: `users/{uid}/chat_history/{sessionId}` (xem bên dưới).
 | visitDurationMinutes | number | |
 | isFeatured | bool | hiển thị trang chủ |
 | isActive | bool | admin duyệt/ẩn |
+| highlights | array\<string\> | đặc điểm nổi bật, mỗi phần tử 1 dòng hiển thị |
+| foodToTry | array\<string\> | món ăn nên thử, mỗi phần tử 1 dòng hiển thị |
 | createdBy | string (uid) | |
 | createdAt / updatedAt | timestamp | |
 

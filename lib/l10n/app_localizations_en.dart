@@ -266,6 +266,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get introductionHeading => 'About';
 
   @override
+  String get highlightsHeading => 'Highlights';
+
+  @override
+  String get foodToTryHeading => 'Food to try';
+
+  @override
   String reviewsHeading(Object count) {
     return 'Reviews ($count)';
   }

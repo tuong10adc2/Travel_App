@@ -83,6 +83,8 @@
     "visitDuration": "{hours}h visit",
     "free": "Free",
     "openingHours": "Opening hours",
+    "highlightsHeading": "Highlights",
+    "foodToTryHeading": "Food to try",
     "mapHeading": "Location on the map",
     "askAiAboutPlace": "Ask the AI about this place"
   },

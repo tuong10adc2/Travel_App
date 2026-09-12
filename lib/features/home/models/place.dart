@@ -16,6 +16,8 @@ class Place {
   final Map<String, String> openingHours;
   final double? latitude;
   final double? longitude;
+  final List<String> highlights;
+  final List<String> foodToTry;
 
   Place({
     required this.id,
@@ -33,6 +35,8 @@ class Place {
     required this.openingHours,
     this.latitude,
     this.longitude,
+    this.highlights = const [],
+    this.foodToTry = const [],
   });
 
   factory Place.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -54,6 +58,8 @@ class Place {
       openingHours: Map<String, String>.from(data['openingHours'] as Map? ?? const {}),
       latitude: location is GeoPoint ? location.latitude : null,
       longitude: location is GeoPoint ? location.longitude : null,
+      highlights: List<String>.from(data['highlights'] as List? ?? const []),
+      foodToTry: List<String>.from(data['foodToTry'] as List? ?? const []),
     );
   }
 }

@@ -260,6 +260,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get introductionHeading => 'Giới thiệu';
 
   @override
+  String get highlightsHeading => 'Đặc điểm nổi bật';
+
+  @override
+  String get foodToTryHeading => 'Món ăn nên thử';
+
+  @override
   String reviewsHeading(Object count) {
     return 'Đánh giá ($count)';
   }

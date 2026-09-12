@@ -166,6 +166,20 @@ class _PlaceDetailContentState extends ConsumerState<_PlaceDetailContent> {
                 const SizedBox(height: AppSpacing.xs),
                 Text(place.description,
                     style: Theme.of(context).textTheme.bodyLarge),
+                if (place.highlights.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(l10n.highlightsHeading,
+                      style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: AppSpacing.xs),
+                  _BulletList(items: place.highlights),
+                ],
+                if (place.foodToTry.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(l10n.foodToTryHeading,
+                      style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: AppSpacing.xs),
+                  _BulletList(items: place.foodToTry),
+                ],
                 const SizedBox(height: AppSpacing.lg),
                 const Divider(),
                 const SizedBox(height: AppSpacing.sm),
@@ -226,6 +240,34 @@ class _PlaceDetailContentState extends ConsumerState<_PlaceDetailContent> {
         .toString()
         .replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => '.');
     return l10n.ticketPriceLabel('$sđ');
+  }
+}
+
+class _BulletList extends StatelessWidget {
+  const _BulletList({required this.items});
+
+  final List<String> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final item in items)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('•  ', style: Theme.of(context).textTheme.bodyLarge),
+                Expanded(
+                    child: Text(item,
+                        style: Theme.of(context).textTheme.bodyLarge)),
+              ],
+            ),
+          ),
+      ],
+    );
   }
 }
 
