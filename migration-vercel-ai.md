@@ -62,22 +62,38 @@
 - [x] `flutter analyze`, `tsc --noEmit`, `npm run build`, `npm run lint` sạch ở cả 3 project
   (webapp/admin/Flutter) sau toàn bộ thay đổi trên
 
-### 6. Set biến môi trường & deploy — ĐANG CHỜ BẠN
-- [ ] Set trên Vercel dashboard: `ANTHROPIC_API_KEY` (key Claude thật) và
-  `FIREBASE_SERVICE_ACCOUNT_KEY` (xem bước 1) — **cần bạn tự làm**, không đưa secret qua chat
-- [ ] Redeploy thủ công sau khi thêm biến (Vercel không tự áp dụng env mới vào bản đã deploy trước
-  đó — tab Deployments → "..." ở bản mới nhất → Redeploy)
-- [ ] Commit + push code (đang chờ, sẽ làm ngay khi bạn xác nhận 2 biến trên đã set xong)
+### 6. Set biến môi trường & deploy — ĐÃ XONG
+- [x] Set `ANTHROPIC_API_KEY` (key thật, loại "Workspace scope: Default" — key "Personal"/identity-
+  linked ban đầu cần thêm header `anthropic-workspace-id` phức tạp hơn không cần thiết) và
+  `FIREBASE_SERVICE_ACCOUNT_KEY` trên Vercel
+- [x] Deploy qua Vercel CLI trực tiếp (`vercel --prod`) sau khi phát hiện webhook GitHub → Vercel bị
+  lỗi không tự trigger deploy (nguyên nhân không rõ, không phải do cấu hình repo/Root Directory — dùng
+  CLI để không phụ thuộc webhook nữa)
+- [x] Nạp credit cho tài khoản Anthropic (trước đó ở gói đánh giá $0 credit)
 
-### 7. Test lại toàn bộ — CHƯA LÀM (chặn bởi bước 6)
-- [ ] Test chat AI thật: hỏi → nhận gợi ý địa điểm → bấm xem chi tiết (Playwright, cả app + web)
-- [ ] Test lịch trình thông minh: "lên lịch 3 ngày ở Sa Pa" → xác nhận đúng thuật toán geo-clustering
-- [ ] Test kiểm duyệt review: viết review spam → xác nhận badge "AI: khả nghi" xuất hiện sau tối đa 5 phút
-- [ ] Test push notification: cần thiết bị Android thật/emulator có Google Play Services
-- [ ] Build lại APK Flutter với `chat_repository.dart` mới, cài lại trên emulator để test
+### 7. Test lại toàn bộ — ĐÃ XONG, TẤT CẢ PASS
+- [x] Test chat AI thật trên webapp production: hỏi → nhận gợi ý địa điểm dạng card đúng dữ liệu thật
+- [x] Test lịch trình thông minh: "lên lịch 2 ngày Hội An + Huế" → đúng thuật toán geo-clustering
+  (Huế ngày 1, Hội An ngày 2), model diễn giải bằng lời tự nhiên dựa trên kết quả server tính
+- [x] Test kiểm duyệt review: tạo review spam qua Firestore REST API → gọi `/api/moderate-review` →
+  `{"processed":1,"flagged":1}`, AI nhận diện đúng
+- [x] Test push notification routes: `/api/remind-itineraries` và `/api/notify-new-place` đều
+  `200 OK` (chưa test push thật trên thiết bị vì cần dữ liệu itinerary sắp tới ngày khởi hành)
+- [x] Build lại APK Flutter, cài trên emulator Android thật (Pixel 6), test chat AI trực tiếp trên
+  app — gửi "Gợi ý Đà Lạt" → nhận đúng card địa điểm Đà Lạt trong bong bóng chat
 
-### 8. Dọn dẹp — CHƯA LÀM
-- [ ] Cập nhật `checklist.md` phản ánh đúng trạng thái mới (bỏ ghi chú "chặn bởi Blaze", thay bằng
-  "đã chuyển sang Vercel")
+**3 bug thật phát hiện + sửa trong lúc làm bước 6-7** (xem chi tiết trong commit `182d3a9`):
+1. `review_repository.dart`/`review-section.tsx` không ghi field `aiModeration` khi tạo review mới
+   → Firestore không match được `where('aiModeration', '==', null)` với field vắng mặt hoàn toàn
+   → cron kiểm duyệt sẽ không bao giờ quét ra gì — sửa ghi tường minh `aiModeration: null`.
+2. `firebase-admin@14` kéo theo `jwks-rsa@4.x` cần `jose@6.x` (ESM-only) → lỗi `ERR_REQUIRE_ESM` khi
+   Next.js externalize package này trên Vercel — hạ xuống `firebase-admin@^13.5` (dùng `jwks-rsa@3.x`
+   + `jose@4.x`, có bản CJS).
+3. Vercel Hobby chỉ cho cron chạy tối đa 1 lần/ngày — cron kiểm duyệt review đổi từ mỗi 5 phút sang
+   1 lần/ngày (`0 1 * * *`).
+
+### 8. Dọn dẹp — ĐÃ XONG
+- [x] Cập nhật `checklist.md` phản ánh đúng trạng thái mới (Giai đoạn 3 + push notification đánh dấu
+  hoàn thành, không còn ghi "chặn bởi Blaze")
 - [x] Giữ nguyên `functions/` (không đụng tới) — phòng trường hợp sau này Blaze được bật thì vẫn có
   sẵn bản gốc để quay lại nếu muốn, không mất công viết lại
