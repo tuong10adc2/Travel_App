@@ -209,6 +209,31 @@
 >   không dùng chung — người dùng cần đăng nhập lại khi chuyển qua lại giữa 2 bản.
 > - Thêm CORS header (`Access-Control-Allow-Origin: *`) cho `/images/*` trên webapp — cần thiết để
 >   Flutter Web (renderer CanvasKit) vẽ được ảnh cross-origin lên canvas (khác `<img>` thường không cần).
+
+> **Cập nhật 2026-09-12 (2) — Sửa lỗi đăng nhập Google trên Flutter Web + thêm khung điện thoại**:
+> - **Bug thật phát hiện sau khi người dùng test thật**: đăng nhập Google trên bản Flutter Web báo lỗi
+>   Google `400: origin_mismatch` ("Đã chặn quyền truy cập: Lỗi uỷ quyền"). Nguyên nhân: package
+>   `google_sign_in` trên web gọi thẳng Google Identity Services bằng 1 OAuth Client ID cố định (khai
+>   trong `web/index.html` qua FlutterFire lúc `flutterfire configure`), và client đó chỉ được đăng ký
+>   sẵn vài domain mặc định — mỗi lần đổi domain deploy phải vào tận Google Cloud Console thêm origin
+>   thủ công, không có API công khai để tự động hoá, và service account hiện có nhiều khả năng cũng
+>   không đủ quyền IAM để sửa OAuth Client. **Sửa tận gốc thay vì đi vá domain**: đổi hẳn cách đăng nhập
+>   Google trên web sang `FirebaseAuth.signInWithPopup(GoogleAuthProvider())` (giống hệt cách webapp
+>   Next.js đã làm) thay vì package `google_sign_in` — cách này chỉ cần domain nằm trong "Authorized
+>   domains" của Firebase Auth (đã có sẵn từ trước), không đụng gì tới Google Cloud Console/OAuth Client
+>   nữa. Code: `AuthRepository.signInWithGoogle()` rẽ nhánh theo `kIsWeb` — web dùng `signInWithPopup`,
+>   Android vẫn giữ nguyên package `google_sign_in` như cũ (không đổi gì ở mobile). Đã xoá luôn meta tag
+>   `google-signin-client_id` không còn dùng tới trong `web/index.html`.
+> - **Thêm khung điện thoại (phone frame)** quanh app khi xem trên trình duyệt — vì app vốn thiết kế
+>   riêng cho mobile, hiển thị full-bleed trên màn hình rộng sẽ sai tỉ lệ/trông không chuyên nghiệp.
+>   Cách làm: tạo `web/flutter_bootstrap.js` tuỳ chỉnh (Flutter build tool hỗ trợ template hoá file này
+>   qua placeholder `{{flutter_js}}`/`{{flutter_build_config}}`), gọi
+>   `engineInitializer.initializeEngine({hostElement: ...})` trỏ vào 1 `<div id="flutter-host">` cố định
+>   kích thước 390×844 (kích thước điện thoại phổ biến) thay vì để Flutter tự vẽ full viewport — CSS bọc
+>   ngoài vẽ khung viền đen bo góc + notch (tai thỏ) giả cho giống điện thoại thật. Dưới 480px chiều
+>   rộng (đang xem trên chính điện thoại thật) khung tự ẩn, app vẫn full-bleed bình thường qua media
+>   query. Đã build/test lại toàn bộ luồng (đăng nhập, trang chủ, chi tiết địa điểm, bản đồ) bên trong
+>   khung mới, không phát sinh lỗi tương tác/cuộn.
 ---
  
 ## Ghi chú
