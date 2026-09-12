@@ -71,6 +71,19 @@
 > - **Chưa làm cho Admin**: form CRUD địa điểm đã có ô nhập toạ độ nhưng chưa có preview bản đồ —
 >   không nằm trong phạm vi yêu cầu lần này (chỉ 2 trang người dùng cuối xem địa điểm), có thể làm sau.
 
+> **Cập nhật 2026-09-12 — Thêm "Đặc điểm nổi bật" + "Món ăn nên thử" cho từng địa điểm**: 2 field mới
+> trên `places`: `highlights` và `foodToTry` (đều `array<string>`, mỗi phần tử 1 dòng hiển thị).
+> - **Admin**: `place-form.tsx` thêm 2 ô textarea (mỗi dòng = 1 mục), dùng chung cho tạo/sửa.
+> - **Flutter & Webapp**: 2 khối mới trên màn/trang Chi tiết địa điểm, đặt sau phần Giới thiệu, trước
+>   Giờ mở cửa — chỉ hiện khi có dữ liệu.
+> - **Nội dung cho 18 địa điểm hiện có**: sinh bằng Claude (`tool_choice` ép buộc tool
+>   `set_place_content`), yêu cầu chỉ dùng kiến thức thật đã biết về địa điểm, phần món ăn **chỉ nêu
+>   tên món, không nêu tên quán cụ thể** (tránh sai lệch/lỗi thời) — đã kiểm tra chất lượng nội dung
+>   sinh ra, chính xác và tự nhiên. Script sinh nội dung chỉ chạy 1 lần qua route API tạm (đã xoá sau
+>   khi dùng xong, không nằm trong code base).
+> - Build/analyze/lint sạch cả 3 project, đã deploy + test thật trên production webapp (Vịnh Hạ Long
+>   hiện đúng 4 đặc điểm nổi bật + 4 món ăn nên thử).
+
 ## GIAI ĐOẠN 3 — Trợ lý AI (Chat)
  
 - [x] Viết Cloud Function (Firebase Functions, callable hoặc HTTPS) gọi Claude API (giấu API key bằng `firebase functions:secrets:set`, không gọi từ client) — tạo project `functions/` (TypeScript, Firebase Functions v2 + `firebase-admin` + `@anthropic-ai/sdk`), khai báo secret `ANTHROPIC_API_KEY` bằng `defineSecret` (không hardcode key). Callable function `chatWithAssistant` (`functions/src/index.ts`): bắt buộc `request.auth`, nhận `{ message, history? }`, validate độ dài + giới hạn 20 lượt sử history gần nhất, trả về `{ reply, suggestedPlaceIds }`. `npx tsc --noEmit` + `npm run build` sạch.
