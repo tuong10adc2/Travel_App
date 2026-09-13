@@ -2,13 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:travelai/main.dart';
+import 'package:travelai/features/auth/screens/login_screen.dart';
+import 'package:travelai/l10n/app_localizations.dart';
 
 void main() {
-  testWidgets('App khởi động và hiển thị màn splash', (WidgetTester tester) async {
-    await tester.pumpWidget(const ProviderScope(child: MyApp()));
+  testWidgets('LoginScreen hiển thị đúng nút đăng nhập Google, không có form email/password', (tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          locale: Locale('vi'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: LoginScreen(),
+        ),
+      ),
+    );
+    await tester.pump();
 
-    expect(find.text('Trợ lý du lịch AI'), findsOneWidget);
-    expect(find.byIcon(Icons.travel_explore), findsOneWidget);
+    expect(find.text('Đăng nhập với Google'), findsOneWidget);
+    expect(find.byType(TextFormField), findsNothing);
   });
 }

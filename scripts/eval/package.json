@@ -1,0 +1,11 @@
+{
+  "name": "eval-chat-ai",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "eval": "node eval.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.5.0"
+  }
+}

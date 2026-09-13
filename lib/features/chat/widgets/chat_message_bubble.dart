@@ -89,12 +89,12 @@ class _PlaceSuggestions extends ConsumerWidget {
 class _ItineraryPlanCard extends ConsumerWidget {
   const _ItineraryPlanCard({required this.itineraryPlan});
 
-  final List<List<String>> itineraryPlan;
+  final List<ItineraryDay> itineraryPlan;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final placesById = ref.watch(placesByIdProvider);
-    final nonEmptyDays = itineraryPlan.where((day) => day.isNotEmpty).toList();
+    final nonEmptyDays = itineraryPlan.where((day) => day.placeIds.isNotEmpty).toList();
     if (nonEmptyDays.isEmpty) return const SizedBox.shrink();
     final l10n = AppLocalizations.of(context)!;
 
@@ -122,11 +122,30 @@ class _ItineraryPlanCard extends ConsumerWidget {
                       spacing: AppSpacing.xs,
                       runSpacing: AppSpacing.xs,
                       children: nonEmptyDays[i]
-                          .map((id) => placesById[id])
-                          .whereType<Place>()
-                          .map((p) => Chip(label: Text(p.name), visualDensity: VisualDensity.compact))
+                          .placeIds
+                          .map((id) => placesById[id] == null ? null : MapEntry(id, placesById[id]!))
+                          .whereType<MapEntry<String, Place>>()
+                          .map((entry) {
+                            final arrival = nonEmptyDays[i].arrivalByPlaceId[entry.key];
+                            final label = arrival != null ? '$arrival · ${entry.value.name}' : entry.value.name;
+                            return Chip(label: Text(label), visualDensity: VisualDensity.compact);
+                          })
                           .toList(),
                     ),
+                    if (nonEmptyDays[i].warnings.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: AppSpacing.xs),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (final warning in nonEmptyDays[i].warnings)
+                              Text(
+                                '⚠ $warning',
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.secondary),
+                              ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -134,7 +153,11 @@ class _ItineraryPlanCard extends ConsumerWidget {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () => _showCreateItineraryDialog(context, ref, nonEmptyDays),
+                onPressed: () => _showCreateItineraryDialog(
+                  context,
+                  ref,
+                  nonEmptyDays.map((d) => d.placeIds).toList(),
+                ),
                 icon: const Icon(Icons.map_outlined, size: 18),
                 label: Text(l10n.createItineraryFromSuggestion),
               ),

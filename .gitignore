@@ -10,6 +10,11 @@
 .svn/
 migrate_working_dir/
 
+# node_modules ở bất kỳ đâu trong repo (scripts/import_places, scripts/eval, ...) — webapp/admin
+# đã có .gitignore riêng nên không trùng, nhưng các script Node lẻ ở scripts/ chưa có, dễ vô tình
+# `git add -A` cả node_modules nếu thiếu dòng này.
+node_modules/
+
 # IntelliJ related
 *.iml
 *.ipr

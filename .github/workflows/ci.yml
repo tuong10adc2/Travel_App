@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  webapp:
+    name: webapp (lint + typecheck + build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: webapp/package-lock.json
+      - run: npm ci
+        working-directory: webapp
+      - run: npm run lint
+        working-directory: webapp
+      - run: npx tsc --noEmit
+        working-directory: webapp
+      - run: npm run build
+        working-directory: webapp
+        env:
+          # Config Firebase phía client — công khai theo thiết kế (bundle vào JS gửi cho trình
+          # duyệt), không phải secret, nên khai thẳng ở đây thay vì cần GitHub Secret riêng.
+          NEXT_PUBLIC_FIREBASE_API_KEY: AIzaSyDHn-Eio0vVPfzWR6PS1t347Bg23AfNrK0
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: travelapp-7f140.firebaseapp.com
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: travelapp-7f140
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: travelapp-7f140.firebasestorage.app
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "591974579800"
+          NEXT_PUBLIC_FIREBASE_APP_ID: "1:591974579800:web:9c240640d5c52f6daa542d"
+          NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: G-17FQMY1W1J
+          # Build-time chỉ cần biến tồn tại (không dùng để gọi API thật lúc build) — các route
+          # dùng firebase-admin khởi tạo lười (lazy), không chạy lúc "next build".
+          FIREBASE_SERVICE_ACCOUNT_KEY: '{"project_id":"ci","client_email":"ci@example.com","private_key":"-----BEGIN PRIVATE KEY-----\nci\n-----END PRIVATE KEY-----\n"}'
+          ANTHROPIC_API_KEY: ci-placeholder
+
+  admin:
+    name: admin (lint + typecheck + build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: admin/package-lock.json
+      - run: npm ci
+        working-directory: admin
+      - run: npm run lint
+        working-directory: admin
+      - run: npx tsc --noEmit
+        working-directory: admin
+      - run: npm run build
+        working-directory: admin
+        env:
+          # Config Firebase phía client — công khai theo thiết kế, không phải secret.
+          NEXT_PUBLIC_FIREBASE_API_KEY: AIzaSyDHn-Eio0vVPfzWR6PS1t347Bg23AfNrK0
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: travelapp-7f140.firebaseapp.com
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: travelapp-7f140
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: travelapp-7f140.firebasestorage.app
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "591974579800"
+          NEXT_PUBLIC_FIREBASE_APP_ID: "1:591974579800:web:fb98e37bcd4d93abaa542d"
+          NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: G-WCFTH2NG48
+
+  flutter:
+    name: Flutter (analyze + test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.0"
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test

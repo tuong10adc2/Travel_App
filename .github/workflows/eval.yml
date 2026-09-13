@@ -1,0 +1,26 @@
+name: Eval AI chat
+
+# Cố ý KHÔNG chạy trên mỗi push/PR — mỗi lần chạy gọi Claude API thật (tốn phí + có độ trễ vài
+# chục giây/case). Chạy thủ công khi cần (vd sau khi đổi system prompt) hoặc theo lịch hàng tuần
+# để phát hiện sớm nếu model/API thay đổi hành vi.
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 2 * * 1" # 02:00 UTC thứ 2 hàng tuần
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: scripts/eval/package-lock.json
+      - run: npm install
+        working-directory: scripts/eval
+      - run: npm run eval
+        working-directory: scripts/eval
+        env:
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
