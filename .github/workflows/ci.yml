@@ -21,8 +21,10 @@ jobs:
         working-directory: webapp
       - run: npm run lint
         working-directory: webapp
-      - run: npx tsc --noEmit
-        working-directory: webapp
+      # Không chạy `tsc --noEmit` riêng — Next.js tự sinh 1 số type (vd `LayoutProps`) trong
+      # `.next/types` ngay trong lúc build, chưa build thì các type đó chưa tồn tại nên tsc
+      # đứng riêng sẽ báo lỗi giả "Cannot find name 'LayoutProps'". `next build` bên dưới đã tự
+      # chạy typecheck nội bộ (in "Running TypeScript...") và fail nếu có lỗi type thật.
       - run: npm run build
         working-directory: webapp
         env:
@@ -53,8 +55,6 @@ jobs:
       - run: npm ci
         working-directory: admin
       - run: npm run lint
-        working-directory: admin
-      - run: npx tsc --noEmit
         working-directory: admin
       - run: npm run build
         working-directory: admin
