@@ -27,12 +27,12 @@ import { PatternOverlay } from "@/components/ui/pattern-overlay";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 import { cn } from "@/lib/cn";
-import type { ChatMessage, Place } from "@/lib/types";
+import type { ChatMessage, ItineraryDayPlan, Place } from "@/lib/types";
 
 interface ChatResponse {
   reply: string;
   suggestedPlaceIds: string[];
-  itineraryPlan: { dayIndex: number; placeIds: string[] }[] | null;
+  itineraryPlan: ItineraryDayPlan[] | null;
 }
 
 function ChatInner() {
@@ -44,10 +44,11 @@ function ChatInner() {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [placesCache, setPlacesCache] = useState<Record<string, Place>>({});
-  const [planModal, setPlanModal] = useState<{ dayIndex: number; placeIds: string[] }[] | null>(null);
+  const [planModal, setPlanModal] = useState<ItineraryDayPlan[] | null>(null);
   const [planName, setPlanName] = useState(t("chat.defaultPlanName"));
   const [planStartDate, setPlanStartDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [creatingPlan, setCreatingPlan] = useState(false);
+  const [streamingText, setStreamingText] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   async function handleCreateItineraryFromPlan() {
@@ -103,7 +104,7 @@ function ChatInner() {
   useEffect(() => {
     if (messages.length === 0) return;
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, [messages, sending]);
+  }, [messages, sending, streamingText]);
 
   async function resolvePlaces(ids: string[]) {
     const missing = ids.filter((id) => !placesCache[id]);
@@ -151,19 +152,53 @@ function ChatInner() {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
         body: JSON.stringify({ message: text, history }),
       });
-      const data = (await res.json()) as ChatResponse & { error?: string };
-      if (!res.ok) {
+      if (!res.ok || !res.body) {
+        const data = await res.json().catch(() => ({}));
         throw new Error(data.error ?? "chat_failed");
       }
 
-      const itineraryPlan = data.itineraryPlan ?? [];
+      // Đọc SSE stream: hiện chữ dần ngay khi Claude sinh ra (giống ChatGPT/Claude.ai) thay vì
+      // đợi trả lời đầy đủ rồi mới hiện 1 lần. Chỉ ghi Firestore 1 LẦN DUY NHẤT khi nhận event
+      // "done" — không ghi mỗi delta, tránh spam write không cần thiết.
+      setStreamingText("");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let done: ChatResponse | null = null;
+      let streamError: string | null = null;
+
+      while (true) {
+        const { value, done: readerDone } = await reader.read();
+        if (readerDone) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        const events = buffer.split("\n\n");
+        buffer = events.pop() ?? "";
+        for (const raw of events) {
+          const line = raw.trim();
+          if (!line.startsWith("data:")) continue;
+          const event = JSON.parse(line.slice("data:".length).trim());
+          if (event.type === "text_delta") {
+            setStreamingText((prev) => (prev ?? "") + event.text);
+          } else if (event.type === "done") {
+            done = event as ChatResponse;
+          } else if (event.type === "error") {
+            streamError = event.error;
+          }
+        }
+      }
+
+      if (streamError) throw new Error(streamError);
+      if (!done) throw new Error("chat_failed");
+
+      const itineraryPlan = done.itineraryPlan ?? [];
       const planPlaceIds = itineraryPlan.flatMap((d) => d.placeIds);
-      const places = await resolvePlaces([...data.suggestedPlaceIds, ...planPlaceIds]);
+      const places = await resolvePlaces([...done.suggestedPlaceIds, ...planPlaceIds]);
 
       await setDoc(doc(messagesRef), {
         role: "assistant",
-        content: data.reply,
-        placeCards: data.suggestedPlaceIds
+        content: done.reply,
+        placeCards: done.suggestedPlaceIds
           .filter((id) => places[id])
           .map((id) => ({
             placeId: id,
@@ -177,6 +212,7 @@ function ChatInner() {
     } catch {
       toast.error(t("chat.toastUnavailable"));
     } finally {
+      setStreamingText(null);
       setSending(false);
     }
   }
@@ -242,15 +278,28 @@ function ChatInner() {
                       <div key={day.dayIndex} className={i > 0 ? "mt-2" : ""}>
                         <p className="text-xs font-semibold text-foreground">{t("common.day", { n: i + 1 })}</p>
                         <div className="mt-1 flex flex-wrap gap-1">
-                          {day.placeIds.map((id) => (
-                            <span
-                              key={id}
-                              className="rounded-full bg-surface px-2 py-0.5 text-[11px] text-foreground"
-                            >
-                              {placesCache[id]?.name ?? "..."}
-                            </span>
-                          ))}
+                          {day.placeIds.map((id) => {
+                            const arrival = day.schedule?.find((s) => s.placeId === id)?.arrival;
+                            return (
+                              <span
+                                key={id}
+                                className="rounded-full bg-surface px-2 py-0.5 text-[11px] text-foreground"
+                              >
+                                {arrival ? `${arrival} · ` : ""}
+                                {placesCache[id]?.name ?? "..."}
+                              </span>
+                            );
+                          })}
                         </div>
+                        {day.warnings && day.warnings.length > 0 && (
+                          <ul className="mt-1 space-y-0.5">
+                            {day.warnings.map((w, wi) => (
+                              <li key={wi} className="text-[11px] text-warning-600">
+                                ⚠ {w}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </div>
                     ))}
                   <Button
@@ -266,7 +315,14 @@ function ChatInner() {
             </div>
           </div>
         ))}
-        {sending && (
+        {sending && streamingText && (
+          <div className="flex justify-start">
+            <div className="max-w-[80%] rounded-2xl rounded-bl-sm border border-border bg-surface px-4 py-2.5 text-sm text-foreground">
+              <p className="whitespace-pre-line">{streamingText}</p>
+            </div>
+          </div>
+        )}
+        {sending && !streamingText && (
           <div className="flex justify-start">
             <div className="flex items-center gap-2 rounded-2xl rounded-bl-sm border border-border bg-surface px-4 py-2.5 text-sm text-muted-foreground">
               <Loader2 className="h-3.5 w-3.5 animate-spin" /> {t("chat.typing")}

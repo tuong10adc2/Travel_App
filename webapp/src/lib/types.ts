@@ -98,12 +98,19 @@ export interface SavedPlace {
   createdAt?: unknown;
 }
 
+export interface ItineraryDayPlan {
+  dayIndex: number;
+  placeIds: string[];
+  schedule?: { placeId: string; arrival: string; departure: string }[];
+  warnings?: string[];
+}
+
 export interface ChatMessage {
   id: string;
   role: "user" | "assistant";
   content: string;
   placeCards?: { placeId: string; name: string; image: string; rating: number }[];
-  itineraryPlan?: { dayIndex: number; placeIds: string[] }[];
+  itineraryPlan?: ItineraryDayPlan[];
   createdAt?: unknown;
 }
 

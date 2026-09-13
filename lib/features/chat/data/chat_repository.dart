@@ -46,12 +46,14 @@ class ChatRepository {
       _firestore.collection('users').doc(uid).collection('chat_history').doc(defaultChatSessionId);
 
   /// Gửi tin nhắn: ghi tin nhắn user ngay (hiển thị lạc quan qua stream), gọi
-  /// Cloud Function `chatWithAssistant` kèm [priorMessages] làm lịch sử hội
-  /// thoại, rồi ghi tiếp câu trả lời của trợ lý (kèm `placeSuggestionIds` nếu
-  /// AI có gợi ý địa điểm) vào cùng sub-collection.
+  /// `/api/chat` (SSE — chữ hiện dần) kèm [priorMessages] làm lịch sử hội
+  /// thoại, gọi [onTextDelta] mỗi khi có đoạn chữ mới để UI hiện dần, rồi ghi
+  /// câu trả lời đầy đủ (kèm `placeSuggestionIds`/`itineraryPlan` nếu có) vào
+  /// Firestore đúng 1 lần khi stream kết thúc — không ghi mỗi delta.
   Future<void> sendMessage({
     required String text,
     required List<ChatMessage> priorMessages,
+    void Function(String textSoFar)? onTextDelta,
   }) async {
     final user = _firebaseAuth.currentUser;
     if (user == null) throw StateError('Chưa đăng nhập');
@@ -81,32 +83,61 @@ class ChatRepository {
         .toList();
 
     final idToken = await user.getIdToken();
-    final response = await http
-        .post(
-          Uri.parse('$_chatApiBaseUrl/api/chat'),
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $idToken',
-          },
-          body: jsonEncode({'message': trimmed, 'history': history}),
-        )
-        .timeout(const Duration(seconds: 60));
+    final request = http.Request('POST', Uri.parse('$_chatApiBaseUrl/api/chat'))
+      ..headers.addAll({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $idToken',
+      })
+      ..body = jsonEncode({'message': trimmed, 'history': history});
 
-    final data = jsonDecode(response.body) as Map<String, dynamic>;
-    if (response.statusCode != 200) {
-      throw StateError((data['error'] as String?) ?? 'Đã có lỗi khi gọi trợ lý AI.');
+    final client = http.Client();
+    String reply = '';
+    List<String> suggestedPlaceIds = const [];
+    List itineraryPlan = const [];
+    String? streamError;
+    bool gotDone = false;
+
+    try {
+      final streamedResponse = await client.send(request).timeout(const Duration(seconds: 60));
+      if (streamedResponse.statusCode != 200) {
+        final body = await streamedResponse.stream.bytesToString();
+        final data = jsonDecode(body) as Map<String, dynamic>;
+        throw StateError((data['error'] as String?) ?? 'Đã có lỗi khi gọi trợ lý AI.');
+      }
+
+      var buffer = '';
+      await for (final chunk in streamedResponse.stream.transform(utf8.decoder)) {
+        buffer += chunk;
+        final events = buffer.split('\n\n');
+        buffer = events.isNotEmpty ? events.removeLast() : '';
+        for (final raw in events) {
+          final line = raw.trim();
+          if (!line.startsWith('data:')) continue;
+          final event = jsonDecode(line.substring(5).trim()) as Map<String, dynamic>;
+          switch (event['type']) {
+            case 'text_delta':
+              reply += event['text'] as String? ?? '';
+              onTextDelta?.call(reply);
+            case 'done':
+              gotDone = true;
+              reply = (event['reply'] as String?) ?? reply;
+              suggestedPlaceIds = List<String>.from(event['suggestedPlaceIds'] as List? ?? const []);
+              itineraryPlan = event['itineraryPlan'] as List? ?? const [];
+            case 'error':
+              streamError = event['error'] as String?;
+          }
+        }
+      }
+    } finally {
+      client.close();
     }
 
-    final reply = (data['reply'] as String?) ?? '';
-    final suggestedPlaceIds = List<String>.from(data['suggestedPlaceIds'] as List? ?? const []);
+    if (streamError != null) throw StateError(streamError);
+    if (!gotDone) throw StateError('Đã có lỗi khi gọi trợ lý AI.');
 
-    // itineraryPlan trả về dạng [{dayIndex, placeIds}, ...] (kết quả tool plan_itinerary,
-    // đã gom theo khu vực địa lý + sắp thứ tự ở server) — lưu nguyên dạng gốc, KHÔNG rút gọn
-    // thành List<List<String>>, để khớp đúng format webapp cũng đang lưu vào cùng collection
-    // `chat_history` (2 client dùng chung 1 backend/schema). `ChatMessage.fromDoc` khi đọc lại
-    // tự nhận diện đúng dạng map này.
-    final itineraryPlan = data['itineraryPlan'] as List? ?? const [];
-
+    // itineraryPlan trả về dạng [{dayIndex, placeIds, schedule, warnings}, ...] — lưu nguyên
+    // dạng gốc, khớp đúng format webapp cũng đang lưu vào cùng collection `chat_history` (2
+    // client dùng chung 1 backend/schema). `ChatMessage.fromDoc` khi đọc lại tự nhận diện đúng.
     await messagesRef.add({
       'role': 'assistant',
       'content': reply,

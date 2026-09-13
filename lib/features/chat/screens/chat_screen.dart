@@ -22,6 +22,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _inputController = TextEditingController();
   final _scrollController = ScrollController();
+  String? _streamingText;
 
   @override
   void dispose() {
@@ -53,9 +54,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     _scrollToBottom();
 
     try {
-      await ref
-          .read(chatRepositoryProvider)
-          .sendMessage(text: text, priorMessages: priorMessages);
+      await ref.read(chatRepositoryProvider).sendMessage(
+            text: text,
+            priorMessages: priorMessages,
+            onTextDelta: (textSoFar) {
+              if (!mounted) return;
+              setState(() => _streamingText = textSoFar);
+              _scrollToBottom();
+            },
+          );
     } on StateError catch (e) {
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
@@ -78,6 +85,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     } finally {
       if (mounted) {
         ref.read(isChatWaitingForReplyProvider.notifier).state = false;
+        setState(() => _streamingText = null);
       }
       _scrollToBottom();
     }
@@ -116,7 +124,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     itemCount: messages.length + (isWaiting ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index >= messages.length) {
-                        return const _TypingIndicator();
+                        return _streamingText != null && _streamingText!.isNotEmpty
+                            ? _StreamingBubble(text: _streamingText!)
+                            : const _TypingIndicator();
                       }
                       return FadeSlideIn(
                           child: ChatMessageBubble(message: messages[index]));
@@ -174,6 +184,31 @@ class _WelcomeState extends StatelessWidget {
       illustrationAsset: 'assets/illustrations/empty_chat.svg',
       title: l10n.appTitle,
       message: l10n.chatWelcomeMessage,
+    );
+  }
+}
+
+/// Bong bóng tạm hiện chữ AI đang gõ dần (chưa ghi Firestore — chỉ ghi 1 lần khi stream xong).
+class _StreamingBubble extends StatelessWidget {
+  const _StreamingBubble({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.78),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+        decoration: BoxDecoration(
+          color: context.colors.surface,
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          border: Border.all(color: context.colors.textSecondary.withOpacity(0.15)),
+        ),
+        child: Text(text, style: Theme.of(context).textTheme.bodyLarge),
+      ),
     );
   }
 }
