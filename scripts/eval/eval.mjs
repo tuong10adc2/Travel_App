@@ -66,15 +66,43 @@ async function getIdToken() {
   return data.idToken;
 }
 
+// /api/chat trả về SSE (Server-Sent Events) từ khi thêm streaming, không còn là JSON thuần —
+// phải đọc từng dòng "data: {...}" và gộp lại giống cách webapp/Flutter đang làm, thay vì
+// gọi thẳng res.json() (sẽ ném SyntaxError vì body không phải 1 JSON object duy nhất).
 async function callChat(idToken, message, history = []) {
   const res = await fetch(`${CHAT_API_BASE_URL}/api/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
     body: JSON.stringify({ message, history }),
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(`/api/chat trả lỗi ${res.status}: ${JSON.stringify(data)}`);
-  return data;
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(`/api/chat trả lỗi ${res.status}: ${JSON.stringify(data)}`);
+  }
+
+  let buffer = "";
+  let result = null;
+  let streamError = null;
+  for await (const chunk of res.body) {
+    buffer += Buffer.from(chunk).toString("utf-8");
+    let sepIndex;
+    while ((sepIndex = buffer.indexOf("\n\n")) !== -1) {
+      const frame = buffer.slice(0, sepIndex);
+      buffer = buffer.slice(sepIndex + 2);
+      const line = frame.split("\n").find((l) => l.startsWith("data: "));
+      if (!line) continue;
+      const event = JSON.parse(line.slice("data: ".length));
+      if (event.type === "done") {
+        result = event;
+      } else if (event.type === "error") {
+        streamError = event.error;
+      }
+    }
+  }
+  if (streamError) throw new Error(`/api/chat trả lỗi stream: ${streamError}`);
+  if (!result) throw new Error("/api/chat kết thúc stream mà không có event 'done'");
+  return result;
 }
 
 async function loadPlacesById() {

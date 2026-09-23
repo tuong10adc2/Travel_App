@@ -92,6 +92,13 @@ class _PlaceDetailContentState extends ConsumerState<_PlaceDetailContent> {
     final myReview = ref.watch(myReviewForTargetProvider(target));
     final l10n = AppLocalizations.of(context)!;
 
+    // Ở locale `en`: dùng bản dịch (description/highlights/foodToTry) nếu đã tải xong, fallback
+    // về dữ liệu gốc tiếng Việt trong lúc chờ dịch lần đầu (những lượt sau đọc cache nên nhanh).
+    final translation = ref.watch(placeTranslationProvider(place.id)).valueOrNull;
+    final description = translation?.description.isNotEmpty == true ? translation!.description : place.description;
+    final highlights = translation != null && translation.highlights.isNotEmpty ? translation.highlights : place.highlights;
+    final foodToTry = translation != null && translation.foodToTry.isNotEmpty ? translation.foodToTry : place.foodToTry;
+
     return CustomScrollView(
       controller: _scrollController,
       slivers: [
@@ -164,21 +171,21 @@ class _PlaceDetailContentState extends ConsumerState<_PlaceDetailContent> {
                 Text(l10n.introductionHeading,
                     style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.xs),
-                Text(place.description,
+                Text(description,
                     style: Theme.of(context).textTheme.bodyLarge),
-                if (place.highlights.isNotEmpty) ...[
+                if (highlights.isNotEmpty) ...[
                   const SizedBox(height: AppSpacing.lg),
                   Text(l10n.highlightsHeading,
                       style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: AppSpacing.xs),
-                  _BulletList(items: place.highlights),
+                  _BulletList(items: highlights),
                 ],
-                if (place.foodToTry.isNotEmpty) ...[
+                if (foodToTry.isNotEmpty) ...[
                   const SizedBox(height: AppSpacing.lg),
                   Text(l10n.foodToTryHeading,
                       style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: AppSpacing.xs),
-                  _BulletList(items: place.foodToTry),
+                  _BulletList(items: foodToTry),
                 ],
                 const SizedBox(height: AppSpacing.lg),
                 const Divider(),

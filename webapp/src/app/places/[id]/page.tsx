@@ -22,12 +22,21 @@ import { Button } from "@/components/ui/button";
 import { SaveToggleButton } from "@/components/save-toggle-button";
 import { AddToItineraryButton } from "@/components/add-to-itinerary-button";
 import { ReviewSection } from "@/components/reviews/review-section";
-import { useTranslations } from "@/contexts/language-context";
+import { useTranslations, useLanguage } from "@/contexts/language-context";
+import { useAuth } from "@/contexts/auth-context";
 import type { Place } from "@/lib/types";
+
+interface PlaceTranslation {
+  description: string;
+  highlights: string[];
+  foodToTry: string[];
+}
 
 export default function PlaceDetailPage() {
   const params = useParams<{ id: string }>();
   const t = useTranslations();
+  const { language } = useLanguage();
+  const { user } = useAuth();
 
   function formatVnd(n: number) {
     return n > 0 ? n.toLocaleString("vi-VN") + " đ" : t("placeDetail.free");
@@ -37,6 +46,7 @@ export default function PlaceDetailPage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
+  const [translation, setTranslation] = useState<PlaceTranslation | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -55,6 +65,41 @@ export default function PlaceDetailPage() {
       cancelled = true;
     };
   }, [params.id]);
+
+  // Chế độ tiếng Anh chỉ dịch được UI tĩnh (messages/en.json) và tag cố định — description/
+  // highlights/foodToTry là nội dung tự do nhập trong Firestore nên phải gọi riêng
+  // /api/translate-place (dịch bằng Claude, cache lại trong chính doc places/{id}). Reset về
+  // null khi đổi ngôn ngữ/đổi trang để không hiện nhầm bản dịch của địa điểm trước.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- đồng bộ theo khoá (language, place) đổi, giống cách language-context.tsx làm.
+    setTranslation(null);
+    if (language !== "en" || !place) return;
+    let cancelled = false;
+    // Không bắt buộc đăng nhập mới gọi — trang này xem công khai được, và server đã tự cho đọc
+    // bản dịch cache mà không cần token (chỉ dịch MỚI mới cần). Có đăng nhập thì gửi kèm token để
+    // lỡ chưa ai dịch trước, chính người này có thể kích hoạt dịch mới.
+    Promise.resolve(user?.getIdToken())
+      .then((idToken) =>
+        fetch("/api/translate-place", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+          },
+          body: JSON.stringify({ placeId: place.id }),
+        })
+      )
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled && data && !data.error) setTranslation(data as PlaceTranslation);
+      })
+      .catch(() => {
+        // Lỗi dịch không chặn trang — người dùng vẫn thấy nội dung tiếng Việt gốc.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [language, user, place]);
 
   if (loading) {
     return (
@@ -75,8 +120,13 @@ export default function PlaceDetailPage() {
     );
   }
 
-  const gallery = [place.coverImage, ...(place.images ?? [])].filter(Boolean);
+  // dedupe: `images` từ import cũ thường đã chứa sẵn coverImage làm phần tử đầu, nếu ghép thẳng
+  // [coverImage, ...images] sẽ hiện 2 ảnh giống hệt nhau trong gallery.
+  const gallery = Array.from(new Set([place.coverImage, ...(place.images ?? [])])).filter(Boolean);
   const hours = formatOpeningHours(place.openingHours);
+  const description = translation?.description || place.description;
+  const highlights = translation?.highlights?.length ? translation.highlights : place.highlights;
+  const foodToTry = translation?.foodToTry?.length ? translation.foodToTry : place.foodToTry;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
@@ -146,15 +196,15 @@ export default function PlaceDetailPage() {
               </span>
             </div>
 
-            <p className="mt-6 whitespace-pre-line leading-relaxed text-foreground">{place.description}</p>
+            <p className="mt-6 whitespace-pre-line leading-relaxed text-foreground">{description}</p>
 
-            {place.highlights && place.highlights.length > 0 && (
+            {highlights && highlights.length > 0 && (
               <div className="mt-6 rounded-2xl border border-border bg-surface p-5">
                 <h3 className="mb-3 flex items-center gap-2 font-semibold text-foreground">
                   <Sparkles className="h-4 w-4" /> {t("placeDetail.highlightsHeading")}
                 </h3>
                 <ul className="space-y-1.5 text-sm text-foreground">
-                  {place.highlights.map((item, i) => (
+                  {highlights.map((item, i) => (
                     <li key={i} className="flex gap-2">
                       <span className="text-brand-600">•</span> {item}
                     </li>
@@ -163,13 +213,13 @@ export default function PlaceDetailPage() {
               </div>
             )}
 
-            {place.foodToTry && place.foodToTry.length > 0 && (
+            {foodToTry && foodToTry.length > 0 && (
               <div className="mt-6 rounded-2xl border border-border bg-surface p-5">
                 <h3 className="mb-3 flex items-center gap-2 font-semibold text-foreground">
                   <Utensils className="h-4 w-4" /> {t("placeDetail.foodToTryHeading")}
                 </h3>
                 <ul className="space-y-1.5 text-sm text-foreground">
-                  {place.foodToTry.map((item, i) => (
+                  {foodToTry.map((item, i) => (
                     <li key={i} className="flex gap-2">
                       <span className="text-brand-600">•</span> {item}
                     </li>

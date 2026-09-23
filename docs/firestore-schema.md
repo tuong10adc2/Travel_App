@@ -43,6 +43,7 @@ Sub-collection: `users/{uid}/chat_history/{sessionId}` (xem bên dưới).
 | isActive | bool | admin duyệt/ẩn |
 | highlights | array\<string\> | đặc điểm nổi bật, mỗi phần tử 1 dòng hiển thị |
 | foodToTry | array\<string\> | món ăn nên thử, mỗi phần tử 1 dòng hiển thị |
+| translations.en | map? | `{ description, highlights, foodToTry, translatedAt }` — bản dịch tiếng Anh, sinh + cache tự động bởi `/api/translate-place` (Claude) khi 1 người dùng nào đó xem địa điểm ở chế độ `en` lần đầu, không nhập tay |
 | createdBy | string (uid) | |
 | createdAt / updatedAt | timestamp | |
 
