@@ -6,6 +6,7 @@ import '../../../l10n/app_localizations.dart';
 import '../data/auth_exception.dart';
 import '../data/auth_repository.dart';
 import '../widgets/auth_background.dart';
+import '../widgets/google_sign_in_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -46,8 +47,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.94),
+                color: Colors.white.withOpacity(0.96),
                 borderRadius: BorderRadius.circular(AppRadius.lg),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.25),
+                    blurRadius: 24,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -59,26 +67,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Text(
                     l10n.login,
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineSmall,
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall
+                        ?.copyWith(color: const Color(0xFF1C1C1E)),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
                     l10n.loginSubtitle,
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(color: const Color(0xFF5C5C60)),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  ElevatedButton.icon(
-                    onPressed: _isLoading ? null : _submitGoogle,
-                    icon: _isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: Colors.white),
-                          )
-                        : const Icon(Icons.g_mobiledata),
-                    label: Text(l10n.loginWithGoogle),
+                  GoogleSignInButton(
+                    label: l10n.loginWithGoogle,
+                    isLoading: _isLoading,
+                    onPressed: _submitGoogle,
                   ),
                 ],
               ),

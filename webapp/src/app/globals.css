@@ -172,3 +172,61 @@ body {
 ::selection {
   background: var(--brand-200);
 }
+
+/* Nút "Đăng nhập với Google" theo phong cách nút chính thức của Google: nền trắng,
+   viền xám mảnh, logo G 4 màu, chữ Roboto medium. Ở chế độ tối dùng bản nền tối
+   (#131314) đúng như hướng dẫn thương hiệu của Google. */
+.google-btn {
+  display: flex;
+  width: 100%;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #3c4043;
+  font-family: Roboto, "Google Sans", Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: background-color 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+.google-btn:hover:not(:disabled) {
+  background: #f8f9fa;
+  border-color: #d2e3fc;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+.google-btn:active:not(:disabled) {
+  background: #eef3fd;
+}
+.google-btn:focus-visible {
+  outline: 2px solid #4285f4;
+  outline-offset: 2px;
+}
+.google-btn:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .google-btn {
+    background: #131314;
+    border-color: #8e918f;
+    color: #e3e3e3;
+  }
+  :root:not([data-theme="light"]) .google-btn:hover:not(:disabled) {
+    background: #1f1f20;
+    border-color: #a8abaa;
+  }
+}
+:root[data-theme="dark"] .google-btn {
+  background: #131314;
+  border-color: #8e918f;
+  color: #e3e3e3;
+}
+:root[data-theme="dark"] .google-btn:hover:not(:disabled) {
+  background: #1f1f20;
+  border-color: #a8abaa;
+}
