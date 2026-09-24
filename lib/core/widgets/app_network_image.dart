@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
 import 'shimmer_box.dart';
 
 /// Ảnh mạng dùng chung: cache + fade-in khi tải xong, shimmer khi đang tải,
@@ -38,11 +39,11 @@ class AppNetworkImage extends StatelessWidget {
           memCacheWidth: cacheWidth,
           fadeInDuration: const Duration(milliseconds: 250),
           placeholder: (context, url) => const ShimmerBox(),
-          errorWidget: (context, url, error) => const ColoredBox(
-            color: Color(0xFFEDEDEA),
+          errorWidget: (context, url, error) => ColoredBox(
+            color: context.colors.shimmerBase,
             child: Center(
               child: Icon(Icons.image_not_supported_outlined,
-                  color: Color(0xFFB5B5B0)),
+                  color: context.colors.textSecondary),
             ),
           ),
         );

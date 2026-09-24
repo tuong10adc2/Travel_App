@@ -141,7 +141,7 @@ class _ItineraryPlanCard extends ConsumerWidget {
                             for (final warning in nonEmptyDays[i].warnings)
                               Text(
                                 '⚠ $warning',
-                                style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.secondary),
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(color: context.colors.warning),
                               ),
                           ],
                         ),

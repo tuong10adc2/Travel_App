@@ -42,6 +42,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     required this.textPrimary,
     required this.textSecondary,
     required this.divider,
+    required this.warning,
     required this.shimmerBase,
     required this.shimmerHighlight,
   });
@@ -51,6 +52,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   final Color textPrimary;
   final Color textSecondary;
   final Color divider;
+  final Color warning;
   final Color shimmerBase;
   final Color shimmerHighlight;
 
@@ -61,20 +63,22 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     background: Color(0xFFF5F1E7),
     surface: Color(0xFFFFFCF5),
     textPrimary: Color(0xFF1C1C1E),
-    textSecondary: Color(0xFF6B6B6F),
-    divider: Color(0xFFE9E2D0),
+    textSecondary: Color(0xFF5C5C60),
+    divider: Color(0xFFDDD4BF),
+    warning: Color(0xFF8A5A00),
     shimmerBase: Color(0xFFEDE6D6),
     shimmerHighlight: Color(0xFFF9F5EA),
   );
 
   static const dark = AppSemanticColors(
-    background: Color(0xFF0F1312),
-    surface: Color(0xFF171B1A),
+    background: Color(0xFF1C2624),
+    surface: Color(0xFF2A3832),
     textPrimary: Color(0xFFEEF1EF),
-    textSecondary: Color(0xFF93A19C),
-    divider: Color(0xFF2A302D),
-    shimmerBase: Color(0xFF232A27),
-    shimmerHighlight: Color(0xFF2D3532),
+    textSecondary: Color(0xFFA9B7B1),
+    divider: Color(0xFF4A5D54),
+    warning: Color(0xFFF0A83C),
+    shimmerBase: Color(0xFF33423C),
+    shimmerHighlight: Color(0xFF3F5049),
   );
 
   @override
@@ -84,6 +88,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     Color? textPrimary,
     Color? textSecondary,
     Color? divider,
+    Color? warning,
     Color? shimmerBase,
     Color? shimmerHighlight,
   }) {
@@ -93,6 +98,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       textPrimary: textPrimary ?? this.textPrimary,
       textSecondary: textSecondary ?? this.textSecondary,
       divider: divider ?? this.divider,
+      warning: warning ?? this.warning,
       shimmerBase: shimmerBase ?? this.shimmerBase,
       shimmerHighlight: shimmerHighlight ?? this.shimmerHighlight,
     );
@@ -107,6 +113,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
       textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
       divider: Color.lerp(divider, other.divider, t)!,
+      warning: Color.lerp(warning, other.warning, t)!,
       shimmerBase: Color.lerp(shimmerBase, other.shimmerBase, t)!,
       shimmerHighlight:
           Color.lerp(shimmerHighlight, other.shimmerHighlight, t)!,
@@ -274,12 +281,12 @@ class AppTheme {
         primary: AppColors.primary,
       );
 
-  // Sáng brand-600 lên một chút cho nền tối (giống bản web) — #0E7C66 nguyên
-  // bản hơi trầm khi đặt cạnh nền gần đen, độ tương phản với chữ trắng cũng
-  // sát ngưỡng AA hơn mức cần.
+  // Nền tối dùng primary sáng hơn 1 chút so với #0E7C66 cho khỏi "chìm", nhưng
+  // không được sáng quá: chữ trắng trên nút phải đạt tương phản ≥ 4.5 (AA) —
+  // #14916F chỉ đạt ~4.0, #0F8468 đạt ~4.65.
   static ThemeData get dark => _build(
         brightness: Brightness.dark,
         colors: AppSemanticColors.dark,
-        primary: const Color(0xFF14916F),
+        primary: const Color(0xFF0F8468),
       );
 }
