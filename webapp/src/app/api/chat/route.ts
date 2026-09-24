@@ -255,6 +255,7 @@ export async function POST(request: Request) {
           let reply = "";
           const suggestedPlaceIds: string[] = [];
           let itineraryPlan: DayPlan[] | null = null;
+          const usage = { inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, cacheCreationTokens: 0 };
 
           for (let turn = 0; turn < MAX_TOOL_ROUND_TRIPS; turn++) {
             const messageStream = client.messages.stream({
@@ -273,6 +274,10 @@ export async function POST(request: Request) {
             });
 
             const response = await messageStream.finalMessage();
+            usage.inputTokens += response.usage.input_tokens ?? 0;
+            usage.outputTokens += response.usage.output_tokens ?? 0;
+            usage.cacheReadTokens += response.usage.cache_read_input_tokens ?? 0;
+            usage.cacheCreationTokens += response.usage.cache_creation_input_tokens ?? 0;
 
             if (response.stop_reason === "refusal") {
               send({ type: "error", error: "Trợ lý không thể trả lời yêu cầu này." });
@@ -322,7 +327,7 @@ export async function POST(request: Request) {
             conversation.push({ role: "user", content: toolResultBlocks });
           }
 
-          send({ type: "done", reply: reply.trim(), suggestedPlaceIds, itineraryPlan });
+          send({ type: "done", reply: reply.trim(), suggestedPlaceIds, itineraryPlan, usage });
         } catch (error) {
           console.error("api/chat: loi khi goi Claude API (stream)", error);
           send({ type: "error", error: "Đã có lỗi khi gọi trợ lý AI. Vui lòng thử lại." });
