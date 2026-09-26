@@ -1,9 +1,8 @@
-import { adminMessaging, verifyRequestAuth, UnauthorizedError } from "@/lib/firebase-admin";
+import { adminDb, adminMessaging, verifyRequestAuth, UnauthorizedError } from "@/lib/firebase-admin";
 
 // Port từ functions/src/index.ts (notifyNewPlace) — bản gốc là Firestore trigger
 // (onDocumentWritten trên places/{placeId}), Vercel không có trigger kiểu này nên đổi sang
-// gọi trực tiếp từ code Admin dashboard ngay sau khi bật isActive: true (chỉ admin mới bấm
-// được nút này nên không lo bị gọi sai/lạm dụng).
+// gọi trực tiếp từ code Admin dashboard ngay sau khi bật isActive: true; server kiểm tra role.
 
 export const maxDuration = 30;
 
@@ -24,13 +23,22 @@ export async function OPTIONS() {
 }
 
 export async function POST(request: Request) {
+  let uid: string;
   try {
-    await verifyRequestAuth(request);
+    uid = await verifyRequestAuth(request);
   } catch (error) {
     if (error instanceof UnauthorizedError) {
       return jsonWithCors({ error: "Unauthorized" }, { status: 401 });
     }
     throw error;
+  }
+
+  // Chỉ admin/content_editor mới được gửi thông báo tới toàn bộ người dùng — trước đây chỉ cần
+  // "đã đăng nhập" nên user thường cũng gọi được (leo thang đặc quyền). Khớp rule Firestore
+  // isContentEditor().
+  const role = (await adminDb.collection("users").doc(uid).get()).data()?.role;
+  if (role !== "admin" && role !== "content_editor") {
+    return jsonWithCors({ error: "Forbidden" }, { status: 403 });
   }
 
   const body = (await request.json().catch(() => null)) as { placeId?: string; placeName?: string } | null;

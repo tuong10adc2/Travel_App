@@ -9,7 +9,8 @@ export const maxDuration = 60;
 
 function isAuthorized(request: Request): boolean {
   const secret = process.env.CRON_SECRET;
-  if (!secret) return true;
+  // Fail-closed: thiếu CRON_SECRET thì từ chối tất cả (trước đây cho qua → ai cũng kích hoạt được cron).
+  if (!secret) return false;
   const header = request.headers.get("authorization");
   return header === `Bearer ${secret}`;
 }

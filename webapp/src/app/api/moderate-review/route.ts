@@ -26,7 +26,8 @@ const FLAG_REVIEW_TOOL: Anthropic.Tool = {
 
 function isAuthorized(request: Request): boolean {
   const secret = process.env.CRON_SECRET;
-  if (!secret) return true; // chưa cấu hình secret thì cho qua (chỉ nên xảy ra lúc mới setup)
+  // Fail-closed: thiếu CRON_SECRET thì từ chối tất cả (trước đây cho qua → ai cũng kích hoạt được cron).
+  if (!secret) return false;
   const header = request.headers.get("authorization");
   return header === `Bearer ${secret}`;
 }
