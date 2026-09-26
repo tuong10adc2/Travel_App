@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/profile/providers/locale_provider.dart';
+import 'features/profile/providers/theme_mode_provider.dart';
 import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
 
@@ -37,7 +38,7 @@ class MyApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
+      themeMode: ref.watch(themeModeProvider),
       locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

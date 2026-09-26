@@ -215,5 +215,9 @@
 
   "languageSectionTitle": "Ngôn ngữ",
   "languageVietnamese": "Tiếng Việt",
-  "languageEnglish": "English"
+  "languageEnglish": "English",
+  "themeSectionTitle": "Giao diện",
+  "themeSystem": "Theo hệ thống",
+  "themeLight": "Sáng",
+  "themeDark": "Tối"
 }

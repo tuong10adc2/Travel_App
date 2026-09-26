@@ -140,5 +140,9 @@
 
   "languageSectionTitle": "Language",
   "languageVietnamese": "Tiếng Việt",
-  "languageEnglish": "English"
+  "languageEnglish": "English",
+  "themeSectionTitle": "Appearance",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark"
 }

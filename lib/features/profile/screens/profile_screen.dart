@@ -15,6 +15,7 @@ import '../../auth/data/auth_repository.dart';
 import '../../itinerary/providers/itinerary_providers.dart';
 import '../../saved/providers/saved_providers.dart';
 import '../providers/profile_providers.dart';
+import '../providers/theme_mode_provider.dart';
 
 // Domain webapp (Vercel) — bản desktop đầy đủ, dùng cho nút chuyển đổi
 // desktop/app chỉ hiện khi chạy Flutter Web (kIsWeb).
@@ -334,6 +335,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   currentLanguage: currentLanguage,
                   onSelect: (language) => _setLanguage(data, language),
                 ),
+                const SizedBox(height: AppSpacing.md),
+                const _ThemeCard(),
                 if (kIsWeb) ...[
                   const SizedBox(height: AppSpacing.lg),
                   OutlinedButton.icon(
@@ -411,6 +414,55 @@ class _LanguageCard extends StatelessWidget {
                         currentLanguage == 'en' ? FontWeight.w600 : null,
                   ),
                 ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Chọn giao diện Sáng / Tối / Theo hệ thống — áp dụng ngay, không cần đăng nhập lại.
+class _ThemeCard extends ConsumerWidget {
+  const _ThemeCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final current = ref.watch(themeModeProvider);
+    Widget chip(ThemeMode mode, IconData icon, String label) {
+      final selected = current == mode;
+      return FilterChip(
+        avatar: Icon(icon,
+            size: 18, color: selected ? AppColors.primary : context.colors.textSecondary),
+        label: Text(label),
+        selected: selected,
+        showCheckmark: false,
+        onSelected: (_) => ref.read(themeModeProvider.notifier).setMode(mode),
+        selectedColor: AppColors.primary.withOpacity(0.16),
+        labelStyle: TextStyle(
+          color: selected ? AppColors.primary : null,
+          fontWeight: selected ? FontWeight.w600 : null,
+        ),
+      );
+    }
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l10n.themeSectionTitle, style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: AppSpacing.sm),
+            Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: [
+                chip(ThemeMode.system, Icons.brightness_auto, l10n.themeSystem),
+                chip(ThemeMode.light, Icons.light_mode_outlined, l10n.themeLight),
+                chip(ThemeMode.dark, Icons.dark_mode_outlined, l10n.themeDark),
               ],
             ),
           ],

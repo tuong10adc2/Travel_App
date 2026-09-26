@@ -838,6 +838,30 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'English'**
   String get languageEnglish;
+
+  /// No description provided for @themeSectionTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giao diện'**
+  String get themeSectionTitle;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In vi, this message translates to:
+  /// **'Theo hệ thống'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sáng'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tối'**
+  String get themeDark;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -427,4 +427,16 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get languageEnglish => 'English';
+
+  @override
+  String get themeSectionTitle => 'Giao diện';
+
+  @override
+  String get themeSystem => 'Theo hệ thống';
+
+  @override
+  String get themeLight => 'Sáng';
+
+  @override
+  String get themeDark => 'Tối';
 }
