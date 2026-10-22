@@ -118,7 +118,7 @@
     "defaultPlanName": "Lịch trình gợi ý từ AI",
     "toastCreated": "Đã tạo lịch trình từ gợi ý AI.",
     "toastCreateFailed": "Không thể tạo lịch trình.",
-    "toastUnavailable": "Trợ lý AI hiện chưa khả dụng (backend chưa được triển khai). Vui lòng thử lại sau.",
+    "toastUnavailable": "Trợ lý AI tạm thời chưa phản hồi được. Vui lòng thử lại sau.",
     "toastSendFailed": "Không thể gửi tin nhắn, vui lòng thử lại."
   },
   "itineraries": {

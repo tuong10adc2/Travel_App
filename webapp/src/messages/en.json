@@ -118,7 +118,7 @@
     "defaultPlanName": "AI-suggested itinerary",
     "toastCreated": "Itinerary created from AI suggestion.",
     "toastCreateFailed": "Could not create itinerary.",
-    "toastUnavailable": "The AI assistant is currently unavailable (backend not deployed). Please try again later.",
+    "toastUnavailable": "The AI assistant could not respond right now. Please try again later.",
     "toastSendFailed": "Could not send message, please try again."
   },
   "itineraries": {

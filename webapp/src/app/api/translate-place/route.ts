@@ -55,8 +55,15 @@ export async function POST(request: Request) {
     return jsonWithCors({ error: "Thiếu placeId." }, { status: 400 });
   }
 
-  const ref = adminDb.collection("places").doc(placeId);
-  const snap = await ref.get();
+  let ref;
+  let snap;
+  try {
+    ref = adminDb.collection("places").doc(placeId);
+    snap = await ref.get();
+  } catch (error) {
+    console.error("api/translate-place: loi khi doc dia diem", error);
+    return jsonWithCors({ error: "Đã có lỗi khi đọc địa điểm." }, { status: 500 });
+  }
   if (!snap.exists) {
     return jsonWithCors({ error: "Không tìm thấy địa điểm." }, { status: 404 });
   }

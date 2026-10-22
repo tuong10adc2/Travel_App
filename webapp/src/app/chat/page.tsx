@@ -209,8 +209,10 @@ function ChatInner() {
         itineraryPlan,
         createdAt: serverTimestamp(),
       });
-    } catch {
-      toast.error(t("chat.toastUnavailable"));
+    } catch (error) {
+      console.error("chat: loi khi gui tin nhan", error);
+      const serverMessage = error instanceof Error && error.message !== "chat_failed" ? error.message : null;
+      toast.error(serverMessage ?? t("chat.toastUnavailable"));
     } finally {
       setStreamingText(null);
       setSending(false);

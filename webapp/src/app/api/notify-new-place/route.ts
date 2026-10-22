@@ -36,7 +36,13 @@ export async function POST(request: Request) {
   // Chỉ admin/content_editor mới được gửi thông báo tới toàn bộ người dùng — trước đây chỉ cần
   // "đã đăng nhập" nên user thường cũng gọi được (leo thang đặc quyền). Khớp rule Firestore
   // isContentEditor().
-  const role = (await adminDb.collection("users").doc(uid).get()).data()?.role;
+  let role: unknown;
+  try {
+    role = (await adminDb.collection("users").doc(uid).get()).data()?.role;
+  } catch (error) {
+    console.error("api/notify-new-place: loi khi doc vai tro", error);
+    return jsonWithCors({ error: "Không kiểm tra được quyền." }, { status: 500 });
+  }
   if (role !== "admin" && role !== "content_editor") {
     return jsonWithCors({ error: "Forbidden" }, { status: 403 });
   }
