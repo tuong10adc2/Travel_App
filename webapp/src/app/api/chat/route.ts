@@ -330,7 +330,10 @@ export async function POST(request: Request) {
           send({ type: "done", reply: reply.trim(), suggestedPlaceIds, itineraryPlan, usage });
         } catch (error) {
           console.error("api/chat: loi khi goi Claude API (stream)", error);
-          send({ type: "error", error: "Đã có lỗi khi gọi trợ lý AI. Vui lòng thử lại." });
+          const status = error instanceof Anthropic.APIError ? error.status : undefined;
+          const errType = error instanceof Anthropic.APIError ? (error.error as { error?: { type?: string } } | undefined)?.error?.type : undefined;
+          const detail = status || errType ? ` (${[status, errType].filter(Boolean).join(" ")})` : "";
+          send({ type: "error", error: `Đã có lỗi khi gọi trợ lý AI${detail}. Vui lòng thử lại.` });
         } finally {
           controller.close();
         }
